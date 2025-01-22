@@ -1,0 +1,205 @@
+/* Google Font Import */
+@import url('https://fonts.googleapis.com/css?family=Montserrat:500&display=swap');
+
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Navbar */
+.navbar {
+    background: #ffffff;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    height: 100px;
+    transition: padding 0.3s ease, height 0.3s ease;
+}
+
+.logo img {
+    height: 80px;
+    transition: height 0.3s ease;
+}
+
+/* Desktop Navigation */
+.nav-links {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.nav-links ul {
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links li {
+    list-style: none;
+}
+
+.nav-links a {
+    padding: 12px 18px;
+    font-size: 25px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    color: #660000;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+}
+
+.nav-links a:hover {
+    background-color: #660000;
+    color: #ffffff;
+    border-color: #660000;
+    transform: scale(1.05);
+}
+
+/* Hamburger Button (Small Devices) */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 24px;
+    gap: 6px;
+    transition: transform 0.3s ease;
+}
+
+.hamburger:hover {
+    transform: scale(1.1);
+}
+
+.hamburger .line {
+    width: 35px;
+    height: 4px;
+    background-color: #660000;
+    border-radius: 2px;
+}
+
+/* Side Menu (Mobile) */
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 300px;
+    height: 100%;
+    background-color: #660000;
+    color: white;
+    transition: right 0.3s ease-in-out;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    padding: 30px 20px;
+    z-index: 1001;
+}
+
+.side-menu.open {
+    right: 0;
+}
+
+.side-menu .close-menu {
+    background: none;
+    border: none;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.side-menu .close-menu:hover {
+    transform: rotate(90deg);
+}
+
+.side-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.side-menu li {
+    margin: 20px 0;
+}
+
+.side-menu a {
+    color: white;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 12px;
+    display: block;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.side-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Responsive Design */
+
+/* Medium Devices (Tablets) */
+@media (max-width: 960px) {
+    .nav-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .logo img {
+        height: 70px;
+    }
+
+    .navbar-container {
+        height: 85px;
+        padding: 0 15px;
+    }
+}
+
+/* Small Devices (Mobile Phones) */
+@media (max-width: 600px) {
+    .logo img {
+        height: 60px;
+    }
+
+    .hamburger .line {
+        width: 30px;
+        height: 3px;
+    }
+
+    .side-menu {
+        width: 250px;
+        padding: 20px;
+    }
+
+    .side-menu a {
+        font-size: 18px;
+    }
+
+    .side-menu li {
+        margin: 15px 0;
+    }
+}
