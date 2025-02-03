@@ -1,11 +1,11 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const userRole = sessionStorage.getItem('userRole');
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem("authToken");
 
-  // Check if the user's role is in the list of allowed roles
-  if (!allowedRoles.includes(userRole)) {
+  // If not authenticated, redirect to login page
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

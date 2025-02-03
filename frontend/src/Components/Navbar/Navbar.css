@@ -1,16 +1,6 @@
 /* Google Font Import */
 @import url('https://fonts.googleapis.com/css?family=Montserrat:500&display=swap');
 
-/* Reset and Global Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Montserrat', sans-serif;
-}
 
 .navbar a {
     text-decoration: none;
@@ -33,12 +23,12 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    height: 100px;
+    height: 80px;
     transition: padding 0.3s ease, height 0.3s ease;
 }
 
 .logo img {
-    height: 80px;
+    height: 60px;
     transition: height 0.3s ease;
 }
 
@@ -60,7 +50,7 @@ body {
 
 .nav-links a {
     padding: 12px 18px;
-    font-size: 25px;
+    font-size: 17px;
     font-weight: bold;
     border: 2px solid transparent;
     color: #660000;

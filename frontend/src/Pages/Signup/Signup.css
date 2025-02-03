@@ -1,0 +1,169 @@
+/* Main container for the signup form */
+.signup {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    color: #4e3b31;
+  }
+  
+  /* Logo Section */
+  .logoSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .logoSection img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .appName {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  
+  /* Title and Subtitle */
+  .title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .subtitle {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: #7d6e64;
+  }
+  
+  /* Form Inputs */
+  .error {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #4e3b31;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn:disabled {
+    background-color: #b0a8a0;
+  }
+  
+  .btn:hover:not(:disabled) {
+    background-color: #6e4a33;
+  }
+  
+  /* Google Button */
+  .googleBtn {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #4285f4;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .googleBtn:hover {
+    background-color: #357ae8;
+  }
+  
+  .googleLogo {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+  
+  /* Link to Log In page */
+  .linkSection {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .linkSection a {
+    color: #4e3b31;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .linkSection a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .signup {
+      padding: 1.5rem;
+      width: 90%;
+    }
+  
+    .title {
+      font-size: 1.3rem;
+    }
+  
+    .btn {
+      padding: 8px 16px;
+    }
+  
+    .googleBtn {
+      padding: 8px 16px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .signup {
+      padding: 1rem;
+      width: 100%;
+    }
+  
+    .logoSection img {
+      width: 30px;
+      height: 30px;
+    }
+  
+    .appName {
+      font-size: 1.5rem;
+    }
+  
+    .title {
+      font-size: 1.2rem;
+    }
+  }
+  
+  .select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .select.invalid {
+    border-color: red;
+  }
+  

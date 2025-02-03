@@ -1,0 +1,43 @@
+.confirm-logout {
+    text-align: center;
+    padding: 50px;
+  }
+  
+  .confirm-logout h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .btn-confirm,
+  .btn-cancel {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .btn-confirm {
+    background-color: #d9534f;
+    color: white;
+  }
+  
+  .btn-cancel {
+    background-color: #5bc0de;
+    color: white;
+  }
+  
+  .btn-confirm:hover {
+    background-color: #c9302c;
+  }
+  
+  .btn-cancel:hover {
+    background-color: #31b0d5;
+  }
+  

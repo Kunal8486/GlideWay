@@ -1,0 +1,58 @@
+/* Input container */
+.control {
+  margin-bottom: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Label for inputs */
+label {
+  font-size: 1rem;
+  color: #4e3b31; /* Dark brown */
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Input field */
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  color: #4e3b31; /* Dark brown */
+  background-color: #f9f4ec; /* Light brownish */
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4e3b31; /* Dark brown */
+  box-shadow: 0 0 3px rgba(78, 59, 49, 0.6);
+}
+
+/* Input when invalid */
+.invalid input {
+  border-color: #e74c3c; /* Red for error */
+}
+
+.invalid label {
+  color: #e74c3c; /* Red for error */
+}
+
+/* Responsive Styles */
+@media (max-width: 480px) {
+  .control {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    font-size: 0.9rem;
+  }
+
+  input {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}

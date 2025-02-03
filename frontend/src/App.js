@@ -1,56 +1,57 @@
 import React from 'react';
-import './App.css'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import Navbar from './Components/Navbar/Navbar';
-import Home from './Pages/Home/Home'; 
+import Footer from './Components/Footer/Footer';
+import Home from './Pages/Home/Home';
+import Login from './Pages/Login/Login';
+import Signup from './Pages/Signup/Signup';
+import Dashboard from './Pages/Dashboard/Rider/RiderDashboard';
+import ConfirmLogout from './Pages/ConfirmLogout/ConfirmLogout';
+import Contact from './Pages/Contact/Contact';
+import About from './Pages/About/About';
+import './App.css';
 
-<Navbar />
-
-
-const BookRide = () => (
-  <div>
-    <h1>Book Your Ride</h1>
-    <Link to="/confirmation">
-      <button>Confirm Booking</button>
-    </Link>
-  </div>
-);
-
-const RideConfirmation = () => (
-  <div>
-    <h1>Your Ride is Confirmed!</h1>
-    <Link to="/">Go Back to Home</Link>
-  </div>
-);
-
-const Profile = () => (
-  <div>
-    <h1>User Profile</h1>
-    <p>Manage your account details here.</p>
-  </div>
-);
-
-const Settings = () => (
-  <div>
-    <h1>App Settings</h1>
-    <p>Update app preferences here.</p>
-  </div>
-);
-
-
-
-// App Component
 const App = () => {
+  const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true'; // Check login state from session storage
+
   return (
     <Router>
       <Navbar />
       <Routes>
+        {/* Public Routes */}
+        <Route
+          path="/login"
+          element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Signup />}
+        />
+        <Route path="/about" element={<About />} />
+        < Route path="/contact" element={<Contact />} />
         <Route path="/" element={<Home />} />
-        <Route path="/book-ride" element={<BookRide />} />
-        <Route path="/confirmation" element={<RideConfirmation />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['user', 'admin']}>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/confirm-logout"
+          element={
+            !isLoggedIn ? <Navigate to="/login" replace /> : <ConfirmLogout />
+          }
+        />
+
+        {/* Catch-all Route for 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </Router>
   );
 };
