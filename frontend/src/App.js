@@ -7,6 +7,7 @@ import Home from './Pages/Home/Home';
 import Login from './Pages/Login/Login';
 import Signup from './Pages/Signup/Signup';
 import Dashboard from './Pages/Dashboard/Rider/RiderDashboard';
+import Driver from './Pages/Dashboard/Driver/DriverDashboard';
 import ConfirmLogout from './Pages/ConfirmLogout/ConfirmLogout';
 import Contact from './Pages/Contact/Contact';
 import About from './Pages/About/About';
@@ -31,7 +32,7 @@ const App = () => {
         <Route path="/about" element={<About />} />
         < Route path="/contact" element={<Contact />} />
         <Route path="/" element={<Home />} />
-
+        <Route path="/driver" element={<Driver />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"
