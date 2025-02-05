@@ -1,0 +1,417 @@
+/* Base Layout */
+.book-ride-container {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    height: 95vh;
+    background-color: #ffffff;
+    position: relative;
+    margin-top: -25px;
+  }
+  
+  /* Form Container */
+  .form-container {
+    background: #ffffff;
+    height: 100vh;
+    padding: 24px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    overflow-y: auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .form-container:hover {
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Location Input Styling */
+  .location-summary {
+    padding: 16px;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .location-summary:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+  }
+  
+  .where-to {
+    font-size: 28px;
+    font-weight: 700;
+    color: #101010;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  
+  .location-inputs {
+    position: relative;
+    padding-left: 24px;
+    margin: 32px 0;
+  }
+  
+  .input-group {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  
+  /* Location Dots and Connector Line */
+  .location-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: absolute;
+    left: -24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+  
+  .location-dot.pickup {
+    background-color: #4460ef;
+  }
+  
+  .location-dot.dropoff {
+    background-color: #276ef1;
+  }
+  
+  .location-inputs::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 20px;
+    bottom: 20px;
+    width: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+  }
+  
+  /* Input Fields */
+  .input-group input {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #1c1c1c;
+    transition: all 0.2s ease;
+  }
+  
+  .input-group input:focus {
+    background: #ffffff;
+    box-shadow: 0 0 0 2px #4460ef33;
+    outline: none;
+  }
+  
+  .input-group input::placeholder {
+    color: #6b7280;
+  }
+  
+  /* Ride Types Section */
+  .ride-options {
+    margin-top: 32px;
+  }
+  
+  .ride-options h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1c1c1c;
+    margin-bottom: 16px;
+  }
+  
+  .ride-types-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .ride-type-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .ride-type-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  .ride-type-item.selected {
+    background: #f5f8ff;
+    border: 2px solid #4460ef;
+  }
+  
+  .ride-icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .ride-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .ride-info h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1c1c1c;
+    margin: 0;
+  }
+  
+  .ride-info p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+  }
+  
+  .ride-eta {
+    color: #059669 !important;
+    font-weight: 500;
+  }
+  
+  .ride-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1c1c1c;
+    align-self: center;
+  }
+  
+  /* Payment Method Section */
+  .payment-method {
+    margin: 24px 0;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+  }
+  
+  .payment-method h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1c1c1c;
+    margin-bottom: 12px;
+  }
+  
+  .payment-method select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 15px;
+    color: #1c1c1c;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .payment-method select:focus {
+    border-color: #4460ef;
+    outline: none;
+  }
+  
+  /* Buttons */
+  .calculate-btn,
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .calculate-btn {
+    background: #f3f4f6;
+    color: #1c1c1c;
+    margin-bottom: 16px;
+  }
+  
+  .calculate-btn:hover:not(:disabled) {
+    background: #e5e7eb;
+  }
+  
+  .submit-btn {
+    background: #4460ef;
+    color: #ffffff;
+  }
+  
+  .submit-btn:hover:not(:disabled) {
+    background: #3b4fd7;
+    transform: translateY(-1px);
+  }
+  
+  .submit-btn:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+  
+  /* Loading Spinner */
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+  }
+  
+  /* Confirmation Screen */
+  .booking-confirmation {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .confirmation-header {
+    margin-bottom: 24px;
+  }
+  
+  .driver-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .driver-avatar {
+    width: 64px;
+    height: 64px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  
+  .driver-details h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1c1c1c;
+    margin: 0 0 8px 0;
+  }
+  
+  .driver-details p {
+    margin: 4px 0;
+    color: #6b7280;
+  }
+  
+  .confirmation-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  
+  .action-btn {
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .action-btn.message {
+    background: #4460ef;
+    color: #ffffff;
+  }
+  
+  .action-btn.message:hover {
+    background: #3b4fd7;
+  }
+  
+  .action-btn.cancel {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .action-btn.cancel:hover {
+    background: #fecaca;
+  }
+  
+  /* Map Container */
+  .map-container {
+    height: 100vh;
+    position: relative;
+  }
+  
+  /* Error Message */
+  .error-message {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* Animations */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .book-ride-container {
+      grid-template-columns: 1fr;
+    }
+  
+    .form-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: auto;
+      max-height: 80vh;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+    }
+  
+    .map-container {
+      height: 100vh;
+      margin-bottom: 80vh;
+    }
+  
+    .ride-types-list {
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+  }
+  
+  /* Touch Device Optimizations */
+  @media (hover: none) {
+    .ride-type-item:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  
+    .submit-btn:hover {
+      transform: none;
+    }
+  }

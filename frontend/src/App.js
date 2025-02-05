@@ -11,6 +11,8 @@ import Driver from './Pages/Dashboard/Driver/DriverDashboard';
 import ConfirmLogout from './Pages/ConfirmLogout/ConfirmLogout';
 import Contact from './Pages/Contact/Contact';
 import About from './Pages/About/About';
+import BecomeDriver from './Pages/BecomeDriver/BecomeDriver';
+import BookARide from './Pages/BookARide/book_a_ride';
 import './App.css';
 
 const App = () => {
@@ -33,6 +35,8 @@ const App = () => {
         < Route path="/contact" element={<Contact />} />
         <Route path="/" element={<Home />} />
         <Route path="/driver" element={<Driver />} />
+        <Route path="/become-driver" element={<BecomeDriver />} />
+        <Route path="/book-a-ride" element={<BookARide />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"
@@ -48,8 +52,6 @@ const App = () => {
             !isLoggedIn ? <Navigate to="/login" replace /> : <ConfirmLogout />
           }
         />
-
-        {/* Catch-all Route for 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />
