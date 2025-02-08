@@ -1,12 +1,14 @@
 import React from "react";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import Card from "../../Components/Card/Card";
 import Button from "../../Components/Buttons/Button";
 import Input from "../../Components/Input/Input";
 import useInput from "../../Components/hooks/use-input";
-import GoogleButton from "react-google-button";
 import "./Signup.css";
 
 const Signup = (props) => {
+  const GOOGLE_CLIENT_ID = "950973384946-h3kdaot9u66156jjm8mo9our9pegl9ue.apps.googleusercontent.com"; // Replace with your Google Client ID
+
   const {
     value: enteredName,
     hasError: nameHasError,
@@ -101,10 +103,36 @@ const Signup = (props) => {
     }
   };
 
+  const handleGoogleSignup = async (credentialResponse) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/riders/google-signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Google Signup Failed");
+      }
+
+      const data = await response.json();
+      console.log("Google Signup Success:", data);
+      alert("Google Signup Successful!");
+    } catch (error) {
+      console.error("Google Signup Error:", error.message);
+      alert(error.message || "An error occurred.");
+    }
+  };
+
   const formIsValid = nameIsValid && emailIsValid && passwordIsValid && dobIsValid && genderIsValid && phoneIsValid;
 
   return (
-    <Card className="signup">
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+
+    <Card className="signupCard">
+
       <h2 className="title">Create Your Account</h2>
       <p className="subtitle">Sign up to get started with Glide Way</p>
 
@@ -197,11 +225,17 @@ const Signup = (props) => {
           <span className="line"></span>
         </div>
 
+        {/* Google Signup Button */}
         <div className="googleSignup">
-          <GoogleButton onClick={() => console.log("Google signup clicked")} />
+          <GoogleLogin
+            onSuccess={handleGoogleSignup}
+            onError={() => alert("Google Login Failed")}
+          />
         </div>
       </form>
     </Card>
+    </GoogleOAuthProvider>
+
   );
 };
 

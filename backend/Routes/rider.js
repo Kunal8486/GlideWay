@@ -1,11 +1,81 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
 require("dotenv").config();
 const Rider = require("../Models/Rider");
 
 const router = express.Router();
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+router.post("/google-signup", async (req, res) => {
+  try {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { name, email, sub } = ticket.getPayload();
+
+    // Check if user exists in DB, if not, create new user
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({ name, email, googleId: sub });
+      await user.save();
+    }
+
+    res.status(200).json({ message: "Google signup successful", user });
+  } catch (error) {
+    res.status(400).json({ error: "Google authentication failed" });
+  }
+});
+// Google Sign-In Route
+router.post("/google-login", async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ message: "Token is required" });
+
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email, name, sub } = ticket.getPayload();
+
+    // Check if the user already exists
+    let rider = await Rider.findOne({ email });
+    
+    if (!rider) {
+      // Create a new Rider if not found
+      rider = new Rider({
+        name,
+        email,
+        password: "", // No password required for Google Sign-In
+        phone_number: "", // Optional, can be added later
+        gender: "other", // Default value, can be updated later
+        dob: "", // Optional, can be added later
+        age: null, // Optional
+        googleId: sub, // Store Google ID
+      });
+
+      await rider.save();
+    }
+
+    // Generate JWT token
+    const authToken = jwt.sign(
+      { riderId: rider._id, email: rider.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({ message: "Login successful", token: authToken });
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    res.status(500).json({ message: "Google login failed" });
+  }
+});
 // Function to calculate age from date of birth
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);

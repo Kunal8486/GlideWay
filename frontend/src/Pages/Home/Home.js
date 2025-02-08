@@ -1,5 +1,5 @@
 import React from 'react';
-import { Car, Smartphone, MapPin, DollarSign, ShieldCheck } from 'lucide-react';
+import { Car, Smartphone, MapPin, DollarSign, ShieldCheck, Users, Briefcase, Clock, UserCheck, Star, PhoneCall } from 'lucide-react';
 import './Home.css';
 
 const HomePage = () => {
@@ -8,14 +8,15 @@ const HomePage = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Your Ride, Anytime, Anywhere</h1>
-          <p>Fast, Safe, and Affordable Rides. Wherever you go, we’ll get you there.</p>
+          <h2>Safe, Reliable, and Affordable Transport at Your Fingertips</h2>
+          <p>With Glide Way, you can book a ride instantly, track your driver in real-time, and travel worry-free with our trusted network of professional drivers.</p>
           <div className="cta-buttons">
-            <button className="cta-button primary">Book a Ride</button>
-            <button className="cta-button secondary">Become a Driver</button>
+            <a href="/book-a-ride" className="cta-button primary">Book a Ride</a>
+            <a href="/become-driver" className="cta-button secondary">Become a Driver</a>
           </div>
         </div>
         <div className="hero-image">
-          <img src="/assets/pngwing.com (2).png" alt="Cityscape" />
+          <img src="/assets/pngwing.com (2).png" alt="Car view" />
         </div>
       </section>
 
@@ -50,80 +51,102 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="how-it-works">
-        <h2>How It Works</h2>
-        <div className="steps">
-          <div className="step">
-            <span className="step-number">1</span>
-            <p>Download the app and sign up.</p>
+      <section className="features">
+        <h2>Ride Options for Every Need</h2>
+        <div className="feature-list">
+          <div className="feature">
+            <Car size={40} />
+            <h3>Standard</h3>
+            <p>Affordable rides for everyday travel.</p>
           </div>
-          <div className="step">
-            <span className="step-number">2</span>
-            <p>Enter your pickup and drop-off location.</p>
+          <div className="feature">
+            <Users size={40} />
+            <h3>Pool</h3>
+            <p>Share rides and save on costs.</p>
           </div>
-          <div className="step">
-            <span className="step-number">3</span>
-            <p>Choose your ride and confirm your booking.</p>
+          <div className="feature">
+            <Briefcase size={40} />
+            <h3>Business</h3>
+            <p>Luxury rides for professionals.</p>
           </div>
-          <div className="step">
-            <span className="step-number">4</span>
-            <p>Sit back, relax, and enjoy the ride!</p>
+          <div className="feature">
+            <Clock size={40} />
+            <h3>Hourly</h3>
+            <p>Rent a car with a driver for multiple stops.</p>
           </div>
         </div>
       </section>
-      <section className="about">
-        <h2>About Glide Way</h2>
-        <p>
-          Glide Way is committed to revolutionizing the way people commute. With a focus on safety, affordability, and convenience, we strive to provide a seamless ride-sharing experience for everyone, everywhere.
-        </p>
-        <button className="cta-button primary">About Us</button>
 
+      <section className="stats">
+        <h2>Your Safety is Our Priority</h2>
+        <div className="stats-grid">
+          <div className="stat">
+            <UserCheck size={40} />
+            <h3>Verified Drivers</h3>
+            <p>All drivers go through a strict background check.</p>
+          </div>
+          <div className="stat">
+            <PhoneCall size={40} />
+            <h3>24/7 Support</h3>
+            <p>Dedicated customer support at any time.</p>
+          </div>
+          <div className="stat">
+            <ShieldCheck size={40} />
+            <h3>Emergency Button</h3>
+            <p>Instant SOS feature for security.</p>
+          </div>
+        </div>
       </section>
+
+      <section className="how-it-works">
+        <h2>How It Works</h2>
+        <div className="steps">
+          <div className="step"><span className="step-number">1</span><p>Download the app and sign up.</p></div>
+          <div className="step"><span className="step-number">2</span><p>Enter your pickup and drop-off location.</p></div>
+          <div className="step"><span className="step-number">3</span><p>Choose your ride and confirm your booking.</p></div>
+          <div className="step"><span className="step-number">4</span><p>Sit back, relax, and enjoy the ride!</p></div>
+        </div>
+      </section>
+
+      <section className="how-it-works">
+        <h2>Drive with Glide Way</h2>
+        <p>Earn money on your schedule. Drive whenever you want and enjoy competitive earnings.</p>
+        <div><br/></div>
+        <div className="steps">
+          <div className="step">
+            <DollarSign size={40} />
+            <h3>Competitive Earnings</h3>
+            <p>Get paid weekly and earn extra through incentives.</p>
+          </div>
+          <div className="step">
+            <Clock size={40} />
+            <h3>Flexible Hours</h3>
+            <p>Drive when and where you want.</p>
+          </div>
+          <div className="step">
+            <Star size={40} />
+            <h3>Incentives & Rewards</h3>
+            <p>Earn bonuses for high ratings and peak-hour driving.</p>
+          </div>
+        </div>
+        </section>
 
       <section className="stats">
         <h2>Our Impact</h2>
         <div className="stats-grid">
-          <div className="stat">
-            <h3>10M+</h3>
-            <p>Rides Completed</p>
-          </div>
-          <div className="stat">
-            <h3>50K+</h3>
-            <p>Drivers Registered</p>
-          </div>
-          <div className="stat">
-            <h3>100+</h3>
-            <p>Cities Covered</p>
-          </div>
-          <div className="stat">
-            <h3>95%</h3>
-            <p>Customer Satisfaction</p>
-          </div>
+          <div className="stat"><h3>10M+</h3><p>Rides Completed</p></div>
+          <div className="stat"><h3>50K+</h3><p>Drivers Registered</p></div>
+          <div className="stat"><h3>100+</h3><p>Cities Covered</p></div>
+          <div className="stat"><h3>95%</h3><p>Customer Satisfaction</p></div>
         </div>
       </section>
-
-      <section className="partner">
-        <h2>Partner with Us</h2>
-        <p>Looking to provide rides for your employees or clients? Collaborate with Glide Way for reliable and affordable corporate solutions.</p>
-        <button className="cta-button primary">Contact Us</button>
-      </section>
-
 
       <section className="testimonials">
         <h2>What Our Users Say</h2>
         <div className="testimonial-list">
-          <div className="testimonial">
-            <p>"The service was amazing. My driver was punctual and courteous!"</p>
-            <span>- Sarah K.</span>
-          </div>
-          <div className="testimonial">
-            <p>"As a driver, I love the flexibility Glide Way offers."</p>
-            <span>- John D.</span>
-          </div>
-          <div className="testimonial">
-            <p>"Glide Way makes commuting so much easier and stress-free!"</p>
-            <span>- Emma R.</span>
-          </div>
+          <div className="testimonial"><p>"The service was amazing. My driver was punctual and courteous!"</p><span>- Sarah K.</span></div>
+          <div className="testimonial"><p>"As a driver, I love the flexibility Glide Way offers."</p><span>- John D.</span></div>
+          <div className="testimonial"><p>"Glide Way makes commuting so much easier and stress-free!"</p><span>- Emma R.</span></div>
         </div>
       </section>
 
@@ -135,6 +158,10 @@ const HomePage = () => {
           <button className="cta-button secondary">Sign Up to Drive</button>
         </div>
       </section>
+
+      <footer className="footer">
+        <p>© 2025 Glide Way. All rights reserved.</p>
+      </footer>
     </div>
   );
 };

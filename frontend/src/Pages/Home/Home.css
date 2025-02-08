@@ -8,7 +8,6 @@
 }
 
 
-
 .homepage {
     padding: 20px;
 }
@@ -296,7 +295,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 30px;
+    gap: 40px;
 }
 
 .stat {
@@ -304,7 +303,7 @@
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 180px;
+    width: 220px;
     text-align: center;
 }
 
@@ -350,6 +349,19 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
+.cta-buttons a {
+    text-decoration: none; /* Removes underline */
+    color: inherit; /* Uses the parent element's color */
+    display: inline-block; /* Makes it behave like a button */
+    padding: 10px 20px; /* Adjust as needed */
+    border-radius: 5px; /* Optional: Makes it look like a button */
+  }
+  
+  .cta-button.secondary{
+    text-decoration: none; /* Removes underline */
+
+  }
 
 .partner .cta-button:hover {
     background-color: #5a3c24;
@@ -401,9 +413,6 @@ section {
         font-size: 0.8rem;
     }
 }
-
-
-
 
 
 /* Global Animations */
@@ -508,7 +517,7 @@ section:nth-child(even) {
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 6px var(--shadow-color);
-    width: 180px;
+    width: 220px;
     text-align: center;
     animation: scaleUp 1s ease-in-out;
 }
@@ -603,3 +612,4 @@ section:nth-child(even) {
         font-size: 0.8rem;
     }
 }
+
