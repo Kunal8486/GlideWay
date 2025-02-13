@@ -1,12 +1,13 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem("authToken");
-
-  // If not authenticated, redirect to login page
-  if (!isAuthenticated) {
+const ProtectedRoute = ({ isLoggedIn, allowedRoles, userRole, children }) => {
+  if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
