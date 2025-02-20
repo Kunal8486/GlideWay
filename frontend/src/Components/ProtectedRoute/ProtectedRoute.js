@@ -1,16 +1,11 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom"
 
-const ProtectedRoute = ({ isLoggedIn, allowedRoles, userRole, children }) => {
-  if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
-  }
+const PrivateRoute = ({ children }) => {
+  const location = useLocation()
+  const token = localStorage.getItem("token")
+  const isAuthenticated = Boolean(token) // Ensures a valid token check
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
-    return <Navigate to="/" replace />;
-  }
+  return isAuthenticated ? children : <Navigate to="/login" state={{ from: location.pathname }} replace />
+}
 
-  return children;
-};
-
-export default ProtectedRoute;
+export default PrivateRoute

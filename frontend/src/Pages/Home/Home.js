@@ -111,7 +111,7 @@ const HomePage = () => {
       <section className="how-it-works">
         <h2>Drive with Glide Way</h2>
         <p>Earn money on your schedule. Drive whenever you want and enjoy competitive earnings.</p>
-        <div><br/></div>
+        <div><br /></div>
         <div className="steps">
           <div className="step">
             <DollarSign size={40} />
@@ -129,7 +129,7 @@ const HomePage = () => {
             <p>Earn bonuses for high ratings and peak-hour driving.</p>
           </div>
         </div>
-        </section>
+      </section>
 
       <section className="stats">
         <h2>Our Impact</h2>
@@ -149,15 +149,16 @@ const HomePage = () => {
           <div className="testimonial"><p>"Glide Way makes commuting so much easier and stress-free!"</p><span>- Emma R.</span></div>
         </div>
       </section>
-
-      <section className="cta">
-        <h2>Ready to Glide?</h2>
-        <p>Download the app today or sign up as a driver to join the Glide Way family.</p>
-        <div className="cta-buttons">
-          <button className="cta-button primary">Download the App</button>
-          <button className="cta-button secondary">Sign Up to Drive</button>
-        </div>
-      </section>
+      <div className="ctacontaner">
+        <section className="cta">
+          <h2>Ready to Glide?</h2>
+          <p>Download the app today or sign up as a driver to join the Glide Way family.</p>
+          <div className="cta-buttons">
+            <button className="cta-button primary">Download the App</button>
+            <button className="cta-button secondary">Sign Up to Drive</button>
+          </div>
+        </section>
+      </div>
 
       <footer className="footer">
         <p>© 2025 Glide Way. All rights reserved.</p>

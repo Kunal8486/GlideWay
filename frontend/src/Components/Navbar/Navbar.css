@@ -41,6 +41,7 @@
 .nav-links ul {
     display: flex;
     gap: 25px;
+    align-items: center;
 }
 
 .nav-links li {
@@ -58,16 +59,33 @@
 }
 
 .nav-links li.active a {
-    background-color: #660000; /* Active background color */
+    background-color: #660000;
     color: #ffffff;
     border-color: #660000;
 }
-
 
 .nav-links a:hover {
     background-color: #660000;
     color: #ffffff;
     border-color: #660000;
+    transform: scale(1.05);
+}
+
+/* Logout Button */
+.logout-button {
+    background-color: #990000;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.logout-button:hover {
+    background-color: #cc0000;
     transform: scale(1.05);
 }
 
@@ -81,8 +99,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 30px; /* Adjust height for better visibility */
-    width: 30px; /* Adjust width to match the SVG */
+    height: 30px;
+    width: 30px;
     transition: transform 0.3s ease;
 }
 
@@ -92,7 +110,7 @@
 }
 
 .hamburger img {
-    width: 100%; /* Ensures SVG scales within the button */
+    width: 100%;
     height: auto;
 }
 
@@ -159,6 +177,26 @@
     transform: scale(1.05);
 }
 
+/* Logout Button in Side Menu */
+.side-menu .logout-button {
+    background-color: white;
+    color: #660000;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.side-menu .logout-button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #660000;
+    transform: scale(1.05);
+}
+
 /* Responsive Design */
 
 /* Medium Devices (Tablets) */
@@ -188,7 +226,7 @@
     }
 
     .hamburger img {
-        width: 30px; /* Adjust size for mobile view */
+        width: 30px;
     }
 
     .side-menu {

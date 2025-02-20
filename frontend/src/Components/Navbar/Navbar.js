@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-// import { useLocation } from 'react-router-dom'; // Import useLocation from React Router
 import './Navbar.css';
 
-const Navbar = () => {
+const Navbar = ({ isLoggedIn, handleLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const closeMenu = () => setIsMenuOpen(false);
 
-    // Conditionally render the "Dashboard" link based on user's sign-in status
+    // Define navigation links dynamically based on authentication status
     const navLinks = [
         { path: '/', label: 'Home' },
         { path: '/about', label: 'About' },
         { path: '/services', label: 'Services' },
         { path: '/contact', label: 'Contact' },
-    ].filter(Boolean); // Filters out any false values, like if isSignedIn is false
+    ];
 
-    // Function to determine if the link is active (matches current location)
-    const isActive = (path) => {
-        // Logic to determine if the link is active (matches current location)
-        return window.location.pathname === path;
-    };
+    if (isLoggedIn) {
+        navLinks.push({ path: '/dashboard', label: 'Dashboard' });
+    } else {
+        navLinks.push({ path: '/login', label: 'Login' });
+    }
+
+    // Determine if a link is active
+    const isActive = (path) => window.location.pathname === path;
+
     return (
         <header className="navbar">
             <div className="navbar-container">
@@ -33,6 +36,13 @@ const Navbar = () => {
                                 <a href={link.path}>{link.label}</a>
                             </li>
                         ))}
+                        {isLoggedIn && (
+                            <li>
+                                <button className="logout-button" onClick={handleLogout}>
+                                    Logout
+                                </button>
+                            </li>
+                        )}
                     </ul>
                 </nav>
                 <button className="hamburger" onClick={toggleMenu}>
@@ -49,6 +59,13 @@ const Navbar = () => {
                             <a href={link.path}>{link.label}</a>
                         </li>
                     ))}
+                    {isLoggedIn && (
+                        <li>
+                            <button className="logout-button" onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </li>
+                    )}
                 </ul>
             </div>
         </header>

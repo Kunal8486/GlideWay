@@ -4,7 +4,7 @@ import "./About.css";
 const AboutPage = () => {
   return (
     <div className="about-container">
-      <h1>About Glide Way</h1>
+      <h1>About Us</h1>
 
       <section className="section mission">
         <h2>Mission Statement</h2>
