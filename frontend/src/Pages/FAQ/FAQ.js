@@ -370,7 +370,7 @@ const FAQPage = () => {
         }
         .faq-question:hover {
       
-          background-color:rgb(255, 233, 176) !important;
+          background-color:#fff8ec !important;
           
         }
         .faq-icon {

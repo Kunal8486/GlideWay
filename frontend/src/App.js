@@ -16,6 +16,8 @@ import BecomeDriver from "./Pages/BecomeDriver/BecomeDriver";
 import FAQ from "./Pages/FAQ/FAQ";
 import BookARide from "./Pages/BookARide/book_a_ride";
 import RiderProfile from "./Pages/Users/Riders/Profile/Profile";
+import ForgetPassword from "./Pages/Users/Riders/ForgetPassword/ForgetPassword";
+import ResetPassword from "./Pages/Users/Riders/ForgetPassword/ResetPassword";
 import "./App.css";
 
 const App = () => {
@@ -60,6 +62,8 @@ const App = () => {
         <Route path="/become-driver" element={<BecomeDriver />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/services" element={<Services />} />
+        <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/book-a-ride" element={<BookARide />} />
         <Route path="/rider-profile" element={<RiderProfile />} />
 

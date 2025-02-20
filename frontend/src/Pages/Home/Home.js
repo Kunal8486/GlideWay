@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Car, Smartphone, MapPin, DollarSign, ShieldCheck, Users, Briefcase, Clock, UserCheck, Star, PhoneCall } from 'lucide-react';
 import './Home.css';
 
+const faqs = [
+  { question: "How does Glide Way work?", answer: "Glide Way is a ride-sharing platform that connects riders with drivers for convenient travel." },
+  { question: "How can I book a ride?", answer: "Simply enter your pickup and drop-off locations, select a ride option, and confirm your booking." },
+  { question: "Is Glide Way available in my city?", answer: "We are expanding rapidly! Check our app to see if we operate in your area." },
+  { question: "What payment methods do you accept?", answer: "We accept credit/debit cards, UPI, and in-app wallet payments." },
+  { question: "Can I schedule a ride in advance?", answer: "Yes! Glide Way allows you to schedule rides up to 7 days in advance." }
+];
+
+
 const HomePage = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+  const navigate = useNavigate();
+
+  const toggleFAQ = (index) => {
+      setOpenIndex(openIndex === index ? null : index);
+  };
+
   return (
     <div className="homepage">
       <section className="hero">
@@ -110,7 +127,6 @@ const HomePage = () => {
 
       <section className="how-it-works">
         <h2>Drive with Glide Way</h2>
-        <p>Earn money on your schedule. Drive whenever you want and enjoy competitive earnings.</p>
         <div><br /></div>
         <div className="steps">
           <div className="step">
@@ -149,6 +165,21 @@ const HomePage = () => {
           <div className="testimonial"><p>"Glide Way makes commuting so much easier and stress-free!"</p><span>- Emma R.</span></div>
         </div>
       </section>
+
+      <div className="faq-section2">
+            <h2>Frequently Asked Questions</h2>
+            <div className="faq-list">
+                {faqs.slice(0, 3).map((faq, index) => (
+                    <div key={index} className="faq-item" onClick={() => toggleFAQ(index)}>
+                        <h3>{faq.question} <span>{openIndex === index ? '▲' : '▼'}</span></h3>
+                        {openIndex === index && <p className="faq-answer">{faq.answer}</p>}
+                    </div>
+                ))}
+            </div>
+            <button className="view-more-button" onClick={() => navigate('/faq')}>View More</button>
+        </div>
+
+
       <div className="ctacontaner">
         <section className="cta">
           <h2>Ready to Glide?</h2>

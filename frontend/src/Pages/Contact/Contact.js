@@ -197,16 +197,16 @@ const ContactPage = () => {
           <div className="social-links">
             <h3>Connect With Us</h3>
             <div className="social-icons">
-              <a href="#" className="social-icon">
+              <a href="https://twitter.com/kunalkumar8486" className="social-icon">
                 <span className="icon">𝕏</span>
               </a>
-              <a href="#" className="social-icon">
+              <a href="https://www.facebook.com/kunalkumar8486" className="social-icon">
                 <span className="icon">ƒ</span>
               </a>
-              <a href="#" className="social-icon">
+              <a href="https://www.linkedin.com/in/kunalkumar8486/" className="social-icon">
                 <span className="icon">in</span>
               </a>
-              <a href="#" className="social-icon">
+              <a href="https://www.instagram.com/kunal_kumar8486" className="social-icon">
                 <span className="icon">ig</span>
               </a>
             </div>
@@ -214,7 +214,7 @@ const ContactPage = () => {
         </div>
         
         <div className="contact-form-section">
-          <div className="form-container">
+          <div className="form-container9">
             <h2>Send Us a Message</h2>
             {submitStatus === 'success' ? (
               <div className="success-message">

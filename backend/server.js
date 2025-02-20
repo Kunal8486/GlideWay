@@ -5,7 +5,8 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
 const { OAuth2Client } = require("google-auth-library")
-const Rider = require("./Models/Rider")
+const Rider = require("./models/Rider.js")
+const authRoutes = require("./Routes/auth") // Import auth.js
 
 dotenv.config()
 const app = express()
@@ -20,6 +21,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }))
 app.use(express.json())
+app.use("/api/auth", authRoutes) // Connect auth routes
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -123,6 +125,9 @@ app.post("/api/auth/google", async (req, res) => {
 app.post("/api/logout", (req, res) => {
   res.json({ message: "Logged out successfully" }) 
 })
+
+
+
 
 // Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
