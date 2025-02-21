@@ -171,7 +171,7 @@ const ContactPage = () => {
               <div className="icon">📍</div>
               <div className="details">
                 <h3>Visit Us</h3>
-                <p>123 GlideWay Avenue<br />Tech District, CA 94103</p>
+                <p>GlideWay Co. Lim.<br />,Bennett Unniversity, Uttar Pradesh BU 822116</p>
               </div>
             </div>
             
@@ -179,8 +179,8 @@ const ContactPage = () => {
               <div className="icon">📞</div>
               <div className="details">
                 <h3>Call Us</h3>
-                <p>+1 (555) 123-4567</p>
-                <p>Mon-Fri: 9AM-6PM PST</p>
+                <p>+91 80926-68486</p>
+                <p>Mon-Fri: 9AM-6PM IST</p>
               </div>
             </div>
             

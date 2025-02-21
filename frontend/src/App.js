@@ -12,7 +12,8 @@ import ConfirmLogout from "./Pages/ConfirmLogout/ConfirmLogout";
 import Services from "./Pages/Services/Services";
 import Contact from "./Pages/Contact/Contact";
 import About from "./Pages/About/About";
-import BecomeDriver from "./Pages/BecomeDriver/BecomeDriver";
+import BecomeDriver from "./Pages/Users/Drivers/Registration/BecomeDriver";
+import DriverLogin from "./Pages/Users/Drivers/Login/DriverLogin";
 import FAQ from "./Pages/FAQ/FAQ";
 import BookARide from "./Pages/BookARide/book_a_ride";
 import RiderProfile from "./Pages/Users/Riders/Profile/Profile";
@@ -66,7 +67,7 @@ const App = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/book-a-ride" element={<BookARide />} />
         <Route path="/rider-profile" element={<RiderProfile />} />
-
+        <Route path="/driver-login" element={<DriverLogin />} />
         {/* Protected Routes */}
         <Route
           path="/dashboard"
