@@ -1,32 +1,105 @@
-div {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-}
-
-h1 {
+/* Services Page Container */
+.services-container {
+    padding: 3rem 2rem;
+    background: #f9f5f0;
+    min-height: 100vh;
     text-align: center;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  /* Page Title */
+  .services-title {
+    font-size: 2.5rem;
     color: #333;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background-color: #f9f9f9;
-    margin: 10px 0;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-    margin: 0 0 10px;
-    color: #007BFF;
-}
-
-p {
-    margin: 0;
-    color: #555;
-}
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  
+  /* Services Grid */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    width: 80%;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* Service Cards */
+  .service-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .service-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .service-card h3 {
+    color: #5a3e2b;
+    font-size: 1.5rem;
+  }
+  
+  .service-card p {
+    color: #444;
+  }
+  
+  /* Hero Box (Call to Action) */
+  .hero-box {
+    background: #d9b99b; /* Lighter Brown */
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 3rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .hero-box h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2b1d0e;
+  }
+  
+  .hero-box p {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  /* Ride Button */
+  .ride-button {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.3s;
+  }
+  
+  .ride-button:hover {
+    background: #0e8f67;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .services-title {
+      font-size: 2rem;
+    }
+  
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .hero-box {
+      padding: 1.5rem;
+    }
+  }
+  

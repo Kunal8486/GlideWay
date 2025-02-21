@@ -59,7 +59,7 @@ const AboutPage = () => {
             </p>
           </div>
           <div className="team-member">
-            <img src="nirupam_kashyam.jpg" alt="Nirupam Kashyam - Tech Innovator" />
+            <img src="/assets/Inovators/Nirupam.jpeg" alt="Nirupam Kashyam - Tech Innovator" />
             <h3>Nirupam Kashyam</h3>
             <p className="role">Tech Innovator & Co-Founder</p>
             <p>
@@ -67,7 +67,7 @@ const AboutPage = () => {
             </p>
           </div>
           <div className="team-member">
-            <img src="satwik_kjs.jpg" alt="K.J.S Satwik - Creative Strategist" />
+            <img src="/assets/Inovators/Satwik.jpg" alt="K.J.S Satwik - Creative Strategist" />
             <h3>K.J.S Satwik</h3>
             <p className="role">Creative Strategist & Co-Founder</p>
             <p>
