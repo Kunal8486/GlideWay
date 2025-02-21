@@ -325,30 +325,3 @@ section {
         align-items: flex-start;
     }
 }
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background-color: #1f2937;
-        --card-background: #111827;
-        --text-color: #f3f4f6;
-        --text-light: #9ca3af;
-        --border-color: #374151;
-    }
-
-    .input,
-    .select {
-        background-color: #374151;
-        color: var(--text-color);
-    }
-
-    .input.error,
-    .select.error {
-        background-color: rgba(220, 38, 38, 0.1);
-    }
-
-    .error-banner {
-        background-color: rgba(220, 38, 38, 0.1);
-        border-color: rgba(220, 38, 38, 0.2);
-    }
-}
