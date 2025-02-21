@@ -1,269 +1,179 @@
 import React, { useState } from 'react';
-import { Camera, Car, Upload, Shield } from 'lucide-react';
+import { Eye, EyeOff, Upload, X } from 'lucide-react';
 import './BecomeDriver.css';
 
 const BecomeDriver = () => {
     const [formData, setFormData] = useState({
-        // Personal Information
         name: '',
         email: '',
         phone_number: '',
         password: '',
         confirm_password: '',
-        profile_picture_url: null,
         gender: '',
         age: '',
-        // Driver Information
         license_number: '',
-        license_photo: null,
-        // Vehicle Information
-        vehicle_details: {
-            make: '',
-            model: '',
-            registration_number: ''
-        },
-        vehicle_insurance_url: null
+        license_expiry: '',
+        vehicle_make: '',
+        vehicle_model: '',
+        vehicle_registration: '',
+        profile_picture: null,
+        license_front: null,
+        license_back: null
     });
 
-    const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState(null);
-    const [previews, setPreviews] = useState({
-        profile: null,
-        license: null,
-        insurance: null
-    });
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+    const [previews, setPreviews] = useState({ profile: null, license_front: null, license_back: null });
 
-    // Form validation function
-    const validateForm = () => {
-        const newErrors = {};
-
-        if (!formData.name.trim()) newErrors.name = 'Name is required';
-        if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = 'Invalid email address';
-        if (!formData.phone_number.match(/^\+?[\d\s-]{10,}$/)) newErrors.phone_number = 'Invalid phone number';
-        if (!formData.password) newErrors.password = 'Password is required';
-        if (formData.password && formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
-        if (formData.password !== formData.confirm_password) newErrors.confirm_password = 'Passwords do not match';
-        if (!formData.gender) newErrors.gender = 'Gender is required';
-        if (!formData.age || formData.age < 18) newErrors.age = 'Must be at least 18 years old';
-        if (!formData.license_number) newErrors.license_number = 'License number is required';
-        if (!formData.license_photo) newErrors.license_photo = 'License photo is required';
-        if (!formData.vehicle_details.make) newErrors['vehicle_details.make'] = 'Vehicle make is required';
-        if (!formData.vehicle_details.model) newErrors['vehicle_details.model'] = 'Vehicle model is required';
-        if (!formData.vehicle_details.registration_number) newErrors['vehicle_details.registration_number'] = 'Registration number is required';
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    // Input change handler
+    // Handle text input changes
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        if (name.includes('vehicle_details.')) {
-            const field = name.split('.')[1];
-            setFormData(prev => ({
-                ...prev,
-                vehicle_details: { ...prev.vehicle_details, [field]: value }
-            }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // File upload handler
-    const handleFileUpload = async (e, field) => {
+    // Handle file uploads
+    const handleFileUpload = (e, field) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        if (file.size > 5 * 1024 * 1024) {
-            setErrors(prev => ({
-                ...prev,
-                [field]: 'File size must be less than 5MB'
-            }));
-            return;
-        }
-
         const previewUrl = URL.createObjectURL(file);
-        setPreviews(prev => ({
-            ...prev,
-            [field]: previewUrl
-        }));
-
-        setFormData(prev => ({
-            ...prev,
-            [field]: file
-        }));
+        setPreviews(prev => ({ ...prev, [field]: previewUrl }));
+        setFormData(prev => ({ ...prev, [field]: file }));
     };
 
-    // Form submission handler
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!validateForm()) {
-            setSubmitStatus({
-                type: 'error',
-                message: 'Please correct the errors in the form'
-            });
+    
+        if (formData.password !== formData.confirm_password) {
+            alert("Passwords do not match!");
             return;
         }
-
-        setIsSubmitting(true);
-        setSubmitStatus(null);
-
+    
+        const formDataObject = new FormData();
+        
+        // Append all text fields properly
+        Object.keys(formData).forEach((key) => {
+            if (formData[key] && key !== "profile_picture" && key !== "license_front" && key !== "license_back") {
+                formDataObject.append(key, formData[key]);
+            }
+        });
+    
+        // Append file fields properly
+        if (formData.profile_picture) {
+            formDataObject.append("profile_picture", formData.profile_picture);
+        }
+        if (formData.license_front) {
+            formDataObject.append("license_front", formData.license_front);
+        }
+        if (formData.license_back) {
+            formDataObject.append("license_back", formData.license_back);
+        }
+    
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            setSubmitStatus({
-                type: 'success',
-                message: 'Application submitted successfully! We will review your details and contact you soon.'
+            const response = await fetch("http://localhost:5000/api/driver/register", {
+                method: "POST",
+                body: formDataObject,
             });
-
+    
+            const data = await response.json();
+            if (response.ok) {
+                alert("Driver registered successfully!");
+            } else {
+                alert("Error: " + data.error);
+            }
         } catch (error) {
-            setSubmitStatus({
-                type: 'error',
-                message: 'Failed to submit application. Please try again.'
-            });
-        } finally {
-            setIsSubmitting(false);
+            console.error("Registration Error:", error);
+            alert("Error registering driver.");
         }
     };
-
-    // Field rendering helper
-    const renderField = (label, name, type = 'text', required = true) => (
-        <div className="field-group">
-            <label htmlFor={name} className={`label ${required ? 'required-label' : ''}`}>
-                {label}
-            </label>
-            <input
-                id={name}
-                name={name}
-                type={type}
-                value={formData[name] || ''}
-                onChange={handleInputChange}
-                className={`input ${errors[name] ? 'error' : ''}`}
-            />
-            {errors[name] && (
-                <p className="error-text">{errors[name]}</p>
-            )}
-        </div>
-    );
-
-    // File upload field rendering helper
-    const renderFileUpload = (label, name, Icon) => (
-        <div className="field-group">
-            <label className="label required-label">{label}</label>
-            <div className="file-upload">
-                <button
-                    type="button"
-                    className="upload-button"
-                    onClick={() => document.getElementById(name).click()}
-                >
-                    <Icon className="icon" />
-                    {formData[name] ? `${label} Uploaded` : `Upload ${label}`}
-                </button>
-                <input
-                    id={name}
-                    type="file"
-                    className="file-input"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e, name)}
-                />
-                {previews[name] && (
-                    <div className="upload-preview">
-                        <img src={previews[name]} alt={label} className="preview-image" />
-                    </div>
-                )}
-                {errors[name] && (
-                    <p className="error-text">{errors[name]}</p>
-                )}
-            </div>
-        </div>
-    );
-
+       
     return (
         <div className="driver-application">
             <div className="card">
                 <div className="card-header">
                     <h2 className="card-title">Become a Driver</h2>
-                    <p className="card-description">
-                        Join our community of professional drivers and start earning with GlideWay
-                    </p>
                 </div>
 
                 <div className="card-content">
                     <form onSubmit={handleSubmit}>
-                        {/* Personal Information */}
-                        <div className="form-section">
-                            <h3 className="section-header">Personal Information</h3>
-                            {renderField('Full Name', 'name')}
-                            {renderField('Email Address', 'email', 'email')}
-                            {renderField('Phone Number', 'phone_number', 'tel')}
+                        <h3 className="section-header">Personal Information</h3>
 
-                            <div className="field-row">
-                                {renderField('Password', 'password', 'password')}
-                                {renderField('Confirm Password', 'confirm_password', 'password')}
-                            </div>
+                        <label className="label required-label">Name</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="input" />
 
-                            <div className="field-row">
-                                <div className="field-group">
-                                    <label htmlFor="gender" className="label required-label">Gender</label>
-                                    <select
-                                        id="gender"
-                                        name="gender"
-                                        value={formData.gender}
-                                        onChange={handleInputChange}
-                                        className="select"
-                                    >
-                                        <option value="">Select gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    {errors.gender && (
-                                        <p className="error-text">{errors.gender}</p>
-                                    )}
-                                </div>
-                                {renderField('Age', 'age', 'number')}
-                            </div>
+                        <label className="label required-label">Email</label>
+                        <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="input" />
 
-                            {renderFileUpload('Profile Picture', 'profile_picture_url', Camera)}
+                        <label className="label required-label">Phone Number</label>
+                        <input type="text" name="phone_number" value={formData.phone_number} onChange={handleInputChange} className="input" />
+
+                        <label className="label required-label">Password</label>
+                        <div className="password-field">
+                            <input type={passwordVisible ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange} className="input" />
+                            <button type="button" onClick={() => setPasswordVisible(!passwordVisible)}>
+                                {passwordVisible ? <EyeOff /> : <Eye />}
+                            </button>
                         </div>
 
-                        {/* Driver Information */}
-                        <div className="form-section">
-                            <h3 className="section-header">Driver Information</h3>
-                            {renderField('License Number', 'license_number')}
-                            {renderFileUpload('License Photo', 'license_photo', Upload)}
+                        <label className="label required-label">Confirm Password</label>
+                        <div className="password-field">
+                            <input type={confirmPasswordVisible ? 'text' : 'password'} name="confirm_password" value={formData.confirm_password} onChange={handleInputChange} className="input" />
+                            <button type="button" onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
+                                {confirmPasswordVisible ? <EyeOff /> : <Eye />}
+                            </button>
                         </div>
 
-                        {/* Vehicle Information */}
-                        <div className="form-section">
-                            <h3 className="section-header">Vehicle Information</h3>
-                            <div className="field-row">
-                                {renderField('Vehicle Make', 'vehicle_details.make')}
-                                {renderField('Vehicle Model', 'vehicle_details.model')}
-                            </div>
-                            {renderField('Registration Number', 'vehicle_details.registration_number')}
-                            {renderFileUpload('Insurance Document', 'vehicle_insurance_url', Shield)}
+                        <label className="label required-label">Gender</label>
+                        <select name="gender" value={formData.gender} onChange={handleInputChange} className="select">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+
+                        <label className="label required-label">Age</label>
+                        <input type="number" name="age" value={formData.age} onChange={handleInputChange} className="input" />
+
+                        <h3 className="section-header">Vehicle Information</h3>
+
+                        <label className="label required-label">Vehicle Make</label>
+                        <input type="text" name="vehicle_make" value={formData.vehicle_make} onChange={handleInputChange} className="input" />
+
+                        <label className="label required-label">Vehicle Model</label>
+                        <input type="text" name="vehicle_model" value={formData.vehicle_model} onChange={handleInputChange} className="input" />
+
+                        <label className="label required-label">Vehicle Registration Number</label>
+                        <input type="text" name="vehicle_registration" value={formData.vehicle_registration} onChange={handleInputChange} className="input" />
+
+                        <h3 className="section-header">Driver’s License</h3>
+
+                        <label className="label required-label">License Number</label>
+                        <input type="text" name="license_number" value={formData.license_number} onChange={handleInputChange} className="input" />
+
+                        <label className="label required-label">License Expiry Date</label>
+                        <input type="date" name="license_expiry" value={formData.license_expiry} onChange={handleInputChange} className="input" />
+
+                        <h3 className="section-header">Upload Documents</h3>
+
+                        <label className="label required-label">Profile Picture</label>
+                        <div className="file-upload">
+                            <label>
+                                <Upload size={16} /> Upload Image
+                                <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'profile_picture')} />
+                            </label>
                         </div>
+
+                        {previews.profile && (
+                            <div className="preview-container">
+                                <img src={previews.profile} className="preview-image" alt="Preview" />
+                                <button onClick={(e) => { e.preventDefault(); setPreviews({ ...previews, profile: null }); }} className="remove-preview"><X /></button>
+                            </div>
+                        )}
+
+                        {/* ✅ Submit Button */}
+                        <button type="submit" className="submit-button">
+                            Submit
+                        </button>
                     </form>
-                </div>
-
-                <div className="card-footer">
-                    {submitStatus && (
-                        <div className={`status-message ${submitStatus.type === 'success' ? 'status-success' : 'status-error'}`}>
-                            {submitStatus.message}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="submit-button"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                    </button>
                 </div>
             </div>
         </div>

@@ -1,219 +1,180 @@
-/* Main container */
+/* General Styling */
 .driver-application {
-    max-width: 1024px;
-    margin: 0 auto;
-    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f8f9fa;
+    padding: 20px;
 }
 
-/* Card styles */
 .card {
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
+.card:hover {
+    transform: translateY(-3px);
+}
+
+/* Header */
 .card-header {
-    padding: 24px;
-    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 .card-title {
     font-size: 24px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0 0 8px 0;
+    font-weight: bold;
+    color: #333;
 }
 
-.card-description {
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.card-content {
-    padding: 24px;
-}
-
-.card-footer {
-    padding: 24px;
-    border-top: 1px solid #e5e7eb;
-}
-
-/* Form sections */
-.form-section {
-    margin-bottom: 32px;
-}
-
-.section-header {
-    font-size: 18px;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 16px;
-}
-
-.field-group {
-    margin-bottom: 16px;
-}
-
-.field-row {
-    display: grid;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-@media (min-width: 768px) {
-    .field-row {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-/* Labels */
+/* Form Inputs */
 .label {
+    font-weight: 600;
+    margin-top: 10px;
     display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
+    color: #444;
 }
 
 .required-label::after {
-    content: "*";
-    color: #ef4444;
-    margin-left: 4px;
+    content: " *";
+    color: red;
 }
 
-/* Inputs */
-.input {
+.input, .select {
     width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    transition: border-color 0.2s ease;
+    font-size: 16px;
+    transition: border 0.3s;
 }
 
-.input:focus {
+.input:focus, .select:focus {
+    border-color: #007bff;
     outline: none;
-    border-color: #660000;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.input.error {
-    border-color: #ef4444;
-}
-
-/* Select styles */
-.select {
-    width: 100%;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background-color: white;
-}
-
-/* File upload */
-.file-upload {
-    margin-bottom: 16px;
-}
-
-.upload-button {
-    width: 100%;
-    padding: 8px 16px;
-    background-color: white;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-    color: #374151;
-    cursor: pointer;
+/* Password Visibility Toggle */
+.password-field {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+    position: relative;
 }
 
-.upload-button:hover {
-    background-color: #f3f4f6;
+.password-field input {
+    flex: 1;
+    padding-right: 40px;
 }
 
-.upload-button svg {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
+.password-field button {
+    position: absolute;
+    right: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #888;
 }
 
-.file-input {
+.password-field button:hover {
+    color: #333;
+}
+
+/* Section Headers */
+.section-header {
+    font-size: 18px;
+    margin-top: 20px;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* File Uploads */
+.file-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.file-upload input {
     display: none;
 }
 
-/* Preview image */
-.upload-preview {
-    margin-top: 8px;
+.file-upload label {
+    background: #007bff;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 5px;
+}
+
+.file-upload label:hover {
+    background: #0056b3;
+}
+
+.preview-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
 }
 
 .preview-image {
-    width: 64px;
-    height: 64px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 2px solid #ddd;
 }
 
-/* Error messages */
-.error-text {
-    color: #ef4444;
-    font-size: 12px;
-    margin-top: 4px;
+.remove-preview {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-size: 18px;
 }
 
-/* Status messages */
-.status-message {
-    margin-bottom: 16px;
-    padding: 16px;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.status-success {
-    background-color: #f0fdf4;
-    border: 1px solid #86efac;
-    color: #166534;
-}
-
-.status-error {
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #991b1b;
-}
-
-/* Submit button */
+/* Submit Button */
 .submit-button {
     width: 100%;
-    padding: 10px 16px;
-    background-color: #660000;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #007bff;
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
+    margin-top: 15px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s;
 }
 
 .submit-button:hover {
-    background-color: #1d4ed8;
+    background: #0056b3;
 }
 
 .submit-button:disabled {
-    background-color: #93c5fd;
+    background: #ccc;
     cursor: not-allowed;
 }
 
-/* Icons */
-.icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
+/* Responsive Design */
+@media (max-width: 500px) {
+    .card {
+        padding: 20px;
+    }
 }
+
