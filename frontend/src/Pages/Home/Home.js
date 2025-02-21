@@ -182,7 +182,7 @@ const HomePage = () => {
 
       <div className="ctacontaner">
         <section className="cta">
-          <h2>Ready to Glide?</h2>
+          <h2 className='Readyto'>Ready to Glide?</h2>
           <p>Download the app today or sign up as a driver to join the Glide Way family.</p>
           <div className="cta-buttons">
             <button className="cta-button primary">Download the App</button>

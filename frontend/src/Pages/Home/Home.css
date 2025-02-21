@@ -352,7 +352,9 @@
     display: block;
     text-align: right;
   }
-  
+  .Readyto{
+    color: #ffff;
+  }
   /* FAQ Section */
   .faq-section2 {
     width: 100%;
