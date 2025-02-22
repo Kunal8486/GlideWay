@@ -185,8 +185,8 @@ const HomePage = () => {
           <h2 className='Readyto'>Ready to Glide?</h2>
           <p>Download the app today or sign up as a driver to join the Glide Way family.</p>
           <div className="cta-buttons">
-            <button className="cta-button primary">Download the App</button>
-            <button className="cta-button secondary">Sign Up to Drive</button>
+            <a href='https://play.google.com' target='_blank'><button className="cta-button primary">Download the App</button></a>
+            <a href='/become-driver'><button className="cta-button secondary">Sign Up to Drive</button></a>
           </div>
         </section>
       </div>
