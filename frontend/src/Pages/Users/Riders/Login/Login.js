@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"
-import { useNavigate, useLocation } from "react-router-dom"
-import "./Login.css" // Importing the separate CSS file
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./Login.css";
 
 const GOOGLE_CLIENT_ID = "950973384946-h3kdaot9u66156jjm8mo9our9pegl9ue.apps.googleusercontent.com"
 
