@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
 
-
 import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer";
 
@@ -88,7 +87,7 @@ const App = () => {
         <Route path="/cancellation-policy" element={<CancellationPolicy />} />
         <Route path="/payment-policy" element={<PaymentPolicy />} />
         <Route path="/driver-policy" element={<DriverPolicy />} />
-        
+
 
         <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login handleLogin={handleLogin} />} />
         <Route path="/signup" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Signup />} />
@@ -102,6 +101,7 @@ const App = () => {
         <Route path="/book-a-ride" element={<BookARide />} />
         <Route path="/rider-profile" element={<RiderProfile />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+
         {/* Protected Routes */}
         <Route
           path="/dashboard"
