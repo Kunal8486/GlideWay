@@ -1,324 +1,124 @@
-/* Main Container */
+/* ===== General Page Styling ===== */
+.cancellation-wrapper {
+  min-height: 100vh;
+  padding: 2.5rem 1rem;
+  font-family: "Inter", sans-serif;
+}
+
 .cancellation-container {
-    padding: 3rem 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
-    min-height: 100vh;
-    font-family: "Poppins", sans-serif;
+  max-width: 850px;
+  margin: 0 auto;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cancellation-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Header Styling ===== */
+.cancellation-header {
+  background: linear-gradient(to right, #ff7043, #d84315);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 14px 14px 0 0;
+}
+
+.cancellation-header h1 {
+  font-size: 2.8rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.header-subtitle {
+  margin-top: 0.5rem;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* ===== Policy Sections ===== */
+.policy-sections {
+  padding: 2rem;
+}
+
+.policy-section {
+  margin-bottom: 1.8rem;
+  padding: 1.5rem;
+  background: #fffdf9;
+  border-left: 6px solid #ff7043;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.policy-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.policy-section h2 {
+  color: #333;
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.section-content {
+  color: #4a4a4a;
+  line-height: 1.8;
+}
+
+/* ===== List Styling ===== */
+.policy-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.policy-section li {
+  position: relative;
+  padding: 0.6rem 0 0.6rem 1.6rem;
+}
+
+.policy-section li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: #ff7043;
+  font-weight: bold;
+}
+
+/* ===== Footer Styling ===== */
+.cancellation-footer {
+  background-color: #ffe9d5;
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: 0 0 14px 14px;
+}
+
+.cancellation-footer p {
+  color: #555;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .cancellation-container {
+    width: 95%;
   }
-  
-  /* Header Section */
+
   .cancellation-header {
-    text-align: center;
-    margin-bottom: 4rem;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s ease-out;
+    padding: 1.5rem;
   }
-  
-  .cancellation-header.visible {
-    opacity: 1;
-    transform: translateY(0);
+
+  .policy-sections {
+    padding: 1rem;
   }
-  
-  .cancellation-title {
-    font-size: 3rem;
-    background: linear-gradient(to right, #000000, #000000);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: bold;
-    margin-bottom: 1rem;
+
+  .policy-section {
+    padding: 1rem;
   }
-  
-  .cancellation-subtitle {
-    font-size: 1.25rem;
-    color: #000000;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-  
-  /* Policy Grid */
-  .cancellation-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto 4rem;
-  }
-  
-  /* Policy Cards */
-  .policy-card {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(145, 160, 181, 0.1);
-    transition: all 0.3s ease-in-out;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
-  
-  .policy-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(125, 211, 252, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    transition: all 0.5s ease;
-  }
-  
-  .policy-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(148, 163, 184, 0.15);
-    background: rgba(255, 255, 255, 0.95);
-  }
-  
-  .policy-card:hover::before {
-    transform: scale(1.2);
-  }
-  
-  .policy-card.active {
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(148, 163, 184, 0.2);
-    border: 2px solid #7dd3fc;
-    background: white;
-  }
-  
-  .card-content {
-    position: relative;
-    z-index: 1;
-  }
-  
-  .policy-icon {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-    transition: transform 0.3s ease;
-  }
-  
-  .policy-card:hover .policy-icon {
-    transform: scale(1.1) rotate(12deg);
-  }
-  
-  .policy-title {
-    font-size: 1.75rem;
-    color: #334155;
-    font-weight: bold;
-    margin-bottom: 0.75rem;
-  }
-  
-  .policy-timeframe {
-    color: #64748b;
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .policy-fee {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #0ea5e9;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Policy Details */
-  .policy-details {
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.5s ease;
-    opacity: 0;
-  }
-  
-  .policy-details.visible {
-    max-height: 300px;
-    opacity: 1;
-  }
-  
-  .conditions-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .condition-item {
-    display: flex;
-    align-items: center;
-    color: #64748b;
-    margin-bottom: 0.75rem;
-    font-size: 0.95rem;
-  }
-  
-  .condition-dot {
-    width: 8px;
-    height: 8px;
-    background: #7dd3fc;
-    border-radius: 50%;
-    margin-right: 0.75rem;
-    flex-shrink: 0;
-  }
-  
-  /* Special Cases Box */
-  .special-cases-box {
-    background: linear-gradient(to right, #bae6fd, #e0f2fe);
-    padding: 1px;
-    border-radius: 20px;
-    max-width: 1200px;
-    margin: 0 auto 4rem;
-  }
-  
-  .special-cases-content {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 19px;
-    padding: 3rem;
-  }
-  
-  .special-cases-content h2 {
-    text-align: center;
-    font-size: 2.25rem;
-    color: #334155;
-    margin-bottom: 2rem;
-  }
-  
-  .special-cases-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-  }
-  
-  .special-case-item {
-    text-align: center;
-    padding: 2rem;
-    background: rgba(248, 250, 252, 0.8);
-    border-radius: 15px;
-    transition: transform 0.3s ease;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
-  
-  .special-case-item:hover {
-    transform: translateY(-5px);
-    background: white;
-  }
-  
-  .special-case-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .special-case-item h3 {
-    font-size: 1.25rem;
-    color: #334155;
-    margin-bottom: 0.75rem;
-  }
-  
-  .special-case-item p {
-    color: #64748b;
-    font-size: 0.95rem;
-  }
-  
-  /* Help Section */
-  .help-section {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-  }
-  
-  .help-section h2 {
-    font-size: 2.25rem;
-    color: #334155;
-    margin-bottom: 1rem;
-  }
-  
-  .help-section p {
-    color: #64748b;
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .button-group {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .primary-button, .secondary-button {
-    padding: 1rem 2rem;
-    font-size: 1.1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .primary-button {
-    background: linear-gradient(to right, #000000, #000000);
-    color: white;
-    border: none;
-  }
-  
-  .secondary-button {
-    background: linear-gradient(to right, #000000, #000000);
-    color: white;
-    border: none;
-  }
-  
-  .primary-button:hover, .secondary-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(148, 163, 184, 0.2);
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .cancellation-container {
-      padding: 2rem 1rem;
-    }
-  
-    .cancellation-title {
-      font-size: 2.25rem;
-    }
-  
-    .policy-card {
-      padding: 1.5rem;
-    }
-  
-    .special-cases-content {
-      padding: 2rem 1rem;
-    }
-  
-    .button-group {
-      flex-direction: column;
-    }
-  
-    .primary-button, .secondary-button {
-      width: 100%;
-    }
-  }
-  
-  /* Accessibility */
-  .primary-button:focus,
-  .secondary-button:focus {
-    outline: 3px solid #7dd3fc;
-    outline-offset: 2px;
-  }
-  
-  /* Animation Classes */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .policy-card {
-    animation: fadeIn 0.5s ease-out forwards;
-  }
+}

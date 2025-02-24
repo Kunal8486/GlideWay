@@ -1,0 +1,125 @@
+/* ===== General Page Styling ===== */
+.cookies-wrapper {
+    min-height: 100vh;
+    padding: 2.5rem 1rem;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .cookies-container {
+    max-width: 850px;
+    margin: 0 auto;
+    border-radius: 14px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .cookies-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* ===== Header Styling ===== */
+  .cookies-header {
+    background: linear-gradient(to right, #ff7043, #d84315);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 14px 14px 0 0;
+  }
+  
+  .cookies-header h1 {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .header-subtitle {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    opacity: 0.9;
+  }
+  
+  /* ===== Policy Sections ===== */
+  .policy-sections {
+    padding: 2rem;
+  }
+  
+  .policy-section {
+    margin-bottom: 1.8rem;
+    padding: 1.5rem;
+    background: #fffdf9;
+    border-left: 6px solid #ff7043;
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .policy-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .policy-section h2 {
+    color: #333;
+    font-size: 1.7rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .section-content {
+    color: #4a4a4a;
+    line-height: 1.8;
+  }
+  
+  /* ===== List Styling ===== */
+  .policy-section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .policy-section li {
+    position: relative;
+    padding: 0.6rem 0 0.6rem 1.6rem;
+  }
+  
+  .policy-section li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    color: #ff7043;
+    font-weight: bold;
+  }
+  
+  /* ===== Footer Styling ===== */
+  .cookies-footer {
+    background-color: #ffe9d5;
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 0 0 14px 14px;
+  }
+  
+  .cookies-footer p {
+    color: #555;
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  /* ===== Responsive Design ===== */
+  @media (max-width: 768px) {
+    .cookies-container {
+      width: 95%;
+    }
+  
+    .cookies-header {
+      padding: 1.5rem;
+    }
+  
+    .policy-sections {
+      padding: 1rem;
+    }
+  
+    .policy-section {
+      padding: 1rem;
+    }
+  }
+  
