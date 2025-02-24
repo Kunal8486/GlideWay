@@ -518,15 +518,7 @@
     color: var(--primary-color);
   }
   
-  /* Footer */
-  .footer {
-    text-align: center;
-    padding: 40px 20px;
-    margin-top: 60px;
-    color: var(--text-color);
-    border-top: 1px solid rgba(139, 69, 19, 0.1);
-  }
-  
+ 
   /* Animations */
   @keyframes floatAnimation {
     0%, 100% {

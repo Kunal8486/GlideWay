@@ -191,9 +191,6 @@ const HomePage = () => {
         </section>
       </div>
 
-      <footer className="footer">
-        <p>© 2025 Glide Way. All rights reserved.</p>
-      </footer>
     </div>
   );
 };
