@@ -573,64 +573,7 @@ const FAQPage = () => {
             }
           }
 
-          /* Dark Mode */
-          @media (prefers-color-scheme: dark) {
-            .faq-container {
-              background: #1a1a1a;
-            }
-
-            .faq-title,
-            .section-title {
-              color: #f0d5b8;
-            }
-
-            .search-input {
-              background: #2a2a2a;
-              border-color: #3a3a3a;
-              color: white;
-            }
-
-            .category-tab {
-              background: #2a2a2a;
-              border-color: #3a3a3a;
-              color: #f0d5b8;
-            }
-
-            .category-tab.active {
-              background: #f0d5b8;
-              color: #1a1a1a;
-            }
-
-            .faq-item {
-              background: #2a2a2a;
-              border-color: #3a3a3a;
-            }
-
-            .faq-question {
-              color: #f0d5b8;
-            }
-
-            .faq-answer {
-              color: #e0c5a8;
-            }
-
-            .support-card {
-              background: #2a2a2a;
-              border-color: #3a3a3a;
-            }
-
-            .support-title {
-              color: #f0d5b8;
-            }
-
-            .support-description {
-              color: #e0c5a8;
-            }
-
-            .support-action {
-              color: #f0d5b8;
-            }
-          }
+         
         `}</style>
     </div>
   );
