@@ -38,6 +38,11 @@ import Driver from "./Pages/Dashboard/Driver/DriverDashboard";
 
 import RiderProfile from "./Pages/Users/Riders/Profile/Profile";
 
+
+import ScheduleRide from "./Pages/Rides/ScheduleRide/ScheduleRide";
+import RideSharing from "./Pages/Rides/RideSharing/RideSharing";
+import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
+
 import "./App.css";
 
 const App = () => {
@@ -101,6 +106,11 @@ const App = () => {
         <Route path="/book-a-ride" element={<BookARide />} />
         <Route path="/rider-profile" element={<RiderProfile />} />
         <Route path="/driver-login" element={<DriverLogin />} />
+
+
+        <Route path="/schedule-ride" element={<ScheduleRide />} />
+        <Route path="/ride-sharing" element={<RideSharing />} />
+        <Route path="/ride-pooling" element={<RidePooling />} />
 
         {/* Protected Routes */}
         <Route
