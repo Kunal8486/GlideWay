@@ -103,7 +103,7 @@ const Registration = () => {
     setIsLoading(true)
 
     try {
-      const res = await axios.post("http://localhost:5000/api/register", formData, { withCredentials: true })
+      const res = await axios.post("http://localhost:5500/api/register", formData, { withCredentials: true })
       setSuccess(res.data.message || "Registration successful! Redirecting to login...")
       setTimeout(() => navigate("/login"), 2000)
     } catch (err) {
@@ -126,7 +126,7 @@ const Registration = () => {
     
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        "http://localhost:5500/api/auth/google",
         { token: credentialResponse.credential },
         { withCredentials: true },
       )

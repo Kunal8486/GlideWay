@@ -32,7 +32,7 @@ const Login = () => {
     setIsLoading(true)
 
     try {
-      const res = await axios.post("http://localhost:5000/api/login", formData, { withCredentials: true })
+      const res = await axios.post("http://localhost:5500/api/login", formData, { withCredentials: true })
       localStorage.setItem("token", res.data.token)
       setSuccess(res.data.message)
       setTimeout(() => {
@@ -50,7 +50,7 @@ const Login = () => {
     setIsLoading(true)
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/google",
+        "http://localhost:5500/api/auth/google",
         { token: credentialResponse.credential },
         { withCredentials: true },
       )

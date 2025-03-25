@@ -270,7 +270,7 @@ const AboutPage = () => {
             </div>
             <div className="milestone">
               <div className="milestone-number">
-                <span>5000</span>
+                <span>5500</span>
                 <sup>+</sup>
               </div>
               <div className="milestone-label">Satisfied Users</div>

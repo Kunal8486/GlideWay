@@ -483,7 +483,7 @@ const StatsCounter = () => {
     const targets = {
       rides: 10000000,
       cities: 200,
-      drivers: 50000,
+      drivers: 55000,
       satisfaction: 98
     };
     
