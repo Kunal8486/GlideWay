@@ -215,7 +215,7 @@ const BecomeDriver = () => {
                 }
             });
 
-            const response = await fetch("http://localhost:5000/api/driver/register", {
+            const response = await fetch("http://localhost:5500/api/driver/register", {
                 method: "POST",
                 body: formDataObject,
             });

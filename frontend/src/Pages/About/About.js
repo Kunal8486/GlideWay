@@ -100,47 +100,47 @@ const AboutPage = () => {
         <div className="section-content">
           <h2>Why Choose Glide Way?</h2>
           <div className="features-container">
-            <div className="feature">
-              <div className="feature-icon">
+            <div className="feature_about">
+              <div className="feature_about-icon">
                 <i className="material-icons">security</i>
               </div>
-              <div className="feature-text">
+              <div className="feature_about-text">
                 <h3>Safety First</h3>
                 <p>Verified drivers, 24/7 support, and in-app safety features like emergency buttons and ride sharing with trusted contacts.</p>
               </div>
             </div>
-            <div className="feature">
-              <div className="feature-icon">
+            <div className="feature_about">
+              <div className="feature_about-icon">
                 <i className="material-icons">payments</i>
               </div>
-              <div className="feature-text">
+              <div className="feature_about-text">
                 <h3>Affordable Pricing</h3>
                 <p>Transparent fares with no hidden charges. We believe in fair pricing for both riders and drivers.</p>
               </div>
             </div>
-            <div className="feature">
-              <div className="feature-icon">
+            <div className="feature_about">
+              <div className="feature_about-icon">
                 <i className="material-icons">grid_view</i>
               </div>
-              <div className="feature-text">
+              <div className="feature_about-text">
                 <h3>Ride Variety</h3>
                 <p>Choose from a variety of ride options, including eco-friendly electric vehicles (EVs) and luxury cars.</p>
               </div>
             </div>
-            <div className="feature">
-              <div className="feature-icon">
+            <div className="feature_about">
+              <div className="feature_about-icon">
                 <i className="material-icons">eco</i>
               </div>
-              <div className="feature-text">
+              <div className="feature_about-text">
                 <h3>Eco-Conscious</h3>
                 <p>We are committed to reducing our carbon footprint through initiatives like carpooling and promoting the use of electric vehicles.</p>
               </div>
             </div>
-            <div className="feature">
-              <div className="feature-icon">
+            <div className="feature_about">
+              <div className="feature_about-icon">
                 <i className="material-icons">support_agent</i>
               </div>
-              <div className="feature-text">
+              <div className="feature_about-text">
                 <h3>Customer Satisfaction</h3>
                 <p>Our dedicated support team is always ready to assist you, ensuring a smooth and enjoyable experience.</p>
               </div>
@@ -270,7 +270,7 @@ const AboutPage = () => {
             </div>
             <div className="milestone">
               <div className="milestone-number">
-                <span>5000</span>
+                <span>5500</span>
                 <sup>+</sup>
               </div>
               <div className="milestone-label">Satisfied Users</div>

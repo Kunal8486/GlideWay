@@ -1,0 +1,214 @@
+
+.glide-way-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .glide-way-header {
+    background-color: var(--secondary-color);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .glide-way-header h1 {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .glide-way-header nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    transition: color 0.3s ease;
+  }
+  
+  .glide-way-header nav a:hover {
+    color: var(--primary-color);
+  }
+  
+  .glide-way-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+  }
+  
+  .card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    padding: 30px;
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.02);
+  }
+  
+  .ride-form-card h2, 
+  .ride-list-section h2 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    margin-bottom: 5px;
+    color: var(--secondary-color);
+  }
+  
+  .form-group input {
+    padding: 10px;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+  }
+  
+  .submit-ride-btn,
+  .join-ride-btn {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .submit-ride-btn:hover,
+  .join-ride-btn:hover {
+    background-color: var(--accent-color);
+  }
+  
+  .rides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .ride-card {
+    background-color: var(--background-color);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .ride-details p {
+    margin-bottom: 8px;
+  }
+  
+  .no-rides-message {
+    text-align: center;
+    color: var(--secondary-color);
+    font-style: italic;
+  }
+  
+  .glide-way-footer {
+    background-color: var(--secondary-color);
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 30px;
+    border-radius: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .glide-way-main {
+      grid-template-columns: 1fr;
+    }
+  
+    .glide-way-header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .glide-way-header nav {
+      margin-top: 15px;
+    }
+  }
+
+
+  /* Previous CSS remains the same, with these additions: */
+
+.ride-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.search-form {
+  background-color: var(--background-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.search-rides-btn {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.search-rides-btn:hover {
+  background-color: var(--accent-color);
+}
+
+/* Additional enhancements to existing styles */
+select {
+  padding: 10px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  background-color: white;
+  width: 100%;
+}
+
+.ride-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.ride-details {
+  flex-grow: 1;
+}
+
+.join-ride-btn {
+  margin-top: 10px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

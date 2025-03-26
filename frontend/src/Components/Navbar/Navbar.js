@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = ({ isLoggedIn, handleLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     
+    // Use React Router hooks for better navigation management
+    const navigate = useNavigate();
+    const location = useLocation();
+    
     // Handle scroll effect for navbar
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setScrolled(true);
-            } else {
-                setScrolled(false);
-            }
+            setScrolled(window.scrollY > 50);
         };
         
         window.addEventListener('scroll', handleScroll);
-        
-        // Clean up event listener
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
@@ -43,53 +42,77 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
     
     // Prevent scrolling when menu is open
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'auto';
-        }
-        
+        document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
         return () => {
             document.body.style.overflow = 'auto';
         };
     }, [isMenuOpen]);
     
+    // Navigation handler with smooth routing
+    const handleNavigation = (path) => {
+        navigate(path);
+        closeMenu();
+    };
+    
+    // Logout handler with navigation
+    const handleLogoutAndRedirect = () => {
+        handleLogout();
+        navigate('/login'); // Redirect to login page after logout
+        closeMenu();
+    };
+    
     // Define navigation links dynamically based on authentication status
-    const navLinks = [
-        { path: '/', label: 'Home' },
-        { path: '/about', label: 'About' },
-        { path: '/services', label: 'Services' },
-        { path: '/contact', label: 'Contact' },
-    ];
+    const getNavLinks = () => {
+        const baseLinks = [
+            { path: '/', label: 'Home' },
+            { path: '/about', label: 'About' },
+            { path: '/services', label: 'Services' },
+            { path: '/contact', label: 'Contact' },
+        ];
+        
+        if (isLoggedIn) {
+            baseLinks.push({ path: '/dashboard', label: 'Dashboard' });
+        } else {
+            baseLinks.push({ path: '/login', label: 'Login' });
+        }
+        
+        return baseLinks;
+    };
     
-    if (isLoggedIn) {
-        navLinks.push({ path: '/dashboard', label: 'Dashboard' });
-    } else {
-        navLinks.push({ path: '/login', label: 'Login' });
-    }
+    // Determine if a link is active using React Router's location
+    const isActive = (path) => location.pathname === path;
     
-    // Determine if a link is active
-    const isActive = (path) => window.location.pathname === path;
+    const navLinks = getNavLinks();
     
     return (
         <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
             <div className="navbar-container">
-                <a href="/" className="logo">
+                <div className="logo" onClick={() => handleNavigation('/')}>
                     <img src="/assets/Logo.png" alt="GlideWay Logo" />
-                </a>
+                </div>
                 
                 <nav className="nav-links">
                     <ul>
-                        {navLinks.map((link, index) => (
-                            <li key={index} className={isActive(link.path) ? 'active' : ''}>
-                                <a href={link.path}>
-                                    <span>{link.label}</span>
-                                </a>
+                        {navLinks.map((link) => (
+                            <li 
+                                key={link.path} 
+                                className={isActive(link.path) ? 'active' : ''}
+                            >
+                                <button 
+                                    onClick={() => handleNavigation(link.path)}
+                                    className="nav-link-button"
+                                >
+                                    {link.label}
+                                </button>
                             </li>
                         ))}
                         {isLoggedIn && (
                             <li className="logout-container">
-                                <button className="logout-button" onClick={handleLogout} aria-label="Log out">
+                                <button 
+                                    className="logout-button" 
+                                    onClick={handleLogoutAndRedirect} 
+                                    aria-label="Log out"
+                                >
                                     Logout
                                 </button>
                             </li>
@@ -116,16 +139,22 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                     <span aria-hidden="true">×</span>
                 </button>
                 
-                <div className="mobile-logo">
+                <div className="mobile-logo" onClick={() => handleNavigation('/')}>
                     <img src="/assets/Logo.png" alt="GlideWay Logo" />
                 </div>
                 
                 <ul>
-                    {navLinks.map((link, index) => (
-                        <li key={index} className={isActive(link.path) ? 'active' : ''}>
-                            <a href={link.path} onClick={closeMenu}>
+                    {navLinks.map((link) => (
+                        <li 
+                            key={link.path} 
+                            className={isActive(link.path) ? 'active' : ''}
+                        >
+                            <button 
+                                onClick={() => handleNavigation(link.path)}
+                                className="mobile-nav-link"
+                            >
                                 {link.label}
-                            </a>
+                            </button>
                         </li>
                     ))}
                 </ul>
@@ -134,10 +163,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                     <div className="mobile-logout">
                         <button 
                             className="logout-button" 
-                            onClick={() => {
-                                handleLogout();
-                                closeMenu();
-                            }}
+                            onClick={handleLogoutAndRedirect}
                         >
                             Logout
                         </button>

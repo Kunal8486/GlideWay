@@ -1,13 +1,5 @@
-/* Google Font Import */
 @import url('https://fonts.googleapis.com/css?family=Montserrat:500&display=swap');
 
-
-.navbar a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* Navbar */
 .navbar {
   background: #ffffff;
   position: fixed;
@@ -41,6 +33,7 @@
 .logo {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .logo img {
@@ -71,7 +64,10 @@
   position: relative;
 }
 
-.nav-links a {
+/* Updated to work with buttons instead of anchor tags */
+.nav-links .nav-link-button {
+  background: none;
+  border: none;
   padding: 12px 18px;
   font-size: 17px;
   font-weight: bold;
@@ -80,10 +76,11 @@
   transition: all 0.3s ease-in-out;
   display: inline-block;
   position: relative;
+  cursor: pointer;
 }
 
 /* Underline animation for links */
-.nav-links a::after {
+.nav-links .nav-link-button::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -95,23 +92,47 @@
   transform: translateX(-50%);
 }
 
-.nav-links li:not(.active) a:hover::after {
+.nav-links li:not(.active) .nav-link-button:hover::after {
   width: 70%;
 }
 
-.nav-links li.active a {
+.nav-links li.active .nav-link-button {
   background-color: #660000;
   color: #ffffff;
   box-shadow: 0 4px 8px rgba(102, 0, 0, 0.2);
 }
 
-.nav-links a:hover {
+.nav-links .nav-link-button:hover {
   color: #660000;
   transform: translateY(-2px);
 }
 
-.nav-links li.active a:hover {
+.nav-links li.active .nav-link-button:hover {
   color: white;
+}
+
+/* Logout Button */
+.logout-container {
+  margin-left: 10px;
+}
+
+.logout-button {
+  background-color: #990000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Logout Button */
@@ -240,6 +261,33 @@
 
 .side-menu li {
   margin: 15px 0;
+}
+
+
+.side-menu .mobile-nav-link {
+  background: none;
+  border: none;
+  color: #660000;
+  font-size: 18px;
+  text-decoration: none;
+  padding: 12px 15px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-radius: 8px;
+  transition: all 0.3s ease-in-out;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.side-menu li.active .mobile-nav-link {
+  background-color: rgba(102, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.side-menu .mobile-nav-link:hover {
+  background-color: rgba(102, 0, 0, 0.05);
+  padding-left: 20px;
 }
 
 .side-menu a {

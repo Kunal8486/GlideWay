@@ -77,7 +77,7 @@ const Login = () => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch("http://localhost:5000/api/driver/login", {
+            const response = await fetch("http://localhost:5500/api/driver/login", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
