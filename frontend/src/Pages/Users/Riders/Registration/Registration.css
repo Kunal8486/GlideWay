@@ -291,3 +291,46 @@
     margin-bottom: 1.25rem;
   }
 }
+
+
+/* Add these to your existing Registration.css */
+
+.form-button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.prev-button {
+  background-color: var(--text-light);
+  margin-right: 1rem;
+}
+
+.prev-button:hover {
+  background-color: var(--text-medium);
+}
+
+.next-button {
+  flex-grow: 1;
+}
+
+/* Optional: Add a progress indicator */
+.step-progress {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--border-color);
+  border-radius: 50%;
+  margin: 0 5px;
+  transition: var(--transition);
+}
+
+.step-dot.active {
+  background-color: var(--primary-color);
+  width: 16px;
+}
