@@ -2,56 +2,69 @@ import React from "react";
 import "./RefundPolicy.css";
 
 const RefundPolicy = () => {
+  const policyContent = [
+    {
+      title: "Eligibility for Refunds",
+      content: "Refunds are considered only in cases where:",
+      listItems: [
+        "The ride was canceled due to driver unavailability.",
+        "You were charged incorrectly for a ride.",
+        "Payment errors resulted in double charges.",
+      ],
+    },
+    {
+      title: "Refund Process",
+      content: "To request a refund, contact our support team within 7 days of the issue. Provide details such as the ride ID, date, and reason for the refund request.",
+    },
+    {
+      title: "Processing Time",
+      content: "Once approved, refunds will be processed within 5-7 business days. The amount will be credited to your original payment method.",
+    },
+    {
+      title: "Non-Refundable Cases",
+      content: "Refunds will not be issued in cases such as:",
+      listItems: [
+        "Rider no-shows without prior cancellation.",
+        "Delays due to traffic or unavoidable circumstances.",
+        "Disputes regarding fares after trip completion.",
+      ],
+    },
+    {
+      title: "Contact Support",
+      content: "If you have any questions, reach out to our support team via email at support@glideway.com or call us at +91-9247460578.",
+    },
+  ];
+
   return (
-    <div className="refund-policy-container">
-      <h1>Refund Policy</h1>
-      <p>
-        At GlideWay, we strive to provide the best ride-sharing experience. However, we understand that unforeseen situations may arise, requiring refunds.
-      </p>
+    <div className="refund-wrapper">
+      <div className="refund-container">
+        <header className="refund-header">
+          <h1>Refund Policy</h1>
+          <p className="header-subtitle">Effective from March 2025</p>
+        </header>
 
-      <div className="policy-section">
-        <h2>Eligibility for Refunds</h2>
-        <p>
-          Refunds are considered only in cases where:
-        </p>
-        <ul>
-          <li>The ride was canceled due to driver unavailability.</li>
-          <li>You were charged incorrectly for a ride.</li>
-          <li>Payment errors resulted in double charges.</li>
-        </ul>
-      </div>
+        <div className="policy-sections">
+          {policyContent.map((section, index) => (
+            <div key={index} className="policy-section">
+              <h2>{section.title}</h2>
+              <div className="section-content">
+                <p>{section.content}</p>
+                {section.listItems && (
+                  <ul>
+                    {section.listItems.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
 
-      <div className="policy-section">
-        <h2>Refund Process</h2>
-        <p>
-          To request a refund, contact our support team within 7 days of the issue. Provide details such as the ride ID, date, and reason for the refund request.
-        </p>
-      </div>
-
-      <div className="policy-section">
-        <h2>Processing Time</h2>
-        <p>
-          Once approved, refunds will be processed within 5-7 business days. The amount will be credited to your original payment method.
-        </p>
-      </div>
-
-      <div className="policy-section">
-        <h2>Non-Refundable Cases</h2>
-        <p>
-          Refunds will not be issued in cases such as:
-        </p>
-        <ul>
-          <li>Rider no-shows without prior cancellation.</li>
-          <li>Delays due to traffic or unavoidable circumstances.</li>
-          <li>Disputes regarding fares after trip completion.</li>
-        </ul>
-      </div>
-
-      <div className="policy-section">
-        <h2>Contact Support</h2>
-        <p>
-          If you have any questions, reach out to our support team via email at <a href="mailto:support@glideway.com">support@glideway.com</a> or call us at +91-9247460578.
-        </p>
+        <footer className="refund-footer">
+          <p>Last updated: February 2025 | Version: 1.0</p>
+          <p>For more details, visit our website or contact support.</p>
+        </footer>
       </div>
     </div>
   );

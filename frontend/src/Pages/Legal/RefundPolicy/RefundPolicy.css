@@ -1,52 +1,165 @@
-.refund-policy-container {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 30px;
-    background-color: #fff5e1; /* Rich warm color */
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+.refund-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
   }
   
-  .refund-policy-container h1 {
+  .refund-container {
+    background-color: #FFFFFF;
+    max-width: 900px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 
+        0 10px 25px rgba(139, 69, 19, 0.1),
+        0 15px 40px rgba(139, 69, 19, 0.05);
+    overflow: hidden;
+    border: 1px solid #D2B48C;
+    transition: transform 0.3s ease;
+  }
+  
+  .refund-container:hover {
+    transform: translateY(-5px);
+  }
+  
+  .refund-header {
+    background: linear-gradient(to right, #D2B48C, #C19A6B);
+    color: #5D4037;
     text-align: center;
-    color: #d35400; /* Deep orange */
-    font-size: 2rem;
-    margin-bottom: 20px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
   }
   
-  .refund-policy-container p {
-    font-size: 1.1rem;
-    color: #444;
-    line-height: 1.6;
+  .refund-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(-45deg);
+  }
+  
+  .refund-header h1 {
+    margin: 0;
+    font-size: 2.8rem;
+    color: #4A2C1D;
+    font-weight: 600;
+    letter-spacing: -1px;
+  }
+  
+  .header-subtitle {
+    color: #4A2C1D;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .policy-sections {
+    padding: 2.5rem;
+    background-color: #FFFFFF;
   }
   
   .policy-section {
-    margin-top: 20px;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #E6D2BA;
+    transition: background-color 0.3s ease;
+  }
+  
+  .policy-section:hover {
+    background-color: rgba(210, 180, 140, 0.05);
+  }
+  
+  .policy-section:last-child {
+    border-bottom: none;
   }
   
   .policy-section h2 {
-    color: #c0392b; /* Dark red */
-    font-size: 1.4rem;
-    margin-bottom: 10px;
+    color: #8B4513;
+    border-left: 4px solid #D2B48C;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   
-  .policy-section ul {
-    padding-left: 20px;
+  .policy-section:hover h2 {
+    color: #5D4037;
   }
   
-  .policy-section ul li {
-    font-size: 1.1rem;
-    color: #555;
-    margin-bottom: 5px;
+  .section-content {
+    color: #4A2C1D;
   }
   
-  .refund-policy-container a {
-    color: #2980b9;
-    text-decoration: none;
+  .section-content ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .section-content ul li {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+  
+  .section-content ul li::before {
+    content: '➤';
+    position: absolute;
+    left: 0;
+    color: #D2B48C;
     font-weight: bold;
   }
   
-  .refund-policy-container a:hover {
-    text-decoration: underline;
+  .refund-footer {
+    background-color: #E6D2BA;
+    color: #4A2C1D;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    border-top: 2px solid #D2B48C;
   }
   
+  /* Responsive Design */
+  @media screen and (max-width: 600px) {
+    .refund-container {
+        margin: 0;
+        border-radius: 0;
+    }
+  
+    .refund-header h1 {
+        font-size: 2.2rem;
+    }
+  
+    .policy-sections {
+        padding: 1.5rem;
+    }
+  }
+  
+  /* Subtle Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .policy-section {
+    animation: fadeIn 0.5s ease backwards;
+  }
+  
+  .policy-section:nth-child(2) { animation-delay: 0.1s; }
+  .policy-section:nth-child(3) { animation-delay: 0.2s; }
+  .policy-section:nth-child(4) { animation-delay: 0.3s; }
+  
+  /* Additional Hover Effects */
+  .policy-section ul li {
+    transition: transform 0.2s ease;
+  }
+  
+  .policy-section ul li:hover {
+    transform: translateX(10px);
+    color: #8B4513;
+  }
