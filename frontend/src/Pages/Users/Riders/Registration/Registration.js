@@ -2,14 +2,18 @@
 
 import { useState } from "react"
 import axios from "axios"
+import ReCAPTCHA from "react-google-recaptcha"
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import "./Registration.css"
 
-const GOOGLE_CLIENT_ID = "950973384946-h3kdaot9u66156jjm8mo9our9pegl9ue.apps.googleusercontent.com"
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "950973384946-h3kdaot9u66156jjm8mo9our9pegl9ue.apps.googleusercontent.com"
+const RECAPTCHA_SITE_KEY = process.env.REACT_APP_RECAPTCHA_SITE_KEY
 
 const Registration = () => {
   const navigate = useNavigate()
+  const location = useLocation();
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -19,13 +23,13 @@ const Registration = () => {
     gender: "",
     dob: "",
     googleId: undefined, 
-
   })
 
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState("")
   const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState(null)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -34,6 +38,17 @@ const Registration = () => {
     // Clear field-specific error when user starts typing
     if (errors[name]) {
       setErrors({...errors, [name]: ""})
+    }
+  }
+
+  const handleCaptchaChange = (token) => {
+    setCaptchaToken(token)
+    
+    // Clear captcha error if a token is received
+    if (errors.captcha) {
+      const newErrors = { ...errors };
+      delete newErrors.captcha;
+      setErrors(newErrors);
     }
   }
 
@@ -87,6 +102,11 @@ const Registration = () => {
       }
     }
     
+    // Captcha validation
+    if (!captchaToken) {
+      newErrors.captcha = "Please complete the reCAPTCHA"
+    }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -94,6 +114,7 @@ const Registration = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSuccess("")
+    setServerError("")
     
     // Form validation
     if (!validateForm()) {
@@ -103,7 +124,11 @@ const Registration = () => {
     setIsLoading(true)
 
     try {
-      const res = await axios.post("http://localhost:5500/api/register", formData, { withCredentials: true })
+      const res = await axios.post("http://localhost:5500/api/register", {
+        ...formData,
+        captchaToken  // Send captcha token to backend
+      }, { withCredentials: true })
+      
       setSuccess(res.data.message || "Registration successful! Redirecting to login...")
       setTimeout(() => navigate("/login"), 2000)
     } catch (err) {
@@ -116,29 +141,51 @@ const Registration = () => {
       }
     } finally {
       setIsLoading(false)
+      // Reset captcha
+      if (window.grecaptcha) {
+        window.grecaptcha.reset();
+      }
+      setCaptchaToken(null);
     }
   }
+
 
   const handleGoogleLogin = async (credentialResponse) => {
-    setIsLoading(true)
-    setServerError("")
-    setSuccess("")
-    
+    // Check if captcha is completed before proceeding with Google login
+    if (!captchaToken) {
+      setServerError("Please complete the reCAPTCHA before continuing");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:5500/api/auth/google",
-        { token: credentialResponse.credential },
-        { withCredentials: true },
-      )
-      setSuccess(res.data.message || "Google authentication successful! Redirecting...")
-      setTimeout(() => navigate("/profile"), 2000)
+        `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5500'}/api/auth/google`,
+        { 
+          token: credentialResponse.credential,
+          captchaToken  // Send captcha token to backend for verification
+        },
+        { withCredentials: true }
+      );
+      
+      localStorage.setItem("token", res.data.token);
+      setSuccess(res.data.message);
+      
+      setTimeout(() => {
+        const from = location.state?.from?.pathname || "/profile";
+        navigate(from);
+      }, 2000);
     } catch (err) {
-      setServerError("Google authentication failed. Please try again.")
+      setServerError("Google login failed");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
+      // Reset captcha after submission
+      if (window.grecaptcha) {
+        window.grecaptcha.reset();
+      }
+      setCaptchaToken(null);
     }
-  }
-
+  };
   return (
     <div className="registration-page">
       <div className="registration-card">
@@ -249,10 +296,23 @@ const Registration = () => {
             </div>
           </div>
           
+          {/* reCAPTCHA Component */}
+          <div className="recaptcha-container">
+            <ReCAPTCHA
+              sitekey={RECAPTCHA_SITE_KEY}
+              onChange={handleCaptchaChange}
+            />
+            {errors.captcha && (
+              <span className="error-text">
+                {errors.captcha}
+              </span>
+            )}
+          </div>
+          
           <div className="form-group terms">
             <input type="checkbox" id="terms" required />
             <label htmlFor="terms">
-              I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
+              I agree to the <a href="/terms-of-service">Terms of Service</a> and <a href="/privacy-policy">Privacy Policy</a>
             </label>
           </div>
 

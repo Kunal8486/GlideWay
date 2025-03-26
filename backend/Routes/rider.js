@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const { OAuth2Client } = require("google-auth-library")
 const dotenv = require("dotenv")
 const Rider = require("../models/Rider.js")
+const axios = require("axios")
 
 dotenv.config()
 const router = express.Router()
@@ -41,21 +42,67 @@ router.post("/register", async (req, res) => {
   }
 })
 
-// 📌 Login Route
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body
-    const rider = await Rider.findOne({ email })
-    if (!rider || !(await bcrypt.compare(password, rider.password))) {
-      return res.status(400).json({ error: "Invalid credentials" })
+    const { email, password, captchaToken } = req.body;
+
+    // Verify reCAPTCHA token
+    const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+    const recaptchaResponse = await axios.post(recaptchaVerifyUrl, null, {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY || "6Le-vAArAAAAAINVH521Vd5qDFNlDu3NMR2-t-eu",
+        response: captchaToken
+      }
+    });
+
+    // Check if reCAPTCHA verification failed
+    if (!recaptchaResponse.data.success) {
+      return res.status(400).json({ 
+        error: "reCAPTCHA verification failed. Please try again." 
+      });
     }
-    const token = jwt.sign({ id: rider._id.toString() }, JWT_SECRET, { expiresIn: "1h" })
-    res.json({ message: "Logged in successfully", token })
+
+    // Find rider by email
+    const rider = await Rider.findOne({ email });
+
+    // Check credentials
+    if (!rider || !(await bcrypt.compare(password, rider.password))) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: rider._id.toString(),
+        email: rider.email
+      }, 
+      JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
+
+    // Optional: Add additional security logging
+    console.log(`Successful login attempt for email: ${email}`);
+
+    // Send successful response
+    res.json({ 
+      message: "Logged in successfully", 
+      token,
+      userId: rider._id.toString()
+    });
+
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: "Server error" })
+    console.error("Login error:", error);
+    
+    // Differentiate between different types of errors
+    if (error.response) {
+      // reCAPTCHA verification error
+      return res.status(500).json({ error: "reCAPTCHA verification failed" });
+    }
+
+    // Generic server error
+    res.status(500).json({ error: "Server error during login" });
   }
-})
+});
 
 // 📌 Profile Route
 router.get("/profile", authenticateToken, async (req, res) => {
