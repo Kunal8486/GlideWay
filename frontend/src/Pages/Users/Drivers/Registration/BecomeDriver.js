@@ -215,7 +215,7 @@ const BecomeDriver = () => {
                 }
             });
 
-            const response = await fetch("http://localhost:5500/api/driver/register", {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/driver/register`, {
                 method: "POST",
                 body: formDataObject,
             });

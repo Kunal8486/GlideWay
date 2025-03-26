@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 const crypto = require("crypto")
 const nodemailer = require("nodemailer")
 const dotenv = require("dotenv")
-const User = require("../models/Rider") // Assuming `Rider` model is used
+const User = require("../Models/Rider")
 dotenv.config()
 
 const router = express.Router()

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReCAPTCHA from "react-google-recaptcha";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
 
 const Login = () => {
@@ -96,8 +96,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5500'}/api/login`, 
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`, 
         {
           ...formData,
           captchaToken  // Send captcha token to backend for verification
@@ -134,7 +133,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5500'}/api/auth/google`,
+        `${process.env.REACT_APP_API_BASE_URL}/api/auth/google`,
         { 
           token: credentialResponse.credential,
           captchaToken  // Send captcha token to backend for verification

@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:5500/api/auth/google/callback", // Make sure this matches your Google Developer Console settings
+      callbackURL: `${process.env.REACT_APP_API_BASE_URL}/api/auth/google/callback`, // Make sure this matches your Google Developer Console settings
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

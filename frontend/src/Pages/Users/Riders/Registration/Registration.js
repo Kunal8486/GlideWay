@@ -22,7 +22,7 @@ const Registration = () => {
     password: "",
     gender: "",
     dob: "",
-    googleId: undefined, 
+    googleId: undefined,
   })
 
   const [errors, setErrors] = useState({})
@@ -34,16 +34,16 @@ const Registration = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
-    
+
     // Clear field-specific error when user starts typing
     if (errors[name]) {
-      setErrors({...errors, [name]: ""})
+      setErrors({ ...errors, [name]: "" })
     }
   }
 
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token)
-    
+
     // Clear captcha error if a token is received
     if (errors.captcha) {
       const newErrors = { ...errors };
@@ -54,14 +54,14 @@ const Registration = () => {
 
   const validateForm = () => {
     const newErrors = {}
-    
+
     // Name validation
     if (!formData.name.trim()) {
       newErrors.name = "Name is required"
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters"
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!formData.email) {
@@ -69,7 +69,7 @@ const Registration = () => {
     } else if (!emailRegex.test(formData.email)) {
       newErrors.email = "Please enter a valid email"
     }
-    
+
     // Phone validation
     const phoneRegex = /^\d{10,15}$/
     if (!formData.phone_number) {
@@ -77,19 +77,19 @@ const Registration = () => {
     } else if (!phoneRegex.test(formData.phone_number.replace(/[^\d]/g, ''))) {
       newErrors.phone_number = "Please enter a valid phone number"
     }
-    
+
     // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required"
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters"
     }
-    
+
     // Gender validation
     if (!formData.gender) {
       newErrors.gender = "Please select your gender"
     }
-    
+
     // Date of birth validation
     if (!formData.dob) {
       newErrors.dob = "Date of birth is required"
@@ -101,12 +101,12 @@ const Registration = () => {
         newErrors.dob = "You must be at least 13 years old"
       }
     }
-    
+
     // Captcha validation
     if (!captchaToken) {
       newErrors.captcha = "Please complete the reCAPTCHA"
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -115,26 +115,26 @@ const Registration = () => {
     e.preventDefault()
     setSuccess("")
     setServerError("")
-    
+
     // Form validation
     if (!validateForm()) {
       return
     }
-    
+
     setIsLoading(true)
 
     try {
-      const res = await axios.post("http://localhost:5500/api/register", {
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/register`, {
         ...formData,
         captchaToken  // Send captcha token to backend
       }, { withCredentials: true })
-      
+
       setSuccess(res.data.message || "Registration successful! Redirecting to login...")
       setTimeout(() => navigate("/login"), 2000)
     } catch (err) {
       const errorMessage = err.response?.data?.error || "Registration failed. Please try again."
       setServerError(errorMessage)
-      
+
       // Handle field-specific errors from backend if available
       if (err.response?.data?.fieldErrors) {
         setErrors(err.response.data.fieldErrors)
@@ -159,18 +159,17 @@ const Registration = () => {
 
     setIsLoading(true);
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:5500'}/api/auth/google`,
-        { 
+      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/google`,
+        {
           token: credentialResponse.credential,
           captchaToken  // Send captcha token to backend for verification
         },
         { withCredentials: true }
       );
-      
+
       localStorage.setItem("token", res.data.token);
       setSuccess(res.data.message);
-      
+
       setTimeout(() => {
         const from = location.state?.from?.pathname || "/profile";
         navigate(from);
@@ -209,68 +208,68 @@ const Registration = () => {
         <form className="registration-form" onSubmit={handleSubmit} noValidate>
           <div className="form-group">
             <label htmlFor="name">Full Name</label>
-            <input 
+            <input
               id="name"
-              type="text" 
-              name="name" 
-              placeholder="Enter your full name" 
+              type="text"
+              name="name"
+              placeholder="Enter your full name"
               value={formData.name}
-              onChange={handleChange} 
+              onChange={handleChange}
               className={errors.name ? "input-error" : ""}
             />
             {errors.name && <span className="error-text">{errors.name}</span>}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email">Email Address</label>
-            <input 
+            <input
               id="email"
-              type="email" 
-              name="email" 
-              placeholder="your@email.com" 
+              type="email"
+              name="email"
+              placeholder="your@email.com"
               value={formData.email}
-              onChange={handleChange} 
+              onChange={handleChange}
               className={errors.email ? "input-error" : ""}
             />
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="phone_number">Phone Number</label>
-            <input 
+            <input
               id="phone_number"
-              type="tel" 
-              name="phone_number" 
-              placeholder="Your phone number" 
+              type="tel"
+              name="phone_number"
+              placeholder="Your phone number"
               value={formData.phone_number}
-              onChange={handleChange} 
+              onChange={handleChange}
               className={errors.phone_number ? "input-error" : ""}
             />
             {errors.phone_number && <span className="error-text">{errors.phone_number}</span>}
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input 
+            <input
               id="password"
-              type="password" 
-              name="password" 
-              placeholder="Create a secure password" 
+              type="password"
+              name="password"
+              placeholder="Create a secure password"
               value={formData.password}
-              onChange={handleChange} 
+              onChange={handleChange}
               className={errors.password ? "input-error" : ""}
             />
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
-          
+
           <div className="form-row">
             <div className="form-group half-width">
               <label htmlFor="gender">Gender</label>
-              <select 
+              <select
                 id="gender"
-                name="gender" 
+                name="gender"
                 value={formData.gender}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className={errors.gender ? "input-error" : ""}
               >
                 <option value="">Select Gender</option>
@@ -280,22 +279,22 @@ const Registration = () => {
               </select>
               {errors.gender && <span className="error-text">{errors.gender}</span>}
             </div>
-            
+
             <div className="form-group half-width">
               <label htmlFor="dob">Date of Birth</label>
-              <input 
+              <input
                 id="dob"
-                type="date" 
+                type="date"
                 name="dob"
                 max={new Date().toISOString().split('T')[0]}
                 value={formData.dob}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className={errors.dob ? "input-error" : ""}
               />
               {errors.dob && <span className="error-text">{errors.dob}</span>}
             </div>
           </div>
-          
+
           {/* reCAPTCHA Component */}
           <div className="recaptcha-container">
             <ReCAPTCHA
@@ -308,7 +307,7 @@ const Registration = () => {
               </span>
             )}
           </div>
-          
+
           <div className="form-group terms">
             <input type="checkbox" id="terms" required />
             <label htmlFor="terms">
@@ -316,9 +315,9 @@ const Registration = () => {
             </label>
           </div>
 
-          <button 
-            type="submit" 
-            className="register-button" 
+          <button
+            type="submit"
+            className="register-button"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -338,8 +337,8 @@ const Registration = () => {
 
         <div className="social-login">
           <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-            <GoogleLogin 
-              onSuccess={handleGoogleLogin} 
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
               onError={() => setServerError("Google authentication failed")}
               theme="outline"
               shape="pill"
@@ -348,7 +347,7 @@ const Registration = () => {
             />
           </GoogleOAuthProvider>
         </div>
-        
+
         <p className="login-prompt">
           Already have an account? <a href="/login">Sign in</a>
         </p>

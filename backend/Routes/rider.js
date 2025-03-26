@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const { OAuth2Client } = require("google-auth-library")
 const dotenv = require("dotenv")
-const Rider = require("../models/Rider.js")
+const Rider = require("../Models/Rider.js")
 const axios = require("axios")
 
 dotenv.config()

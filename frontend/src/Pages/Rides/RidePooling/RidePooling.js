@@ -90,7 +90,7 @@ function RidePooling() {
                 throw new Error('Origin and destination are required');
             }
 
-            const response = await axios.post('http://localhost:5500/api/rides/createpool', rideDetails);
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/rides/createpool`, rideDetails);
             setRides(prev => [...prev, response.data]);
 
             // Reset form with toast-like notification
@@ -121,7 +121,7 @@ function RidePooling() {
         setError(null);
 
         try {
-            const response = await axios.get('http://localhost:5500/api/rides/poolsearch', {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/poolsearch`, {
                 params: searchFilters
             });
             setRides(response.data);
@@ -139,7 +139,7 @@ function RidePooling() {
         setError(null);
 
         try {
-            const response = await axios.get('http://localhost:5000/api/poolroute', {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/poolroute`, {
                 params: { origin, destination }
             });
             setRouteDetails(response.data);
@@ -155,7 +155,7 @@ function RidePooling() {
     const handleJoinRide = async (rideId) => {
         try {
             // TODO: Implement actual join ride backend logic
-            const response = await axios.post(`http://localhost:5500/api/rides/${rideId}/join`);
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/rides/${rideId}/join`);
             alert('Ride joined successfully!');
         } catch (error) {
             console.error('Error joining ride:', error);
@@ -168,7 +168,7 @@ function RidePooling() {
         const fetchRides = async () => {
             setLoading(prev => ({ ...prev, searchRides: true }));
             try {
-                const response = await axios.get('http://localhost:5500/api/rides/poolsearch');
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/poolsearch`);
                 setRides(response.data);
             } catch (error) {
                 console.error('Error fetching rides:', error);

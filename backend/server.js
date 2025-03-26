@@ -9,7 +9,7 @@ const riderRoutes = require("./Routes/rider")
 const poolrideRoutes = require('./Routes/poolride')
 dotenv.config()
 const app = express()
-const PORT = process.env.PORT || 5500
+const PORT = process.env.PORT
 
 // Middleware
 app.use(cors({
