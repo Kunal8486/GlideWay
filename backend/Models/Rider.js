@@ -14,6 +14,7 @@ const riderSchema = new Schema(
     age: { type: Number, required: false },
     wallet_balance: { type: Number, default: 0 },
     preferred_payment: { type: String, enum: ["card", "wallet", "cash"], default: "wallet" },
+    role: { type: String, default: "rider" },
     home_location: {
       latitude: { type: Number },
       longitude: { type: Number },

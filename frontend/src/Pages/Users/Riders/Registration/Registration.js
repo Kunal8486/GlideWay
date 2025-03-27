@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import axios from "axios"
 import ReCAPTCHA from "react-google-recaptcha"
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"
@@ -31,6 +31,10 @@ const Registration = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [captchaToken, setCaptchaToken] = useState(null)
   const [isEmailVerified, setIsEmailVerified] = useState(false)
+  const [resendTimer, setResendTimer] = useState(0)
+  const [resendAttempts, setResendAttempts] = useState(0)
+  const [lastResendTime, setLastResendTime] = useState(null)
+
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -43,6 +47,21 @@ const Registration = () => {
   }
 
   const sendEmailVerification = async () => {
+    const currentTime = Date.now()
+    const timeSinceLastResend = lastResendTime ? currentTime - lastResendTime : Infinity
+
+    // Check if 900 seconds have passed since last resend
+    if (timeSinceLastResend < 900000) {
+      setServerError("Please wait 15 Min before requesting another code")
+      return
+    }
+
+    // Prevent sending if maximum resend attempts reached
+    if (resendAttempts >= 3) {
+      setServerError("Maximum resend attempts reached. Please wait 5 minutes.")
+      return
+    }
+
     setIsLoading(true)
     setServerError("")
     setSuccess("")
@@ -53,12 +72,55 @@ const Registration = () => {
       })
 
       setSuccess(res.data.message || "Verification code sent to your email")
+      
+      // Update last resend time and attempts
+      setLastResendTime(currentTime)
+      setResendAttempts(prev => prev + 1)
+      
+      // Start the 900-second timer
+      setResendTimer(900)
     } catch (err) {
-      setServerError(err.response?.data?.error || "Failed to send verification code")
+      const errorMessage = err.response?.data?.error || "Failed to send verification code"
+      setServerError(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Reset resend attempts after 5 minutes
+  useEffect(() => {
+    let resetTimeout;
+    if (resendAttempts >= 3) {
+      resetTimeout = setTimeout(() => {
+        setResendAttempts(0)
+        setLastResendTime(null)
+      }, 5 * 60 * 1000) // 5 minutes
+    }
+
+    return () => {
+      if (resetTimeout) clearTimeout(resetTimeout)
+    }
+  }, [resendAttempts])
+
+  // Timer countdown effect
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer(prevTimer => {
+          if (prevTimer <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return prevTimer - 1
+        })
+      }, 1000)
+    }
+
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [resendTimer])
 
   const verifyEmailCode = async () => {
     setIsLoading(true)
@@ -73,6 +135,7 @@ const Registration = () => {
 
       setIsEmailVerified(true)
       setSuccess(res.data.message || "Email verified successfully")
+      setResendTimer(900)
       nextStep()
     } catch (err) {
       setServerError(err.response?.data?.error || "Invalid verification code")
@@ -94,10 +157,11 @@ const Registration = () => {
       );
 
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "rider");
       setSuccess(res.data.message);
 
       setTimeout(() => {
-        const from = location.state?.from?.pathname || "/profile";
+        const from = location.state?.from?.pathname || "/rider-profile";
         navigate(from);
       }, 2000);
     } catch (err) {
@@ -115,7 +179,7 @@ const Registration = () => {
   const validateStep = () => {
     const newErrors = {}
 
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         // Name validation
         if (!formData.name.trim()) {
@@ -255,7 +319,7 @@ const Registration = () => {
   }
 
   const renderStep = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         return (
           <div className="form-group">
@@ -270,9 +334,9 @@ const Registration = () => {
               className={errors.name ? "input-error" : ""}
             />
             {errors.name && <span className="error-text">{errors.name}</span>}
-            <button 
-              type="button" 
-              className="register-button next-button" 
+            <button
+              type="button"
+              className="register-button next-button"
               onClick={nextStep}
             >
               Next
@@ -312,16 +376,16 @@ const Registration = () => {
             </div>
 
             <div className="form-button-group">
-              <button 
-                type="button" 
-                className="register-button prev-button" 
+              <button
+                type="button"
+                className="register-button prev-button"
                 onClick={prevStep}
               >
                 Previous
               </button>
-              <button 
-                type="button" 
-                className="register-button next-button" 
+              <button
+                type="button"
+                className="register-button next-button"
                 onClick={nextStep}
               >
                 Next
@@ -330,52 +394,64 @@ const Registration = () => {
           </>
         )
 
-      case 3:
-        return (
-          <div className="form-group">
-            <label htmlFor="email_verification_code">Email Verification</label>
-            <p>A verification code has been sent to {formData.email}</p>
-            <div className="verification-container">
-              <input
-                id="email_verification_code"
-                type="text"
-                name="email_verification_code"
-                placeholder="Enter 6-digit verification code"
-                value={formData.email_verification_code}
-                onChange={handleChange}
-                className={errors.email_verification_code ? "input-error" : ""}
-                maxLength="6"
-              />
-              <button 
-                type="button" 
-                className="resend-verification-button" 
-                onClick={sendEmailVerification}
-                disabled={isLoading}
-              >
-                {isLoading ? "Sending..." : "Resend Code"}
-              </button>
+        case 3:
+          return (
+            <div className="form-group">
+              <label htmlFor="email_verification_code">Email Verification</label>
+              <p>A verification code has been sent to {formData.email}</p>
+              <div className="verification-container">
+                <input
+                  id="email_verification_code"
+                  type="text"
+                  name="email_verification_code"
+                  placeholder="Enter 6-digit verification code"
+                  value={formData.email_verification_code}
+                  onChange={handleChange}
+                  className={errors.email_verification_code ? "input-error" : ""}
+                  maxLength="6"
+                />
+                <button
+                  type="button"
+                  className="resend-verification-button"
+                  onClick={sendEmailVerification}
+                  disabled={isLoading || resendTimer > 0 || resendAttempts >= 3}
+                >
+                  {resendAttempts >= 3 ? (
+                    "Retry Later"
+                  ) : (
+                    resendTimer > 0
+                      ? `Resend Code (${resendTimer}s)`
+                      : (isLoading ? "Sending..." : "Send Code")
+                  )}
+                </button>
+              </div>
+              {errors.email_verification_code && <span className="error-text">{errors.email_verification_code}</span>}
+              {resendAttempts >= 3 && (
+                <span className="error-text">
+                  Too many resend attempts. Please wait 5 minutes before trying again.
+                </span>
+              )}
+  
+              <div className="form-button-group">
+                <button
+                  type="button"
+                  className="register-button prev-button"
+                  onClick={prevStep}
+                >
+                  Previous
+                </button>
+                <button
+                  type="button"
+                  className="register-button next-button"
+                  onClick={verifyEmailCode}
+                  disabled={isLoading}
+                >
+                  Verify Email
+                </button>
+              </div>
             </div>
-            {errors.email_verification_code && <span className="error-text">{errors.email_verification_code}</span>}
-            
-            <div className="form-button-group">
-              <button 
-                type="button" 
-                className="register-button prev-button" 
-                onClick={prevStep}
-              >
-                Previous
-              </button>
-              <button 
-                type="button" 
-                className="register-button next-button" 
-                onClick={verifyEmailCode}
-                disabled={isLoading}
-              >
-                Verify Email
-              </button>
-            </div>
-          </div>
-        )
+          )
+
 
       case 4:
         return (
@@ -391,7 +467,7 @@ const Registration = () => {
               className={errors.password ? "input-error" : ""}
             />
             {errors.password && <span className="error-text">{errors.password}</span>}
-            
+
             <label htmlFor="confirm_password">Confirm Password</label>
             <input
               id="confirm_password"
@@ -403,18 +479,18 @@ const Registration = () => {
               className={errors.confirm_password ? "input-error" : ""}
             />
             {errors.confirm_password && <span className="error-text">{errors.confirm_password}</span>}
-            
+
             <div className="form-button-group">
-              <button 
-                type="button" 
-                className="register-button prev-button" 
+              <button
+                type="button"
+                className="register-button prev-button"
                 onClick={prevStep}
               >
                 Previous
               </button>
-              <button 
-                type="button" 
-                className="register-button next-button" 
+              <button
+                type="button"
+                className="register-button next-button"
                 onClick={nextStep}
               >
                 Next
@@ -460,16 +536,16 @@ const Registration = () => {
             </div>
 
             <div className="form-button-group">
-              <button 
-                type="button" 
-                className="register-button prev-button" 
+              <button
+                type="button"
+                className="register-button prev-button"
                 onClick={prevStep}
               >
                 Previous
               </button>
-              <button 
-                type="button" 
-                className="register-button next-button" 
+              <button
+                type="button"
+                className="register-button next-button"
                 onClick={nextStep}
               >
                 Next
@@ -501,9 +577,9 @@ const Registration = () => {
             </div>
 
             <div className="form-button-group">
-              <button 
-                type="button" 
-                className="register-button prev-button" 
+              <button
+                type="button"
+                className="register-button prev-button"
                 onClick={prevStep}
               >
                 Previous

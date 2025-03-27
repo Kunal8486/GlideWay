@@ -7,6 +7,7 @@ const driverRoutes = require("./Routes/driver")
 const driverLogin = require("./Routes/DriverLogin")
 const riderRoutes = require("./Routes/rider") 
 const poolrideRoutes = require('./Routes/poolride')
+const navRefresher = require('./Routes/navRefresher')
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT
@@ -23,6 +24,7 @@ app.use("/api/driver", driverRoutes)
 app.use("/api/driver", driverLogin)
 app.use("/api", riderRoutes) 
 app.use('/api/rides', poolrideRoutes);
+// app.use('/api/nav', navRefresher);
 
 
 // MongoDB Connection

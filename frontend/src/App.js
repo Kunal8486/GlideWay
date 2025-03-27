@@ -21,29 +21,35 @@ import CancellationPolicy from "./Pages/Legal/CancellationPolicy/CancellationPol
 import PaymentPolicy from "./Pages/Legal/PaymentPolicy/PaymentPolicy";
 import DriverPolicy from "./Pages/Legal/DriversPolicy/DriverPolicy";
 
-
 import Login from "./Pages/Users/Riders/Login/Login";
 import DriverLogin from "./Pages/Users/Drivers/Login/DriverLogin";
 
 import Signup from "./Pages/Users/Riders/Registration/Registration";
-import BecomeDriver from "./Pages/Users/Drivers/Registration/BecomeDriver";
-
+import DriverSignup from "./Pages/Users/Drivers/Registration/BecomeDriver";
 
 import ConfirmLogout from "./Pages/ConfirmLogout/ConfirmLogout";
 import ForgetPassword from "./Pages/Users/Riders/ForgetPassword/ForgetPassword";
 import ResetPassword from "./Pages/Users/Riders/ForgetPassword/ResetPassword";
 
-import Dashboard from "./Pages/Dashboard/Rider/RiderDashboard";
-import Driver from "./Pages/Dashboard/Driver/DriverDashboard";
+import RiderDashboard from "./Pages/Dashboard/Rider/RiderDashboard";
+import DriverDashboard from "./Pages/Dashboard/Driver/DriverDashboard";
 
 import RiderProfile from "./Pages/Users/Riders/Profile/Profile";
-
+import DriverProfile from "./Pages/Users/Drivers/Profile/Profile";
 
 import ScheduleRide from "./Pages/Rides/ScheduleRide/ScheduleRide";
 import RideSharing from "./Pages/Rides/RideSharing/RideSharing";
 import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
 
 import "./App.css";
+
+// Create an AuthContext for robust state management
+const AuthContext = React.createContext({
+  isLoggedIn: false,
+  userRole: null,
+  login: () => {},
+  logout: () => {}
+});
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -53,7 +59,7 @@ const App = () => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
-    if (token) {
+    if (token && role) {
       setIsLoggedIn(true);
       setUserRole(role);
     }
@@ -73,64 +79,164 @@ const App = () => {
     setUserRole(null);
   };
 
+  // Authentication context value
+  const authContextValue = {
+    isLoggedIn,
+    userRole,
+    login: handleLogin,
+    logout: handleLogout
+  };
+
   return (
-    <Router>
-      <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
+    <AuthContext.Provider value={authContextValue}>
+      <Router>
+        <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} userRole={userRole} />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
 
-        <Route path="/cookies-policy" element={<CookiesPolicy />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/refund-policy" element={<RefundPolicy />} />
-        <Route path="/pooling-policy" element={<PoolingPolicy />} />
-        <Route path="/cancellation-policy" element={<CancellationPolicy />} />
-        <Route path="/payment-policy" element={<PaymentPolicy />} />
-        <Route path="/driver-policy" element={<DriverPolicy />} />
+          {/* Legal Routes */}
+          <Route path="/cookies-policy" element={<CookiesPolicy />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/pooling-policy" element={<PoolingPolicy />} />
+          <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+          <Route path="/payment-policy" element={<PaymentPolicy />} />
+          <Route path="/driver-policy" element={<DriverPolicy />} />
 
+          {/* Authentication Routes */}
+          {/* Rider Routes */}
+          <Route 
+            path="/login" 
+            element={
+              isLoggedIn && userRole === 'rider' ? (
+                <Navigate to="/rider-dashboard" replace />
+              ) : (
+                <Login handleLogin={handleLogin} role="rider" />
+              )
+            } 
+          />
+          <Route 
+            path="/signup" 
+            element={
+              isLoggedIn && userRole === 'rider' ? (
+                <Navigate to="/rider-dashboard" replace />
+              ) : (
+                <Signup />
+              )
+            } 
+          />
 
-        <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Login handleLogin={handleLogin} />} />
-        <Route path="/signup" element={isLoggedIn ? <Navigate to="/dashboard" replace /> : <Signup />} />
-        <Route path="/forget-password" element={<ForgetPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+          {/* Driver Routes */}
+          <Route 
+            path="/driver-login" 
+            element={
+              isLoggedIn && userRole === 'driver' ? (
+                <Navigate to="/driver-dashboard" replace />
+              ) : (
+                <DriverLogin handleLogin={handleLogin} role="driver" />
+              )
+            } 
+          />
+          <Route 
+            path="/become-driver" 
+            element={
+              isLoggedIn && userRole === 'driver' ? (
+                <Navigate to="/driver-dashboard" replace />
+              ) : (
+                <DriverSignup />
+              )
+            } 
+          />
 
-        <Route path="/driver" element={<Driver />} />
-        <Route path="/become-driver" element={<BecomeDriver />} />
+          {/* Common Authentication Routes */}
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
+          {/* Ride-related Routes */}
+          <Route path="/book-a-ride" element={<BookARide />} />
+          <Route path="/schedule-ride" element={<ScheduleRide />} />
+          <Route path="/ride-sharing" element={<RideSharing />} />
+          <Route path="/ride-pooling" element={<RidePooling />} />
 
-        <Route path="/book-a-ride" element={<BookARide />} />
-        <Route path="/rider-profile" element={<RiderProfile />} />
-        <Route path="/driver-login" element={<DriverLogin />} />
+          {/* Protected Routes */}
+          {/* Rider Protected Routes */}
+          <Route
+            path="/rider-dashboard"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["rider"]} 
+                userRole={userRole}
+              >
+                <RiderDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/rider-profile"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["rider"]} 
+                userRole={userRole}
+              >
+                <RiderProfile />
+              </ProtectedRoute>
+            }
+          />
 
+          {/* Driver Protected Routes */}
+          <Route
+            path="/driver-dashboard"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["driver"]} 
+                userRole={userRole}
+              >
+                <DriverDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/driver-profile"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["driver"]} 
+                userRole={userRole}
+              >
+                <DriverProfile />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="/schedule-ride" element={<ScheduleRide />} />
-        <Route path="/ride-sharing" element={<RideSharing />} />
-        <Route path="/ride-pooling" element={<RidePooling />} />
+          {/* Logout Route */}
+          <Route 
+            path="/confirm-logout" 
+            element={
+              isLoggedIn ? (
+                <ConfirmLogout handleLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            } 
+          />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute isLoggedIn={isLoggedIn} allowedRoles={["user", "admin"]} userRole={userRole}>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Confirmation and Logout Routes */}
-        <Route path="/confirm-logout" element={isLoggedIn ? <ConfirmLogout handleLogout={handleLogout} /> : <Navigate to="/login" replace />} />
-
-        {/* Redirect unknown routes */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-      <Footer />
-    </Router>
+          {/* Redirect unknown routes */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <Footer />
+      </Router>
+    </AuthContext.Provider>
   );
 };
 
 export default App;
+export { AuthContext };

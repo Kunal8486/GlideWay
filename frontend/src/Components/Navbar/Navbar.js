@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios'; // Make sure to import axios
 import './Navbar.css';
 
 const Navbar = ({ isLoggedIn, handleLogout }) => {
@@ -9,6 +10,56 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
     // Use React Router hooks for better navigation management
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // Token refresh function
+    const refreshToken = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                // If no token exists, redirect to login
+                handleLogout();
+                navigate('/login');
+                return false;
+            }
+
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/api/nav/refresh-token`, 
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    withCredentials: true
+                }
+            );
+
+            // If refresh is successful, update the token
+            if (response.data && response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                return true;
+            }
+        } catch (error) {
+            console.error("Token refresh failed:", error);
+            // If refresh fails, logout the user
+            handleLogout();
+            navigate('/login');
+            return false;
+        }
+    };
+
+    // Token refresh effect (run every 10 minutes)
+    useEffect(() => {
+        // Only run token refresh if logged in
+        if (!isLoggedIn) return;
+
+        // Initial refresh interval
+        const refreshInterval = setInterval(() => {
+            refreshToken();
+        }, 10 * 60 * 1000); // 10 minutes
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(refreshInterval);
+    }, [isLoggedIn]);
     
     // Handle scroll effect for navbar
     useEffect(() => {
@@ -71,7 +122,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         ];
         
         if (isLoggedIn) {
-            baseLinks.push({ path: '/dashboard', label: 'Dashboard' });
+            baseLinks.push({ path: '/rider-dashboard', label: 'Dashboard' });
         } else {
             baseLinks.push({ path: '/login', label: 'Login' });
         }

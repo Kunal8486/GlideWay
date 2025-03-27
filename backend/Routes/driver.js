@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const Driver = require('../Models/Driver');
 const router = express.Router();
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
@@ -137,5 +139,7 @@ router.post('/register', upload.fields([
         res.status(500).json({ error: "Registration failed. Please try again." });
     }
 });
+
+
 
 module.exports = router;

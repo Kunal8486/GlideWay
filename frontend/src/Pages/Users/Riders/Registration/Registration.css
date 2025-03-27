@@ -95,6 +95,9 @@
   margin-bottom: 1.25rem;
 }
 
+#name{
+  margin-bottom: 2rem;
+}
 .form-group label {
   display: block;
   margin-bottom: 0.375rem;
@@ -333,4 +336,34 @@
 .step-dot.active {
   background-color: var(--primary-color);
   width: 16px;
+}
+
+
+
+
+
+/* Register Button */
+.resend-verification-button {
+  margin-top: 2rem;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.resend-verification-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.resend-verification-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

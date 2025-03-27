@@ -105,7 +105,7 @@ router.post("/login", async (req, res) => {
 });
 
 // 📌 Profile Route
-router.get("/profile", authenticateToken, async (req, res) => {
+router.get("/rider-profile", authenticateToken, async (req, res) => {
   try {
     console.log("Decoded User in Profile Route:", req.user) 
     const rider = await Rider.findById(req.user.id).select("-password")

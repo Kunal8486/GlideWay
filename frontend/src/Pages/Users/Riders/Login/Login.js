@@ -105,10 +105,11 @@ const Login = () => {
       );
       
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "rider");
       setSuccess(res.data.message);
       
       setTimeout(() => {
-        const from = location.state?.from?.pathname || "/profile";
+        const from = location.state?.from?.pathname || "/rider-profile";
         navigate(from);
       }, 2000);
     } catch (err) {
@@ -124,11 +125,11 @@ const Login = () => {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
-    // Check if captcha is completed before proceeding with Google login
-    if (!captchaToken) {
-      setError("Please complete the reCAPTCHA before continuing");
-      return;
-    }
+    // // Check if captcha is completed before proceeding with Google login
+    // if (!captchaToken) {
+    //   setError("Please complete the reCAPTCHA before continuing");
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
@@ -140,8 +141,10 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      
+
+            
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", "rider");
       setSuccess(res.data.message);
       
       setTimeout(() => {
