@@ -1,6 +1,8 @@
 /* Services Page Container */
 .services-container {
   padding: 3rem 2rem;
+  margin-top: -5px;
+  margin-bottom: -10px;
   background: #faf7f2; /* Match the background color from JS */
   min-height: 100vh;
   font-family: "Poppins", sans-serif;

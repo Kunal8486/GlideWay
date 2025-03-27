@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReCAPTCHA from "react-google-recaptcha";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import './DriverLogin.css';

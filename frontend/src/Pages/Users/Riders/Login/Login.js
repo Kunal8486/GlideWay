@@ -7,7 +7,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Login.css";
 
-const Login = () => {
+const Login = ({ handleLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,6 +21,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   // Environment variable validation
   useEffect(() => {
@@ -87,42 +90,42 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setErrors({});
 
-    // Validate form before submission
+    // Validate form
     if (!validateForm()) return;
 
-    setIsLoading(true);
+    setIsSubmitting(true);
 
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`, 
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`, 
         {
           ...formData,
           captchaToken  // Send captcha token to backend for verification
         }, 
         { withCredentials: true }
       );
-      
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", "rider");
-      setSuccess(res.data.message);
-      
-      setTimeout(() => {
-        const from = location.state?.from?.pathname || "/rider-profile";
-        navigate(from);
-      }, 2000);
-    } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+
+        // Call handleLogin with token and role
+        handleLogin(response.data.token, 'rider');
+
+        // Success notification or redirect
+        const from = location.state?.from?.pathname || "/rider-dashboard";
+        navigate(from, { replace: true });
+    } catch (error) {
+        setErrors({
+            submit: error.response?.data?.error || 'Login failed. Please try again.'
+        });
     } finally {
-      setIsLoading(false);
-      // Reset captcha after submission
-      if (window.grecaptcha) {
-        window.grecaptcha.reset();
-      }
-      setCaptchaToken(null);
+        setIsSubmitting(false);
+        // Reset captcha
+        if (window.grecaptcha) {
+            window.grecaptcha.reset();
+        }
+        setCaptchaToken(null);
     }
-  };
+};
+
 
   const handleGoogleLogin = async (credentialResponse) => {
     // // Check if captcha is completed before proceeding with Google login
