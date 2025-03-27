@@ -21,8 +21,9 @@ const Login = ({ handleLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState(null);
-  const [setErrors] = useState({});
-  const [setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   // Environment variable validation
   useEffect(() => {
