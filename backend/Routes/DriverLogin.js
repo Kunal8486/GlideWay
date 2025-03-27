@@ -98,7 +98,7 @@ router.get('/me', async (req, res) => {
 });
 
 // Route for password reset request
-router.post('/forgot-password', async (req, res) => {
+router.post('/rider-forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
         

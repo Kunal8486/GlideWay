@@ -6,6 +6,7 @@ const nodemailer = require("nodemailer")
 const dotenv = require("dotenv")
 const User = require("../Models/Rider")
 const EmailVerification = require("../Models/EmailVerification")
+const Driver = require("../Models/Driver")
 dotenv.config()
 
 const router = express.Router()
@@ -37,7 +38,7 @@ const handleError = (res, error, customMessage = "Server error") => {
   })
 }
 
-router.post("/forgot-password", async (req, res) => {
+router.post("/rider-forgot-password", async (req, res) => {
   try {
     const { email } = req.body
     
@@ -69,7 +70,7 @@ router.post("/forgot-password", async (req, res) => {
       return handleError(res, saveError, "Failed to save reset token")
     }
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+    const resetUrl = `${process.env.FRONTEND_URL}/rider-reset-password/${resetToken}`
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -99,7 +100,7 @@ router.post("/forgot-password", async (req, res) => {
   }
 })
 
-router.post("/reset-password/:token", async (req, res) => {
+router.post("/rider-reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params
     const { newPassword } = req.body
@@ -145,6 +146,127 @@ router.post("/reset-password/:token", async (req, res) => {
     handleError(res, error)
   }
 })
+
+
+
+
+router.post("/driver-forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body
+    
+    // Validate email format
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format" })
+    }
+
+    // Find driver with proper error handling
+    const driver = await Driver.findOne({ email }).exec()
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" })
+    }
+
+    // Generate reset token
+    const resetToken = jwt.sign({ id: driver._id }, process.env.JWT_SECRET, { 
+      expiresIn: "1h" 
+    })
+
+    // Update driver with reset token
+    driver.resetPasswordToken = resetToken
+    driver.resetPasswordExpires = Date.now() + 3600000 // 1 hour from now
+    
+    // Save with error handling
+    try {
+      await driver.save()
+    } catch (saveError) {
+      return handleError(res, saveError, "Failed to save reset token")
+    }
+
+    const resetUrl = `${process.env.FRONTEND_URL}/driver-reset-password/${resetToken}`
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: driver.email,
+      subject: "Password Reset Request",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Password Reset</h2>
+          <p>You have requested to reset your password. Click the link below to reset:</p>
+          <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none;">
+            Reset Password
+          </a>
+          <p>If you did not request a password reset, please ignore this email.</p>
+          <p>This link will expire in 1 hour.</p>
+        </div>
+      `
+    }
+
+    // Send email with comprehensive error handling
+    try {
+      await transporter.sendMail(mailOptions)
+      res.json({ message: "Password reset link sent to your email" })
+    } catch (emailError) {
+      return handleError(res, emailError, "Failed to send reset email")
+    }
+  } catch (error) {
+    handleError(res, error)
+  }
+})
+
+router.post("/driver-reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params
+    const { newPassword } = req.body
+
+    // Validate password strength
+    if (newPassword.length < 8) {
+      return res.status(400).json({ 
+        message: "Password must be at least 8 characters long" 
+      })
+    }
+
+    // Verify token with error handling
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET)
+    } catch (tokenError) {
+      return res.status(400).json({ message: "Invalid or expired token" })
+    }
+
+    // Find driver with proper query
+    const driver = await Driver.findById(decoded.id).exec()
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" })
+    }
+
+    // Verify token matches saved token and not expired
+    if (driver.resetPasswordToken !== token || driver.resetPasswordExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired reset token" })
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(12)  // Increased salt rounds for better security
+    const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+    // Update driver password
+    driver.password = hashedPassword
+    driver.resetPasswordToken = undefined
+    driver.resetPasswordExpires = undefined
+
+    // Save with error handling
+    try {
+      await driver.save()
+      res.json({ message: "Password reset successful" })
+    } catch (saveError) {
+      return handleError(res, saveError, "Failed to update password")
+    }
+  } catch (error) {
+    handleError(res, error)
+  }
+})
+
+
+
+//OTP Verification
 
 router.post("/send-verification-email", async (req, res) => {
   try {

@@ -15,6 +15,16 @@ const driverSchema = new Schema(
     license_expiry: { type: Date, required: true },
     license_front_url: { type: String, required: true },
     license_back_url: { type: String, required: true },
+
+    //Reset Password
+    resetPasswordToken: { 
+      type: String, 
+      default: null 
+    },
+    resetPasswordExpires: { 
+      type: Date, 
+      default: null 
+    },
     
     // Vehicle information
     vehicle_details: {
@@ -27,8 +37,18 @@ const driverSchema = new Schema(
     profile_picture_url: { type: String, required: true },
     
     // Status and verification
-    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-    is_verified: { type: Boolean, default: false },
+    status: { 
+      type: String, 
+      enum: ['pending', 'approved', 'rejected'], 
+      default: 'pending',
+      trim: true, // Add trim to remove whitespace
+      validate: {
+        validator: function(v) {
+          return ['pending', 'approved', 'rejected'].includes(v.trim());
+        },
+        message: props => `${props.value} is not a valid status!`
+      }
+    },    is_verified: { type: Boolean, default: false },
     
     // Additional fields (not in frontend form but retained from original model)
     vehicle_insurance_url: { type: String },

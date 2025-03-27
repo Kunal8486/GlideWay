@@ -206,7 +206,7 @@ const DriverLogin = ({ handleLogin }) => {
             </div>
 
             <div className="forgot-password">
-              <a href="/driver/forget-password">Forgot your password?</a>
+              <a href="/driver-forgot-password">Forgot your password?</a>
             </div>
           </div>
 

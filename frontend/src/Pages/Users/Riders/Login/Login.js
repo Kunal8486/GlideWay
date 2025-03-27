@@ -255,7 +255,7 @@ const Login = ({ handleLogin }) => {
             </div>
 
             <div className="forgot-password">
-              <a href="/forget-password">Forgot your password?</a>
+              <a href="/rider-forgot-password">Forgot your password?</a>
             </div>
           </div>
 

@@ -28,8 +28,10 @@ import Signup from "./Pages/Users/Riders/Registration/Registration";
 import DriverSignup from "./Pages/Users/Drivers/Registration/BecomeDriver";
 
 import ConfirmLogout from "./Pages/ConfirmLogout/ConfirmLogout";
-import ForgetPassword from "./Pages/Users/Riders/ForgetPassword/ForgetPassword";
-import ResetPassword from "./Pages/Users/Riders/ForgetPassword/ResetPassword";
+import RiderForgetPassword from "./Pages/Users/Riders/ForgetPassword/ForgetPassword";
+import RiderResetPassword from "./Pages/Users/Riders/ForgetPassword/ResetPassword";
+import DriverForgetPassword from "./Pages/Users/Drivers/ForgetPassword/ForgetPassword";
+import DriverResetPassword from "./Pages/Users/Drivers/ForgetPassword/ResetPassword";
 
 import RiderDashboard from "./Pages/Dashboard/Rider/RiderDashboard";
 import DriverDashboard from "./Pages/Dashboard/Driver/DriverDashboard";
@@ -155,8 +157,10 @@ const App = () => {
           />
 
           {/* Common Authentication Routes */}
-          <Route path="/forget-password" element={<ForgetPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/rider-forgot-password" element={<RiderForgetPassword />} />
+          <Route path="/rider-reset-password/:token" element={<RiderResetPassword />} />
+          <Route path="/driver-forgot-password" element={<DriverForgetPassword />} />
+          <Route path="/driver-reset-password/:token" element={<DriverResetPassword />} />
 
           {/* Ride-related Routes */}
           <Route path="/book-a-ride" element={<BookARide />} />
