@@ -13,7 +13,7 @@ const PORT = process.env.PORT
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.FRONTEND_URL,
   credentials: true, 
   allowedHeaders: ["Content-Type", "Authorization"]
 }))
