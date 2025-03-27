@@ -11,9 +11,9 @@ const Login = ({ handleLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [formData, setFormData] = useState({ 
-    email: "", 
-    password: "" 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -32,7 +32,7 @@ const Login = ({ handleLogin }) => {
       process.env.REACT_APP_API_BASE_URL,
       process.env.REACT_APP_RECAPTCHA_SITE_KEY
     ];
-    
+
     requiredEnvVars.forEach(varName => {
       if (!process.env[varName]) {
         console.error(`Missing environment variable: ${varName}`);
@@ -68,7 +68,7 @@ const Login = ({ handleLogin }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear specific field error when user starts typing
     if (formErrors[name]) {
       const newErrors = { ...formErrors };
@@ -79,7 +79,7 @@ const Login = ({ handleLogin }) => {
 
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token);
-    
+
     // Clear captcha error if a token is received
     if (formErrors.captcha) {
       const newErrors = { ...formErrors };
@@ -98,33 +98,33 @@ const Login = ({ handleLogin }) => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`, 
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/login`,
         {
           ...formData,
           captchaToken  // Send captcha token to backend for verification
-        }, 
+        },
         { withCredentials: true }
       );
 
-        // Call handleLogin with token and role
-        handleLogin(response.data.token, 'rider');
+      // Call handleLogin with token and role
+      handleLogin(response.data.token, 'rider');
 
-        // Success notification or redirect
-        const from = location.state?.from?.pathname || "/rider-dashboard";
-        navigate(from, { replace: true });
+      // Success notification or redirect
+      const from = location.state?.from?.pathname || "/rider-dashboard";
+      navigate(from, { replace: true });
     } catch (error) {
-        setErrors({
-            submit: error.response?.data?.error || 'Login failed. Please try again.'
-        });
+      setErrors({
+        submit: error.response?.data?.error || 'Login failed. Please try again.'
+      });
     } finally {
-        setIsSubmitting(false);
-        // Reset captcha
-        if (window.grecaptcha) {
-            window.grecaptcha.reset();
-        }
-        setCaptchaToken(null);
+      setIsSubmitting(false);
+      // Reset captcha
+      if (window.grecaptcha) {
+        window.grecaptcha.reset();
+      }
+      setCaptchaToken(null);
     }
-};
+  };
 
 
   const handleGoogleLogin = async (credentialResponse) => {
@@ -138,18 +138,18 @@ const Login = ({ handleLogin }) => {
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/api/auth/google`,
-        { 
+        {
           token: credentialResponse.credential,
           captchaToken  // Send captcha token to backend for verification
         },
         { withCredentials: true }
       );
 
-            
+
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", "rider");
       setSuccess(res.data.message);
-      
+
       setTimeout(() => {
         const from = location.state?.from?.pathname || "/profile";
         navigate(from);
@@ -169,6 +169,7 @@ const Login = ({ handleLogin }) => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
 
   return (
     <div className="login-page">
@@ -210,7 +211,7 @@ const Login = ({ handleLogin }) => {
               </span>
             )}
           </div>
-          
+
           <div className="form-group password-group">
             <label htmlFor="password">Password</label>
             <div className="password-input-wrapper">
@@ -292,11 +293,11 @@ const Login = ({ handleLogin }) => {
         </div>
 
         <div className="social-login">
-          <GoogleOAuthProvider 
+          <GoogleOAuthProvider
             clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
           >
-            <GoogleLogin 
-              onSuccess={handleGoogleLogin} 
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
               onError={() => setError("Google Login Failed")}
               theme="outline"
               size="large"
@@ -304,11 +305,20 @@ const Login = ({ handleLogin }) => {
             />
           </GoogleOAuthProvider>
         </div>
-        
+
         <p className="signup-prompt">
           Don't have an account?{" "}
           <a href="/signup">Sign up</a>
         </p>
+        <div className="partner-login">
+          <a
+            href="/driver-login"
+            className="partner-login-btn"
+
+          >
+            Login as Partner
+          </a>
+        </div>
       </div>
     </div>
   );

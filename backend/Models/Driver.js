@@ -50,10 +50,6 @@ driverSchema.path('license_expiry').validate(function(value) {
   return value > new Date();
 }, 'License expiry date must be in the future');
 
-// Add index for better query performance
-driverSchema.index({ email: 1 });
-driverSchema.index({ "vehicle_details.registration_number": 1 });
-driverSchema.index({ license_number: 1 });
 
 const Driver = mongoose.model("Driver", driverSchema);
 module.exports = Driver;
