@@ -1,24 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, MessageCircle, AlertTriangle, Sparkles, User, RefreshCw } from 'lucide-react';
+import { Send, MapPin, Car, Wallet, User, AlertTriangle, Sparkles } from 'lucide-react';
 import { 
   generateAIResponse, 
   processMessage, 
   moderateContent 
 } from './gemmaService';
+import { 
+  fetchRideEstimate,
+  checkDriverAvailability,
+  calculatePoolingOptions
+} from './glideWayService';
 import './Chatbot.css';
 
-const AIChatbot = ({ 
+const GlideWayChatbot = ({ 
   initialContext = [], 
   initialMessages = [],
-  placeholder = "Type your message...",
-  headerTitle = "GlideWay AI Assistant"
+  userLocation = null,
+  placeholder = "Ask about rides, booking, or services...",
+  headerTitle = "GlideWay Support"
 }) => {
   const [messages, setMessages] = useState([
     ...(initialMessages.length > 0 
       ? initialMessages 
       : [{ 
           id: 1, 
-          text: "Hello! I'm an AI assistant. How can I help you today?", 
+          text: "Welcome to GlideWay! I'm your AI assistant. Need help with rides, booking, or have any questions? I'm here to assist you!", 
           sender: 'ai' 
         }]
     )
@@ -36,6 +42,53 @@ const AIChatbot = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const handleSpecialIntents = async (message) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Ride fare estimation
+    if (lowerMessage.includes('fare') || lowerMessage.includes('price')) {
+      try {
+        const estimate = await fetchRideEstimate(
+          userLocation?.origin, 
+          userLocation?.destination
+        );
+        return `Estimated fare details:
+                • Price: $${estimate.price}
+                • Distance: ${estimate.distance} miles
+                • Estimated Time: ${estimate.duration} minutes`;
+      } catch (err) {
+        return "I can help estimate fares, but couldn't fetch the exact details right now.";
+      }
+    }
+
+    // Pooling options
+    if (lowerMessage.includes('pool') || lowerMessage.includes('sharing')) {
+      try {
+        const poolingOptions = await calculatePoolingOptions(userLocation);
+        return `Ride Pooling Options:
+                • Shared Ride Discount: Up to 30% off
+                • Current matched riders: ${poolingOptions.matchedRiders}
+                • Estimated wait time: ${poolingOptions.waitTime} minutes`;
+      } catch (err) {
+        return "Pooling information is currently processing. I can still help you explore options.";
+      }
+    }
+
+    // Driver availability
+    if (lowerMessage.includes('driver') || lowerMessage.includes('availability')) {
+      try {
+        const driverStatus = await checkDriverAvailability(userLocation);
+        return `Driver Availability:
+                • Nearby drivers: ${driverStatus.nearbyDrivers}
+                • Estimated pickup time: ${driverStatus.pickupTime} minutes`;
+      } catch (err) {
+        return "Driver availability check is momentarily unavailable.";
+      }
+    }
+
+    return null;
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -60,16 +113,25 @@ const AIChatbot = ({
     setConversationStatus('processing');
 
     try {
-      // Process message with context
-      const processedMessage = processMessage(
-        inputMessage, 
-        initialContext
-      );
+      // First, check for special ride-sharing intents
+      const specialResponse = await handleSpecialIntents(inputMessage);
+      
+      let aiResponseText;
+      if (specialResponse) {
+        // Use special intent response if available
+        aiResponseText = specialResponse;
+      } else {
+        // Process message with context and generate AI response
+        const processedMessage = processMessage(
+          inputMessage, 
+          initialContext
+        );
 
-      const aiResponseText = await generateAIResponse([
-        ...messages, 
-        userMessage
-      ]);
+        aiResponseText = await generateAIResponse([
+          ...messages, 
+          userMessage
+        ]);
+      }
 
       const aiMessage = {
         id: Date.now() + 1,
@@ -88,28 +150,18 @@ const AIChatbot = ({
     }
   };
 
-  const handleResetConversation = () => {
-    setMessages([{ 
-      id: 1, 
-      text: "Hello! I'm an AI assistant. How can I help you today?", 
-      sender: 'ai' 
-    }]);
-    setInputMessage('');
-    setError(null);
-    setConversationStatus('initial');
-  };
-
   return (
     <div className="glideways-chatbot-container">
-      {/* Enhanced Header */}
+      {/* Header */}
       <div className="chatbot-header">
-      <Sparkles size={16} />
-
+        <Sparkles size={16} />
         <div className="header-content">
           <h2 className="header-title">{headerTitle}</h2>
         </div>
-        <div></div><div></div>
-
+        <div className="header-actions">
+          <MapPin size={16} />
+          <Car size={16} />
+        </div>
       </div>
 
       {/* Messages Area */}
@@ -155,7 +207,7 @@ const AIChatbot = ({
           {isLoading && (
             <div className="loading-indicator">
               <div className="typing-animation">
-              <span className="typing-text">AI is typing</span>
+                <span className="typing-text">AI is processing</span>
                 <span className="typing-dot">.</span>
                 <span className="typing-dot delayed-dot">.</span>
                 <span className="typing-dot more-delayed-dot">.</span>
@@ -200,4 +252,4 @@ const AIChatbot = ({
   );
 };
 
-export default AIChatbot;
+export default GlideWayChatbot;
