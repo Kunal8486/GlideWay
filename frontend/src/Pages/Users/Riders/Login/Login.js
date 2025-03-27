@@ -128,12 +128,6 @@ const Login = ({ handleLogin }) => {
 
 
   const handleGoogleLogin = async (credentialResponse) => {
-    // // Check if captcha is completed before proceeding with Google login
-    // if (!captchaToken) {
-    //   setError("Please complete the reCAPTCHA before continuing");
-    //   return;
-    // }
-
     setIsLoading(true);
     try {
       const res = await axios.post(
@@ -145,25 +139,14 @@ const Login = ({ handleLogin }) => {
         { withCredentials: true }
       );
 
+      handleLogin(res.data.token, 'rider');
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", "rider");
       setSuccess(res.data.message);
 
-      setTimeout(() => {
-        const from = location.state?.from?.pathname || "/profile";
-        navigate(from);
-      }, 2000);
+      
     } catch (err) {
       setError("Google login failed");
-    } finally {
-      setIsLoading(false);
-      // Reset captcha after submission
-      if (window.grecaptcha) {
-        window.grecaptcha.reset();
-      }
-      setCaptchaToken(null);
-    }
+    } 
   };
 
   const togglePasswordVisibility = () => {
