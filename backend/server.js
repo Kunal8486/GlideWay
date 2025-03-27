@@ -13,11 +13,13 @@ const app = express()
 const PORT = process.env.PORT
 
 // Middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true, 
-  allowedHeaders: ["Content-Type", "Authorization"]
-}))
+app.use(
+//   cors({
+//   origin: process.env.FRONTEND_URL,
+//   credentials: true, 
+//   allowedHeaders: ["Content-Type", "Authorization"]
+// })
+)
 app.use(express.json())
 app.use("/api/auth", authRoutes) 
 app.use("/api/driver", driverRoutes)
