@@ -12,12 +12,12 @@ const DriverLogin = ({ handleLogin }) => {
     password: ""
   });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [success] = useState("");
+  const [isLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [captchaToken, setCaptchaToken] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [setIsSubmitting] = useState(false);
 
   // Environment variable validation
   useEffect(() => {
