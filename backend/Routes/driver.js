@@ -3,8 +3,6 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const Driver = require('../Models/Driver');
 const router = express.Router();
-const { OAuth2Client } = require('google-auth-library');
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
@@ -18,11 +16,11 @@ const storage = multer.diskStorage({
 
 // Add file validation
 const fileFilter = (req, file, cb) => {
-    // Accept only image files
-    if (file.mimetype.startsWith('image/')) {
+    // Accept image files and PDFs
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
         cb(null, true);
     } else {
-        cb(new Error('Only image files are allowed'), false);
+        cb(new Error('Only image and PDF files are allowed'), false);
     }
 };
 
@@ -38,7 +36,8 @@ const upload = multer({
 router.post('/register', upload.fields([
     { name: 'profile_picture', maxCount: 1 },
     { name: 'license_front', maxCount: 1 },
-    { name: 'license_back', maxCount: 1 }
+    { name: 'license_back', maxCount: 1 },
+    { name: 'vehicle_insurance', maxCount: 1 }
 ]), async (req, res) => {
     try {
         // Extract all fields from req.body
@@ -49,17 +48,22 @@ router.post('/register', upload.fields([
             password,
             gender,
             age,
-            license_number,
-            license_expiry,
+            referral_code,
             vehicle_make,
             vehicle_model,
-            vehicle_registration
+            vehicle_registration,
+            vehicle_year,
+            vehicle_color,
+            license_number,
+            license_expiry,
+            license_state
         } = req.body;
 
         // Basic server-side validation (matching frontend validation)
         if (!name || !email || !phone_number || !password || !gender || !age ||
-            !license_number || !license_expiry || !vehicle_make || !vehicle_model || !vehicle_registration) {
-            return res.status(400).json({ error: "All fields are required" });
+            !vehicle_make || !vehicle_model || !vehicle_registration || !vehicle_year || !vehicle_color ||
+            !license_number || !license_expiry || !license_state) {
+            return res.status(400).json({ error: "All required fields must be filled" });
         }
 
         // Email validation
@@ -75,7 +79,8 @@ router.post('/register', upload.fields([
         }
 
         // Validate age
-        if (parseInt(age) < 18 || parseInt(age) > 70) {
+        const parsedAge = parseInt(age);
+        if (parsedAge < 18 || parsedAge > 70) {
             return res.status(400).json({ error: "Driver must be between 18 and 70 years old" });
         }
 
@@ -86,9 +91,19 @@ router.post('/register', upload.fields([
             return res.status(400).json({ error: "License has expired" });
         }
 
-        // Check if files were uploaded
-        if (!req.files.profile_picture || !req.files.license_front || !req.files.license_back) {
-            return res.status(400).json({ error: "All required documents must be uploaded" });
+        // Validate vehicle year
+        const parsedVehicleYear = parseInt(vehicle_year);
+        const currentYear = new Date().getFullYear();
+        if (parsedVehicleYear < 1990 || parsedVehicleYear > currentYear + 1) {
+            return res.status(400).json({ error: "Invalid vehicle year" });
+        }
+
+        // Check if required files were uploaded
+        const requiredFiles = ['profile_picture', 'license_front', 'license_back', 'vehicle_insurance'];
+        for (let file of requiredFiles) {
+            if (!req.files[file]) {
+                return res.status(400).json({ error: `${file.replace('_', ' ')} is required` });
+            }
         }
 
         // Hash password
@@ -98,6 +113,7 @@ router.post('/register', upload.fields([
         const profilePictureUrl = req.files.profile_picture[0].path;
         const licenseFrontUrl = req.files.license_front[0].path;
         const licenseBackUrl = req.files.license_back[0].path;
+        const vehicleInsuranceUrl = req.files.vehicle_insurance[0].path;
 
         // Create new driver document
         const driver = new Driver({
@@ -106,19 +122,25 @@ router.post('/register', upload.fields([
             phone_number,
             password: hashedPassword,
             gender,
-            age: parseInt(age),
+            age: parsedAge,
             license_number,
-            license_expiry,
-            profile_picture_url: profilePictureUrl,
+            license_expiry: expiryDate,
             license_front_url: licenseFrontUrl,
             license_back_url: licenseBackUrl,
+            license_state, // Added license state
             vehicle_details: {
                 make: vehicle_make,
                 model: vehicle_model,
-                registration_number: vehicle_registration
+                registration_number: vehicle_registration,
+                year: parsedVehicleYear, // Corrected vehicle year storage
+                color: vehicle_color // Added vehicle color to details
             },
+            profile_picture_url: profilePictureUrl,
+            vehicle_insurance_url: vehicleInsuranceUrl,
             status: 'pending', // Default status for new drivers
-            created_at: new Date()
+            
+            // Optional fields
+            ...(referral_code && { referral_code }),
         });
 
         await driver.save();
@@ -139,7 +161,5 @@ router.post('/register', upload.fields([
         res.status(500).json({ error: "Registration failed. Please try again." });
     }
 });
-
-
 
 module.exports = router;
