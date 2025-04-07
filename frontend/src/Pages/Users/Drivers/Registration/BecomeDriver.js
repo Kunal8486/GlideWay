@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Eye, EyeOff, Upload, X, CheckCircle, AlertCircle, 
-  UserCheck, Car, FileText, Camera, Calendar, PhoneCall, 
-  Info, Lock, Shield, Star 
+  UserCheck, Car, FileText, Camera, PhoneCall, 
+  Info, Lock, 
 } from 'lucide-react';
 import './BecomeDriver.css';
 
@@ -51,6 +51,7 @@ const BecomeDriver = () => {
     license_back: null,
     vehicle_insurance: null
   });
+  const [success, setSuccess] = useState("");
 
   // Validation Rules
   const validationRules = {
@@ -165,6 +166,11 @@ const BecomeDriver = () => {
       const error = validateField(name, value);
       setErrors(prev => ({ ...prev, [name]: error }));
     }
+
+    // Clear success message when user makes changes
+    if (success) {
+      setSuccess("");
+    }
   };
 
   const handleBlur = (e) => {
@@ -223,64 +229,25 @@ const BecomeDriver = () => {
     if (Object.keys(stepErrors).length === 0) {
       setCurrentStep(prev => Math.min(prev + 1, 5));
       setErrors({});
+      // Show success message when advancing to next step
+      setSuccess(`Step ${currentStep} completed successfully!`);
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
     } else {
       setErrors(stepErrors);
+      // Mark all fields as touched to show errors
+      const touchedFields = {};
+      Object.keys(stepErrors).forEach(field => {
+        touchedFields[field] = true;
+      });
+      setTouched(prev => ({ ...prev, ...touchedFields }));
     }
   };
 
   const prevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  // Form Submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validate all fields
-    const allErrors = {
-      ...validateStepFields(1),
-      ...validateStepFields(2),
-      ...validateStepFields(3),
-      ...validateStepFields(4)
-    };
-
-    if (Object.keys(allErrors).length > 0) {
-      setErrors(allErrors);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const formDataObject = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (formData[key] !== null) {
-          formDataObject.append(key, formData[key]);
-        }
-      });
-
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/driver/register`, {
-        method: "POST",
-        body: formDataObject,
-      });
-
-      const data = await response.json();
-      
-      if (response.ok) {
-        alert("Driver registered successfully!");
-        // Reset form
-        resetForm();
-      } else {
-        throw new Error(data.error || 'Registration failed');
-      }
-    } catch (error) {
-      setErrors(prev => ({
-        ...prev,
-        submit: error.message || 'Error registering driver'
-      }));
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Clear errors when going back
+    setErrors({});
   };
 
   // Form Reset Method
@@ -301,37 +268,140 @@ const BecomeDriver = () => {
     setCurrentStep(1);
     setTouched({});
     setErrors({});
+    setSuccess("");
+  };
+
+  // Form Submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validate all fields
+    const allErrors = {
+      ...validateStepFields(1),
+      ...validateStepFields(2),
+      ...validateStepFields(3),
+      ...validateStepFields(4)
+    };
+
+    if (Object.keys(allErrors).length > 0) {
+      setErrors(allErrors);
+      // Mark all fields with errors as touched
+      const touchedFields = {};
+      Object.keys(allErrors).forEach(field => {
+        touchedFields[field] = true;
+      });
+      setTouched(prev => ({ ...prev, ...touchedFields }));
+      
+      // Scroll to the first field with an error
+      const firstErrorField = document.querySelector('.dreg-error');
+      if (firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSuccess("");
+
+    try {
+      const formDataObject = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== null) {
+          formDataObject.append(key, formData[key]);
+        }
+      });
+
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/driver/register`, {
+        method: "POST",
+        body: formDataObject,
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSuccess("Driver registered successfully! Redirecting to login page...");
+        // Reset form and redirect after successful submission
+        setTimeout(() => {
+          resetForm();
+          window.location.href = '/driver/login';
+        }, 3000);
+      } else {
+        throw new Error(data.error || 'Registration failed');
+      }
+    } catch (error) {
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message || 'Error registering driver'
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Render Input Fields
   const renderField = (label, name, type = 'text', options = null) => (
-    <div className="form-group">
-      <label className="label required-label">{label}</label>
+    <div className="dreg-form-group">
+      <label className="dreg-form-label required-label">{label}</label>
       {type === 'select' ? (
-        <select
-          name={name}
-          value={formData[name]}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          className={`select ${errors[name] && touched[name] ? 'error' : ''}`}
-        >
-          <option value="">Select {label}</option>
-          {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+        <div className="dreg-input-wrapper">
+          <select
+            name={name}
+            value={formData[name]}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            className={`dreg-select ${errors[name] && touched[name] ? 'dreg-input-error' : ''}`}
+          >
+            <option value="">Select {label}</option>
+            {options.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
       ) : (
-        <input
-          type={type}
-          name={name}
-          value={formData[name]}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          className={`input ${errors[name] && touched[name] ? 'error' : ''}`}
-        />
+        <div className="dreg-input-wrapper">
+          <div className="dreg-input-icon">
+            {name.includes('password') ? (
+              <Lock size={20} />
+            ) : name === 'email' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            ) : name === 'phone_number' ? (
+              <PhoneCall size={20} />
+            ) : name.includes('age') ? (
+              <UserCheck size={20} />
+            ) : (
+              <Info size={20} />
+            )}
+          </div>
+          <input
+            type={type}
+            name={name}
+            value={formData[name]}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            className={`dreg-input ${errors[name] && touched[name] ? 'dreg-input-error' : ''}`}
+          />
+          {name.includes('password') && (
+            <button 
+              type="button" 
+              onClick={() => togglePasswordVisibility(name)} 
+              className="dreg-password-toggle"
+              aria-label={showPassword[name] ? "Hide password" : "Show password"}
+            >
+              {showPassword[name] ? (
+                <EyeOff size={20} />
+              ) : (
+                <Eye size={20} />
+              )}
+            </button>
+          )}
+        </div>
       )}
       {errors[name] && touched[name] && (
-        <span className="error-message">
+        <span className="dreg-error-message">
           <AlertCircle size={16} />
           {errors[name]}
         </span>
@@ -341,10 +411,10 @@ const BecomeDriver = () => {
 
   // File Upload Render
   const renderFileUpload = (field, label) => (
-    <div className="file-upload-section">
-      <label className="label required-label">{label}</label>
-      <div className="file-upload">
-        <label className={`upload-button ${errors[field] && touched[field] ? 'error' : ''}`}>
+    <div className="dreg-file-upload-section">
+      <label className="dreg-form-label required-label">{label}</label>
+      <div className="dreg-file-upload">
+        <label className={`dreg-upload-button ${errors[field] && touched[field] ? 'dreg-input-error' : ''}`}>
           <Upload size={20} />
           <span>Upload {label}</span>
           <input
@@ -356,19 +426,19 @@ const BecomeDriver = () => {
           />
         </label>
         {previews[field] && (
-          <div className="preview-container">
-            <img src={previews[field]} alt={`${label} preview`} className="preview-image" />
+          <div className="dreg-preview-container">
+            <img src={previews[field]} alt={`${label} preview`} className="dreg-preview-image" />
             <button
               type="button"
               onClick={() => removeFile(field)}
-              className="remove-preview"
+              className="dreg-remove-preview"
             >
               <X size={20} />
             </button>
           </div>
         )}
         {errors[field] && touched[field] && (
-          <span className="error-message">
+          <span className="dreg-error-message">
             <AlertCircle size={16} />
             {errors[field]}
           </span>
@@ -388,14 +458,14 @@ const BecomeDriver = () => {
     ];
 
     return (
-      <div className="progress-container">
+      <div className="dreg-progress-container">
         {steps.map((step, index) => (
           <div 
             key={index} 
-            className={`progress-step ${currentStep === index + 1 ? 'active' : index + 1 < currentStep ? 'completed' : ''}`}
+            className={`dreg-progress-step ${currentStep === index + 1 ? 'dreg-active' : index + 1 < currentStep ? 'dreg-completed' : ''}`}
           >
-            <div className="progress-icon">{step.icon}</div>
-            <div className="progress-title">{step.title}</div>
+            <div className="dreg-progress-icon">{step.icon}</div>
+            <div className="dreg-progress-title">{step.title}</div>
           </div>
         ))}
       </div>
@@ -404,33 +474,14 @@ const BecomeDriver = () => {
 
   // Step Rendering Methods
   const renderPersonalInformation = () => (
-    <div className="step-section">
-      <h2 className="step-title"><UserCheck /> Personal Information</h2>
-      <div className="form-grid">
+    <div className="dreg-step-section">
+      <h2 className="dreg-step-title"><UserCheck /> Personal Information</h2>
+      <div className="dreg-form-grid">
         {renderField('Name', 'name')}
         {renderField('Email', 'email', 'email')}
         {renderField('Phone Number', 'phone_number', 'tel')}
-        
-        <div className="password-container">
-          {renderField('Password', 'password', showPassword.password ? 'text' : 'password')}
-          <button 
-            type="button" 
-            onClick={() => togglePasswordVisibility('password')} 
-            className="password-toggle"
-          >
-          </button>
-        </div>
-        
-        <div className="password-container">
-          {renderField('Confirm Password', 'confirm_password', showPassword.confirm_password ? 'text' : 'password')}
-          <button 
-            type="button" 
-            onClick={() => togglePasswordVisibility('confirm_password')} 
-            className="password-toggle"
-          >
-          </button>
-        </div>
-
+        {renderField('Password', 'password', showPassword.password ? 'text' : 'password')}
+        {renderField('Confirm Password', 'confirm_password', showPassword.confirm_password ? 'text' : 'password')}
         {renderField('Gender', 'gender', 'select', [
           { value: 'male', label: 'Male' },
           { value: 'female', label: 'Female' },
@@ -443,9 +494,9 @@ const BecomeDriver = () => {
   );
 
   const renderVehicleInformation = () => (
-    <div className="step-section">
-      <h2 className="step-title"><Car /> Vehicle Information</h2>
-      <div className="form-grid">
+    <div className="dreg-step-section">
+      <h2 className="dreg-step-title"><Car /> Vehicle Information</h2>
+      <div className="dreg-form-grid">
         {renderField('Vehicle Make', 'vehicle_make')}
         {renderField('Vehicle Model', 'vehicle_model')}
         {renderField('Vehicle Registration', 'vehicle_registration')}
@@ -456,9 +507,9 @@ const BecomeDriver = () => {
   );
 
   const renderLicenseInformation = () => (
-    <div className="step-section">
-      <h2 className="step-title"><FileText /> License Details</h2>
-      <div className="form-grid">
+    <div className="dreg-step-section">
+      <h2 className="dreg-step-title"><FileText /> License Details</h2>
+      <div className="dreg-form-grid">
         {renderField('License Number', 'license_number')}
         {renderField('License Expiry Date', 'license_expiry', 'date')}
         {renderField('License State', 'license_state')}
@@ -467,9 +518,9 @@ const BecomeDriver = () => {
   );
 
   const renderDocumentUploads = () => (
-    <div className="step-section">
-      <h2 className="step-title"><Camera /> Document Uploads</h2>
-      <div className="form-grid">
+    <div className="dreg-step-section">
+      <h2 className="dreg-step-title"><Camera /> Document Uploads</h2>
+      <div className="dreg-form-grid">
         {renderFileUpload('profile_picture', 'Profile Picture')}
         {renderFileUpload('license_front', 'License Front')}
         {renderFileUpload('license_back', 'License Back')}
@@ -479,10 +530,10 @@ const BecomeDriver = () => {
   );
 
   const renderSubmitReview = () => (
-    <div className="step-section">
-      <h2 className="step-title"><CheckCircle /> Review & Submit</h2>
-      <div className="review-section">
-        <div className="review-column">
+    <div className="dreg-step-section">
+      <h2 className="dreg-step-title"><CheckCircle /> Review & Submit</h2>
+      <div className="dreg-review-section">
+        <div className="dreg-review-column">
           <h3>Personal Information</h3>
           <p><strong>Name:</strong> {formData.name}</p>
           <p><strong>Email:</strong> {formData.email}</p>
@@ -491,7 +542,7 @@ const BecomeDriver = () => {
           <p><strong>Age:</strong> {formData.age}</p>
           {formData.referral_code && <p><strong>Referral Code:</strong> {formData.referral_code}</p>}
         </div>
-        <div className="review-column">
+        <div className="dreg-review-column">
           <h3>Vehicle Details</h3>
           <p><strong>Make:</strong> {formData.vehicle_make}</p>
           <p><strong>Model:</strong> {formData.vehicle_model}</p>
@@ -499,13 +550,13 @@ const BecomeDriver = () => {
           <p><strong>Year:</strong> {formData.vehicle_year}</p>
           <p><strong>Color:</strong> {formData.vehicle_color}</p>
         </div>
-        <div className="review-column">
+        <div className="dreg-review-column">
           <h3>License Information</h3>
           <p><strong>License Number:</strong> {formData.license_number}</p>
           <p><strong>Expiry Date:</strong> {formData.license_expiry}</p>
           <p><strong>State:</strong> {formData.license_state}</p>
         </div>
-        <div className="review-column">
+        <div className="dreg-review-column">
           <h3>Uploaded Documents</h3>
           {previews.profile_picture && <p>Profile Picture: Uploaded</p>}
           {previews.license_front && <p>License Front: Uploaded</p>}
@@ -527,55 +578,114 @@ const BecomeDriver = () => {
 
   // Main Render
   return (
-    <div className="driver-registration-container">
-      <form onSubmit={handleSubmit} className="registration-card">
-        <ProgressBar />
-        
-        <div className="form-content">
-          {currentStep === 1 && renderPersonalInformation()}
-          {currentStep === 2 && renderVehicleInformation()}
-          {currentStep === 3 && renderLicenseInformation()}
-          {currentStep === 4 && renderDocumentUploads()}
-          {currentStep === 5 && renderSubmitReview()}
-
-          {errors.submit && (
-            <div className="error-banner">
-              <AlertCircle size={20} />
-              {errors.submit}
-            </div>
-          )}
-
-          <div className="navigation-buttons">
-            {currentStep > 1 && (
-              <button 
-                type="button" 
-                onClick={prevStep} 
-                className="btn btn-secondary"
-              >
-                Previous
-              </button>
-            )}
-            {currentStep < 5 && (
-              <button 
-                type="button" 
-                onClick={nextStep} 
-                className="btn btn-primary"
-              >
-                Next
-              </button>
-            )}
-            {currentStep === 5 && (
-              <button 
-                type="submit" 
-                className={`btn btn-success ${isSubmitting ? 'submitting' : ''}`}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Application'}
-              </button>
-            )}
+    <div className="dreg-registration-container">
+      {/* Background animation elements similar to login page */}
+      <div className="dreg-bg-animation">
+        <div className="dreg-bg-circle dreg-circle-1"></div>
+        <div className="dreg-bg-circle dreg-circle-2"></div>
+        <div className="dreg-bg-circle dreg-circle-3"></div>
+        <div className="dreg-bg-shape dreg-shape-1"></div>
+        <div className="dreg-bg-shape dreg-shape-2"></div>
+      </div>
+      
+      <div className="dreg-registration-wrapper">
+        <div className="dreg-brand">
+          <div className="dreg-logo-container">
+            <h1 className="dreg-logo">Glide Way</h1>
+          </div>
+          <div className="dreg-brand-message">
+            <h2>Join our driver network</h2>
+            <p>Complete this form to begin your journey with us</p>
           </div>
         </div>
-      </form>
+        
+        <form onSubmit={handleSubmit} className="dreg-registration-card">
+          <div className="dreg-card-header">
+            <h2>Driver Registration</h2>
+            <p>Start earning with Glide Way</p>
+          </div>
+          
+          <ProgressBar />
+          
+          {success && (
+            <div className="dreg-alert dreg-alert-success" role="alert">
+              <div className="dreg-alert-icon">
+                <CheckCircle size={20} />
+              </div>
+              <p>{success}</p>
+            </div>
+          )}
+          
+          {errors.submit && (
+            <div className="dreg-alert dreg-alert-error" role="alert">
+              <div className="dreg-alert-icon">
+                <AlertCircle size={20} />
+              </div>
+              <p>{errors.submit}</p>
+            </div>
+          )}
+          
+          <div className="dreg-form-content">
+            {currentStep === 1 && renderPersonalInformation()}
+            {currentStep === 2 && renderVehicleInformation()}
+            {currentStep === 3 && renderLicenseInformation()}
+            {currentStep === 4 && renderDocumentUploads()}
+            {currentStep === 5 && renderSubmitReview()}
+
+            <div className="dreg-navigation-buttons">
+              {currentStep > 1 && (
+                <button 
+                  type="button" 
+                  onClick={prevStep} 
+                  className="dreg-btn dreg-btn-secondary"
+                  disabled={isSubmitting}
+                >
+                  Previous
+                </button>
+              )}
+              {currentStep < 5 && (
+                <button 
+                  type="button" 
+                  onClick={nextStep} 
+                  className="dreg-btn dreg-btn-primary"
+                >
+                  Next
+                </button>
+              )}
+              {currentStep === 5 && (
+                <button 
+                  type="submit" 
+                  className={`dreg-btn dreg-btn-success ${isSubmitting ? 'dreg-submitting' : ''}`}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <span className="dreg-loading-text">
+                      <span className="dreg-spinner"></span>
+                      Submitting...
+                    </span>
+                  ) : (
+                    'Submit Application'
+                  )}
+                </button>
+              )}
+              
+              <button 
+                type="button" 
+                onClick={resetForm} 
+                className="dreg-btn dreg-btn-reset"
+                disabled={isSubmitting}
+              >
+                Reset Form
+              </button>
+            </div>
+          </div>
+          
+          <div className="dreg-login-prompt">
+            <p>Already have a driver account?</p>
+            <a href="/driver/login" className="dreg-login-link">Sign in to your account</a>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

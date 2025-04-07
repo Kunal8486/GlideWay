@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./Components/ProtectedRoute/ProtectedRoute";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import Navbar from "./Components/Navbar/Navbar";
 import Footer from "./Components/Footer/Footer";
@@ -117,7 +118,7 @@ const App = () => {
             path="/login" 
             element={
               isLoggedIn && userRole === 'rider' ? (
-                <Navigate to="/rider-dashboard" replace />
+                <Navigate to="/dashboard" replace />
               ) : (
                 <Login handleLogin={handleLogin} role="rider" />
               )
@@ -127,7 +128,7 @@ const App = () => {
             path="/signup" 
             element={
               isLoggedIn && userRole === 'rider' ? (
-                <Navigate to="/rider-dashboard" replace />
+                <Navigate to="/dashboard" replace />
               ) : (
                 <Signup />
               )
@@ -136,10 +137,10 @@ const App = () => {
 
           {/* Driver Routes */}
           <Route 
-            path="/driver-login" 
+            path="/driver/login" 
             element={
               isLoggedIn && userRole === 'driver' ? (
-                <Navigate to="/driver-dashboard" replace />
+                <Navigate to="/driver/dashboard" replace />
               ) : (
                 <DriverLogin handleLogin={handleLogin} role="driver" />
               )
@@ -149,7 +150,7 @@ const App = () => {
             path="/become-driver" 
             element={
               isLoggedIn && userRole === 'driver' ? (
-                <Navigate to="/driver-dashboard" replace />
+                <Navigate to="/driver/dashboard" replace />
               ) : (
                 <DriverSignup />
               )
@@ -171,7 +172,7 @@ const App = () => {
           {/* Protected Routes */}
           {/* Rider Protected Routes */}
           <Route
-            path="/rider-dashboard"
+            path="/dashboard"
             element={
               <ProtectedRoute 
                 isLoggedIn={isLoggedIn} 
@@ -183,7 +184,7 @@ const App = () => {
             }
           />
           <Route
-            path="/rider-profile"
+            path="/profile"
             element={
               <ProtectedRoute 
                 isLoggedIn={isLoggedIn} 
@@ -197,7 +198,7 @@ const App = () => {
 
           {/* Driver Protected Routes */}
           <Route
-            path="/driver-dashboard"
+            path="/driver/dashboard"
             element={
               <ProtectedRoute 
                 isLoggedIn={isLoggedIn} 
@@ -209,7 +210,7 @@ const App = () => {
             }
           />
           <Route
-            path="/driver-profile"
+            path="/driver/profile"
             element={
               <ProtectedRoute 
                 isLoggedIn={isLoggedIn} 

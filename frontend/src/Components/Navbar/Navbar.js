@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios';
 import './Navbar.css';
 import ChatbotLauncher from '../ChatbotLauncher/ChatbotLauncher';
 
 const Navbar = ({ isLoggedIn, handleLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const [userRole, setUserRole] = useState('rider'); // Default to rider role
+    const profileDropdownRef = useRef(null);
 
     // Use React Router hooks for better navigation management
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Get user role from localStorage on component mount
+    useEffect(() => {
+        if (isLoggedIn) {
+            const storedRole = localStorage.getItem("role");
+            if (storedRole) {
+                setUserRole(storedRole.toLowerCase());
+            }
+        }
+    }, [isLoggedIn]);
 
     // Token refresh function
     const refreshToken = async () => {
@@ -76,13 +89,22 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const closeMenu = () => setIsMenuOpen(false);
+    const toggleProfileDropdown = () => setProfileDropdownOpen(!profileDropdownOpen);
+    const closeProfileDropdown = () => setProfileDropdownOpen(false);
 
     // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isMenuOpen && !event.target.closest('.side-menu') &&
-                !event.target.closest('.hamburger')) {
+            if (isMenuOpen && !event.target.closest('.gw-navbar-side-menu') &&
+                !event.target.closest('.gw-navbar-hamburger')) {
                 closeMenu();
+            }
+            
+            if (profileDropdownOpen && 
+                profileDropdownRef.current && 
+                !profileDropdownRef.current.contains(event.target) &&
+                !event.target.closest('.gw-navbar-profile-icon-button')) {
+                closeProfileDropdown();
             }
         };
 
@@ -90,7 +112,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isMenuOpen]);
+    }, [isMenuOpen, profileDropdownOpen]);
 
     // Prevent scrolling when menu is open
     useEffect(() => {
@@ -104,6 +126,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
     const handleNavigation = (path) => {
         navigate(path);
         closeMenu();
+        closeProfileDropdown();
     };
 
     // Logout handler with navigation
@@ -111,9 +134,34 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         handleLogout();
         navigate('/login'); // Redirect to login page after logout
         closeMenu();
+        closeProfileDropdown();
     };
 
-    // Define navigation links dynamically based on authentication status
+    // Get user info from localStorage
+    const getUserInfo = () => {
+        try {
+            const userDataString = localStorage.getItem("userData");
+            if (userDataString) {
+                return JSON.parse(userDataString);
+            }
+        } catch (error) {
+            console.error("Error parsing user data:", error);
+        }
+        return { name: "User", email: "user@example.com" };
+    };
+
+    // User info for display
+    const userInfo = getUserInfo();
+
+    // Helper to get role-specific path
+    const getRolePath = (basePath) => {
+        if (userRole === 'driver') {
+            return `/driver${basePath}`;
+        }
+        return basePath;
+    };
+
+    // Define navigation links dynamically based on authentication status and role
     const getNavLinks = () => {
         const baseLinks = [
             { path: '/', label: 'Home' },
@@ -123,7 +171,11 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         ];
 
         if (isLoggedIn) {
-            baseLinks.push({ path: '/rider-dashboard', label: 'Dashboard' });
+            const dashboardPath = getRolePath('/dashboard');
+            baseLinks.push({ 
+                path: dashboardPath, 
+                label: userRole === 'driver' ? 'Driver Dashboard' : 'Book Ride' 
+            });
         } else {
             baseLinks.push({ path: '/login', label: 'Login' });
         }
@@ -136,62 +188,116 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
 
     const navLinks = getNavLinks();
 
+    // Get role-specific profile links
+    const getProfileLinks = () => {
+        if (userRole === 'driver') {
+            return [
+                { path: '/driver/profile', label: 'My Profile', icon: 'fas fa-user' },
+                { path: '/driver/trips', label: 'My Trips', icon: 'fas fa-route' },
+                { path: '/driver/earnings', label: 'My Earnings', icon: 'fas fa-dollar-sign' },
+                { path: '/driver/vehicle', label: 'My Vehicle', icon: 'fas fa-car' }
+            ];
+        }
+        return [
+            { path: '/profile', label: 'My Profile', icon: 'fas fa-user' },
+            { path: '/trips', label: 'My Trips', icon: 'fas fa-home' },
+            { path: '/payment', label: 'Payment Methods', icon: 'fas fa-credit-card' }
+        ];
+    };
+
+    const profileLinks = getProfileLinks();
+
     return (
-        <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-            <div className="navbar-container">
-                <div className="logo" onClick={() => handleNavigation('/')}>
+        <div>
+        <header className={`gw-navbar ${scrolled ? 'gw-navbar-scrolled' : ''}`}>
+            <div className="gw-navbar-container">
+                <div className="gw-navbar-logo" onClick={() => handleNavigation('/')}>
                     <img src="/assets/Logo.png" alt="GlideWay Logo" />
                 </div>
 
-                <nav className="nav-links">
+                <nav className="gw-navbar-nav-links">
                     <ul>
                         {navLinks.map((link) => (
                             <li
                                 key={link.path}
-                                className={isActive(link.path) ? 'active' : ''}
+                                className={isActive(link.path) ? 'gw-navbar-active' : ''}
                             >
                                 <button
                                     onClick={() => handleNavigation(link.path)}
-                                    className="nav-link-button"
+                                    className="gw-navbar-nav-link-button"
                                 >
                                     {link.label}
                                 </button>
                             </li>
                         ))}
+                        
                         {isLoggedIn && (
-                            <li className="logout-container">
-                                <button
-                                    className="logout-button"
-                                    onClick={handleLogoutAndRedirect}
-                                    aria-label="Log out"
+                            <li className="gw-navbar-profile-container">
+                                <button 
+                                    className="gw-navbar-profile-icon-button" 
+                                    onClick={toggleProfileDropdown}
+                                    aria-label="Open profile menu"
+                                    aria-expanded={profileDropdownOpen}
                                 >
-                                    Logout
+                                    <i className="fas fa-user"></i>
                                 </button>
+                                
+                                {profileDropdownOpen && (
+                                    <div className="gw-navbar-profile-dropdown" ref={profileDropdownRef}>
+                                        <div className="gw-navbar-dropdown-header">
+                                            <div className="gw-navbar-user-avatar">
+                                                <i className="fas fa-user-circle"></i>
+                                            </div>
+                                            <div className="gw-navbar-user-info">
+                                                <div className="gw-navbar-user-name">{userInfo.name}</div>
+                                                <div className="gw-navbar-user-email">{userInfo.email}</div>
+                                                <div className="gw-navbar-user-role">{userRole === 'driver' ? 'Driver' : 'Rider'}</div>
+                                            </div>
+                                        </div>
+                                        <ul className="gw-navbar-dropdown-menu">
+                                            {profileLinks.map((link) => (
+                                                <li key={link.path}>
+                                                    <button onClick={() => handleNavigation(link.path)}>
+                                                        <i className={link.icon}></i>
+                                                        {link.label}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                            <li className="gw-navbar-dropdown-divider"></li>
+                                            <li>
+                                                <button onClick={handleLogoutAndRedirect} className="gw-navbar-dropdown-logout">
+                                                    <i className="fas fa-sign-out-alt"></i>
+                                                    Logout
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
                             </li>
                         )}
                     </ul>
                 </nav>
 
                 <button
-                    className="hamburger"
+                    className="gw-navbar-hamburger"
                     onClick={toggleMenu}
                     aria-expanded={isMenuOpen}
                     aria-label="Toggle navigation menu"
                 >
-                    <img src="/assets/hamburger.svg" alt="" />
+                    <i className="fas fa-bars"></i>
                 </button>
             </div>
 
             {/* Overlay for mobile menu background */}
-            {isMenuOpen && <div className="menu-overlay" onClick={closeMenu}></div>}
+            {isMenuOpen && <div className="gw-navbar-menu-overlay" onClick={closeMenu}></div>}
 
             {/* Side menu for mobile */}
-            <div className={`side-menu ${isMenuOpen ? 'open' : ''}`} aria-hidden={!isMenuOpen}>
-                <button className="close-menu" onClick={closeMenu} aria-label="Close menu">
-                    <span aria-hidden="true">×</span>
+            <div className={`gw-navbar-side-menu ${isMenuOpen ? 'gw-navbar-open' : ''}`} aria-hidden={!isMenuOpen}>
+                <button className="gw-navbar-close-menu" onClick={closeMenu} aria-label="Close menu">
+                    <i className="fas fa-times"></i>
                 </button>
 
-                <div className="mobile-logo" onClick={() => handleNavigation('/')}>
+                <div className="gw-navbar-mobile-logo" onClick={() => handleNavigation('/')}>
                     <img src="/assets/Logo.png" alt="GlideWay Logo" />
                 </div>
 
@@ -199,42 +305,66 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
                     {navLinks.map((link) => (
                         <li
                             key={link.path}
-                            className={isActive(link.path) ? 'active' : ''}
+                            className={isActive(link.path) ? 'gw-navbar-active' : ''}
                         >
                             <button
                                 onClick={() => handleNavigation(link.path)}
-                                className="mobile-nav-link"
+                                className="gw-navbar-mobile-nav-link"
                             >
                                 {link.label}
                             </button>
                         </li>
                     ))}
+                    
+                    {isLoggedIn && (
+                        <>
+                            <li className="gw-navbar-mobile-profile-section">
+                                <div className="gw-navbar-mobile-profile-header">
+                                    <div className="gw-navbar-mobile-user-avatar">
+                                        <i className="fas fa-user-circle fa-2x"></i>
+                                    </div>
+                                    <div className="gw-navbar-mobile-user-info">
+                                        <div className="gw-navbar-mobile-user-name">{userInfo.name}</div>
+                                        <div className="gw-navbar-mobile-user-email">{userInfo.email}</div>
+                                        <div className="gw-navbar-mobile-user-role">{userRole === 'driver' ? 'Driver' : 'Rider'}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            {profileLinks.map((link) => (
+                                <li key={link.path}>
+                                    <button onClick={() => handleNavigation(link.path)} className="gw-navbar-mobile-nav-link">
+                                        <i className={link.icon}></i>
+                                        {link.label}
+                                    </button>
+                                </li>
+                            ))}
+                        </>
+                    )}
                 </ul>
 
                 {isLoggedIn && (
-                    <div className="mobile-logout">
+                    <div className="gw-navbar-mobile-logout">
                         <button
-                            className="logout-button"
+                            className="gw-navbar-logout-button"
                             onClick={handleLogoutAndRedirect}
                         >
+                            <i className="fas fa-sign-out-alt" style={{marginRight: '8px'}}></i>
                             Logout
                         </button>
                     </div>
                 )}
             </div>
-            <ChatbotLauncher
-    logoSrc="/assets/icons/SqrLogoSmall.png"
-    logoWidth={32}  // Specify a smaller width in pixels
-    logoHeight={32} // Specify a smaller height in pixels
-    companyName="GlideWay"
-    initialContext={['Travel Support', 'Booking Assistance']}
-/>
+            
         </header>
-
-
-
+        <ChatbotLauncher
+                logoSrc="/assets/icons/SqrLogoSmall.png"
+                logoWidth={32}
+                logoHeight={32}
+                companyName="GlideWay"
+                initialContext={['Travel Support', 'Booking Assistance']}
+            />
+        </div>
     );
-
 };
 
 export default Navbar;

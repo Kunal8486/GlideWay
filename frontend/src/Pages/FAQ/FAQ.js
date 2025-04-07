@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { ChevronDown, Search, Phone, Mail, MessageCircle, ExternalLink } from 'lucide-react';
-
 const faqData = {
   booking: {
     title: "Booking & Rides",
@@ -149,13 +148,13 @@ const FAQPage = () => {
         
         <div className="search-container">
           <div className="search-box">
-            <Search className="search-icon" />
+            <Search className="search-icon-2" />
             <input
               type="text"
               placeholder="Search for answers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
+              className="search-input-2"
             />
           </div>
         </div>
@@ -267,7 +266,7 @@ const FAQPage = () => {
           margin: 0 auto;
         }
 
-        .search-input {
+        .search-input-2 {
           width: 100%;
           padding: 1rem 1rem 1rem 3rem;
           border: 2px solid #f0d5b8;
@@ -277,17 +276,16 @@ const FAQPage = () => {
           transition: all 0.3s ease;
         }
 
-        .search-input:focus {
+        .search-input-2:focus {
           outline: none;
           border-color: #8b5e3c;
           box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.1);
         }
 
-        .search-icon {
+        .search-icon-2 {
           position: absolute;
-          left: 1rem;
-          margin-top: -10px;
           top: 50%;
+          margin-left: -2rem;
           transform: translateY(-50%);
           color: #8b5e3c;
         }
@@ -298,7 +296,9 @@ const FAQPage = () => {
           overflow-x: auto;
           padding-bottom: 1rem;
           margin-bottom: 2rem;
-        }
+          align-items: center;
+          justify-content: center;
+          }
 
         .category-tab {
           padding: 0.75rem 1.5rem;
@@ -490,7 +490,7 @@ const FAQPage = () => {
               margin-bottom: 1.5rem;
             }
 
-            .search-input {
+            .search-input-2 {
               font-size: 1rem;
               padding: 0.75rem 0.75rem 0.75rem 2.5rem;
             }
@@ -533,7 +533,7 @@ const FAQPage = () => {
               font-size: 1.75rem;
             }
 
-            .search-input {
+            .search-input-2 {
               padding: 0.75rem 0.75rem 0.75rem 2.25rem;
             }
 

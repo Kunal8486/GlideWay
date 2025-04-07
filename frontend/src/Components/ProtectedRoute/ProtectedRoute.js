@@ -26,9 +26,9 @@ const ProtectedRoute = ({ children, isLoggedIn, allowedRoles, userRole }) => {
       // Specific redirect based on current role
       switch(userRole) {
         case 'user':
-          return <Navigate to="/rider-dashboard" replace />;
+          return <Navigate to="/dashboard" replace />;
         case 'driver':
-          return <Navigate to="/driver-dashboard" replace />;
+          return <Navigate to="/driver/dashboard" replace />;
         default:
           return <Navigate to="/" replace />;
       }

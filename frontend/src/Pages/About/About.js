@@ -166,9 +166,9 @@ const AboutPage = () => {
                 <img src="/assets/Inovators/Kunal.png" alt="Kunal Kumar - Visionary Leader" />
                 <div className="photo-overlay">
                   <div className="social-links">
-                    <a href="https://wa.link/w37l5q" target="_blank" className="social"><i className="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://kunalkumar.co.in/" target="_blank" className="social"><i className="material-icons">language</i></a>
-                    <a href="https://www.linkedin.com/in/kunalkumar8486/" target="_blank" className="social"><i className="fa-brands fa-linkedin"></i></a>
+                    <a href="https://wa.link/w37l5q" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://kunalkumar.co.in/" target="_blank" rel="noreferrer"className="social"><i className="material-icons">language</i></a>
+                    <a href="https://www.linkedin.com/in/kunalkumar8486/" target="noreferrer" rel="noopener"className="social"><i className="fa-brands fa-linkedin"></i></a>
                   </div>
                 </div>
               </div>
@@ -186,16 +186,16 @@ const AboutPage = () => {
                 <img src="/assets/Inovators/Nirupam.jpeg" alt="Nirupam Kashyam - Tech Innovator" />
                 <div className="photo-overlay">
                   <div className="social-links">
-                    <a href="https://wa.link/2u09fh" target="_blank" className="social"><i className="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://discordapp.com/users/657624711009665032" target="_blank" className="social"><i className="fa-brands fa-discord"></i></a>
-                    <a href="https://www.linkedin.com/in/nirupam-kashyap-742321301/" target="_blank" className="social"><i className="fa-brands fa-linkedin"></i></a>
+                    <a href="https://wa.link/2u09fh" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://discordapp.com/users/657624711009665032" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-discord"></i></a>
+                    <a href="https://www.linkedin.com/in/nirupam-kashyap-742321301/" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-linkedin"></i></a>
 
                   </div>
                 </div>
               </div>
               <div className="member-info">
                 <h3>Nirupam Kashyam</h3>
-                <p className="role">Tech Innovator & Co-Founder</p>
+                <p className="role">Tech Innovator, Designer & Co-Founder</p>
                 <p className="bio">
                   Nirupam is the brains behind Glide Way's cutting-edge technology. His expertise in software development and problem-solving has been instrumental in building a seamless and user-friendly platform.
                 </p>
@@ -207,9 +207,9 @@ const AboutPage = () => {
                 <img src="/assets/Inovators/Satwik.jpg" alt="K.J.S Satwik - Creative Strategist" />
                 <div className="photo-overlay">
                   <div className="social-links">
-                    <a href="https://wa.link/bjkd6a" target="_blank" className="social"><i className="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/kjs_sathwik/" target="_blank" className="social"><i className="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/in/sathwik-konakalla-1b6bbb326/" target="_blank" className="social"><i className="fa-brands fa-linkedin"></i></a>
+                    <a href="https://wa.link/bjkd6a" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/kjs_sathwik/" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/sathwik-konakalla-1b6bbb326/" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-linkedin"></i></a>
                   </div>
                 </div>
               </div>
@@ -227,9 +227,9 @@ const AboutPage = () => {
                 <img src="/assets/Inovators/Aaryan.jpg" alt="Aaryan Goyal - Business Developer" />
                 <div className="photo-overlay">
                 <div className="social-links">
-                    <a href="https://wa.link/ppelbn" target="_blank" className="social"><i className="fa-brands fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/_.aaryan25/" target="_blank" className="social"><i className="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.linkedin.com/in/aaryan-goyal-8722312bb/" target="_blank" className="social"><i className="fa-brands fa-linkedin"></i></a>
+                    <a href="https://wa.link/ppelbn" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/_.aaryan25/" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/in/aaryan-goyal-8722312bb/" target="_blank" rel="noreferrer" className="social"><i className="fa-brands fa-linkedin"></i></a>
                   </div>
                 </div>
               </div>

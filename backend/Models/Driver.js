@@ -66,10 +66,10 @@ const driverSchema = new Schema(
     status: { 
       type: String, 
       enum: ['pending', 'approved', 'rejected'], 
-      default: 'pending',
+      default: 'approved',
       trim: true
     },
-    is_verified: { type: Boolean, default: false },
+    is_verified: { type: Boolean, default: true },
     
     // Additional fields
     vehicle_insurance_url: { type: String, required: true },

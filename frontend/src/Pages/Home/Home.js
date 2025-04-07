@@ -2,33 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Car, Smartphone, MapPin, DollarSign, ShieldCheck, 
-  Users, Briefcase, Clock, UserCheck, Star, PhoneCall, ChevronUp, ChevronDown 
+  Users, Briefcase, Clock, UserCheck, Star, PhoneCall, 
+  ChevronUp, ChevronDown, Navigation, CreditCard, Calendar
 } from 'lucide-react';
 import './Home.css';
 
-// Component for reusable feature cards
-const FeatureCard = ({ Icon, title, description }) => (
-  <div className="feature">
-    <Icon size={40} aria-hidden="true" />
-    <h3>{title}</h3>
-    <p>{description}</p>
-  </div>
-);
-
-// FAQ Accordion component
-const FAQItem = ({ question, answer, isOpen, onClick }) => (
-  <div className={`faq-item ${isOpen ? 'active' : ''}`} onClick={onClick}>
-    <h3>
-      {question}
-      <span>{isOpen ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}</span>
-    </h3>
-    {isOpen && <div className="faq-answer">{answer}</div>}
-  </div>
-);
-
-// Stat counter component with animation
-const AnimatedStat = ({ value, label, index }) => {
-  const statRef = useRef(null);
+// Base Components
+const FadeInElement = ({ children, className, index, threshold = 0.2 }) => {
+  const elementRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -39,416 +20,428 @@ const AnimatedStat = ({ value, label, index }) => {
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.2 }
+      { threshold }
     );
 
-    if (statRef.current) {
-      observer.observe(statRef.current);
+    if (elementRef.current) {
+      observer.observe(elementRef.current);
     }
 
     return () => {
-      if (statRef.current) {
-        observer.unobserve(statRef.current);
+      if (elementRef.current) {
+        observer.unobserve(elementRef.current);
       }
     };
-  }, []);
-
-  // For numeric stats, animate counting up
-  const animateValue = () => {
-    // If the value is not a percentage or has a "+" symbol
-    if (value.includes('+') || value.includes('%')) {
-      return value;
-    }
-    
-    const numValue = parseInt(value.replace(/[^0-9]/g, ''));
-    return isVisible ? numValue : 0;
-  };
+  }, [threshold]);
 
   return (
     <div 
-      ref={statRef} 
-      className={`stat ${isVisible ? 'in-view' : ''}`}
+      ref={elementRef} 
+      className={`hw-fade-element ${isVisible ? 'hw-visible' : ''} ${className || ''}`}
       style={{ 
-        '--stat-index': index + 1, 
+        '--element-index': index + 1, 
         animationDelay: `${(index + 1) * 0.15}s`
       }}
     >
-      <h3>{value}</h3>
-      <p>{label}</p>
+      {children}
     </div>
   );
 };
 
-// Testimonial component with animation
-const Testimonial = ({ quote, author, index }) => {
-  const testimonialRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
+// Enhanced Feature Card Component
+const FeatureCard = ({ Icon, title, description, index, className }) => (
+  <FadeInElement className={`hw-feature-card ${className || ''}`} index={index}>
+    <div className="hw-feature-card__icon-container">
+      <Icon size={40} className="hw-feature-card__icon" aria-hidden="true" />
+    </div>
+    <h3 className="hw-feature-card__title">{title}</h3>
+    <p className="hw-feature-card__description">{description}</p>
+  </FadeInElement>
+);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (testimonialRef.current) {
-      observer.observe(testimonialRef.current);
-    }
-
-    return () => {
-      if (testimonialRef.current) {
-        observer.unobserve(testimonialRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div 
-      ref={testimonialRef} 
-      className={`testimonial ${isVisible ? 'in-view' : ''}`}
-      style={{ 
-        '--testimonial-index': index + 1, 
-        animationDelay: `${(index + 1) * 0.2}s`
-      }}
+// Enhanced FAQ Accordion Component
+const FAQItem = ({ question, answer, isOpen, onClick, index }) => (
+  <FadeInElement className={`hw-faq-item ${isOpen ? 'hw-faq-item--active' : ''}`} index={index}>
+    <button 
+      className="hw-faq-item__question" 
+      onClick={onClick}
+      aria-expanded={isOpen}
+      aria-controls={`faq-answer-${index}`}
     >
-      <p>"{quote}"</p>
-      <span>- {author}</span>
-    </div>
-  );
-};
-
-// Safety feature component with animation
-const SafetyFeature = ({ Icon, title, description, index }) => {
-  const featureRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (featureRef.current) {
-      observer.observe(featureRef.current);
-    }
-
-    return () => {
-      if (featureRef.current) {
-        observer.unobserve(featureRef.current);
-      }
-    };
-  }, []);
-
-  return (
+      <span>{question}</span>
+      <span className="hw-faq-item__icon">
+        {isOpen ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}
+      </span>
+    </button>
     <div 
-      ref={featureRef} 
-      className={`safety-feature ${isVisible ? 'in-view' : ''}`}
-      style={{ 
-        '--feature-index': index + 1, 
-        animationDelay: `${(index + 1) * 0.15}s`
-      }}
+      id={`faq-answer-${index}`}
+      className="hw-faq-item__answer"
+      aria-hidden={!isOpen}
+      style={{ maxHeight: isOpen ? '500px' : '0' }}
     >
-      <Icon size={40} aria-hidden="true" />
-      <h3>{title}</h3>
-      <p>{description}</p>
+      {answer}
     </div>
-  );
-};
+  </FadeInElement>
+);
 
-// Data constants
+// Enhanced Stat Counter Component
+const AnimatedStat = ({ value, label, index }) => (
+  <FadeInElement className="hw-stat-card" index={index}>
+    <h3 className="hw-stat-card__value">{value}</h3>
+    <p className="hw-stat-card__label">{label}</p>
+  </FadeInElement>
+);
+
+// Enhanced Testimonial Component
+const Testimonial = ({ quote, author, role, index }) => (
+  <FadeInElement className="hw-testimonial-card" index={index}>
+    <div className="hw-testimonial-card__quote-mark" aria-hidden="true">"</div>
+    <p className="hw-testimonial-card__quote">{quote}</p>
+    <div className="hw-testimonial-card__author">
+      <p className="hw-testimonial-card__author-name">{author}</p>
+      {role && <p className="hw-testimonial-card__author-role">{role}</p>}
+    </div>
+  </FadeInElement>
+);
+
+// Step Component
+const StepItem = ({ number, title, description, index }) => (
+  <FadeInElement className="hw-step-item" index={index}>
+    <div className="hw-step-item__number-container">
+      <span className="hw-step-item__number" aria-hidden="true">{number}</span>
+    </div>
+    <div className="hw-step-item__content">
+      <h3 className="hw-step-item__title">{title}</h3>
+      <p className="hw-step-item__description">{description}</p>
+    </div>
+  </FadeInElement>
+);
+
+// Enhanced Content
 const SAFETY_FEATURES = [
   {
     icon: UserCheck,
     title: "Verified Drivers",
-    description: "All drivers go through a strict background check."
+    description: "All drivers undergo comprehensive background checks, vehicle inspections, and safety training."
+  },
+  {
+    icon: Navigation,
+    title: "Trip Monitoring",
+    description: "AI-powered system monitors routes for safety and sends alerts for unusual activity."
   },
   {
     icon: PhoneCall,
-    title: "24/7 Support",
-    description: "Dedicated customer support at any time."
+    title: "24/7 Support Center",
+    description: "Dedicated emergency response team available around the clock for immediate assistance."
   },
   {
     icon: ShieldCheck,
-    title: "Emergency Button",
-    description: "Instant SOS feature for security."
+    title: "In-app Safety Tools",
+    description: "One-tap emergency button, ride sharing, and trusted contacts features built into every ride."
   }
 ];
 
 const STATS = [
-  { value: "10M+", label: "Rides Completed" },
-  { value: "50K+", label: "Drivers Registered" },
-  { value: "100+", label: "Cities Covered" },
-  { value: "95%", label: "Customer Satisfaction" }
+  { value: "12M+", label: "Rides Completed" },
+  { value: "65K+", label: "Drivers Nationwide" },
+  { value: "150+", label: "Cities Covered" },
+  { value: "97%", label: "Customer Satisfaction" }
 ];
 
 const TESTIMONIALS = [
   { 
-    quote: "The service was amazing. My driver was punctual and courteous!", 
-    author: "Sarah K." 
+    quote: "Glide Way has transformed my daily commute. The drivers are professional, the cars are clean, and the app is incredibly easy to use.", 
+    author: "Shaurabh",
+    role: "Daily Commuter" 
   },
   { 
-    quote: "As a driver, I love the flexibility Glide Way offers.", 
-    author: "John D." 
+    quote: "As a driver partner, I appreciate the flexibility and fair compensation. The training provided helped me deliver better service.", 
+    author: "Aisha Patel",
+    role: "Driver Partner, 2 years" 
   },
   { 
-    quote: "Glide Way makes commuting so much easier and stress-free!", 
-    author: "Emma R." 
-  }
+    quote: "I travel frequently for business, and Glide Way's consistency across cities makes transportation one less thing to worry about.", 
+    author: "Shaurya",
+    role: "Business Traveler" 
+  },
+  
 ];
 
 const FAQS = [
   { 
-    question: "How does Glide Way work?", 
-    answer: "Glide Way is a ride-sharing platform that connects riders with drivers for convenient travel." 
+    question: "How does Glide Way ensure passenger safety?", 
+    answer: "Glide Way implements a multi-layered safety system including thorough driver background checks, real-time trip monitoring, an in-app emergency button, ride details sharing, and 24/7 customer support. All rides are GPS-tracked and insured for additional peace of mind." 
   },
   { 
-    question: "How can I book a ride?", 
-    answer: "Simply enter your pickup and drop-off locations, select a ride option, and confirm your booking." 
+    question: "What makes Glide Way different from other ride-sharing services?", 
+    answer: "Glide Way distinguishes itself through exceptional reliability, transparent pricing with no surge charges, eco-friendly vehicle options, a loyalty rewards program, and a community-focused approach that prioritizes both riders and drivers." 
   },
   { 
-    question: "Is Glide Way available in my city?", 
-    answer: "We are expanding rapidly! Check our app to see if we operate in your area." 
+    question: "How can I become a Glide Way driver?", 
+    answer: "To become a driver, download our Driver app, complete the registration form, submit required documents (driver's license, vehicle registration, insurance), pass our background check, complete our online safety training, and schedule a vehicle inspection. Most applications are processed within 3-5 business days." 
   },
   { 
     question: "What payment methods do you accept?", 
-    answer: "We accept credit/debit cards, UPI, and in-app wallet payments." 
+    answer: "We accept all major credit/debit cards, digital wallets (Apple Pay, Google Pay, PayPal), UPI payments, and our in-app GlideWallet for seamless transactions. Business accounts with monthly invoicing are also available." 
   },
   { 
-    question: "Can I schedule a ride in advance?", 
-    answer: "Yes! Glide Way allows you to schedule rides up to 7 days in advance." 
+    question: "Can I schedule rides in advance?", 
+    answer: "Yes! You can schedule rides up to 7 days in advance. This feature is perfect for airport transfers, important meetings, or any planned travel. You'll receive reminders and live updates when your scheduled ride is approaching." 
   }
 ];
 
 const FEATURES = [
   {
-    icon: Car,
-    title: "Quick Ride Booking",
-    description: "Book a ride instantly with just a few taps on your phone."
+    icon: Smartphone,
+    title: "Seamless Booking Experience",
+    description: "Book, track, and pay for rides with our intuitive app designed for speed and convenience."
   },
   {
     icon: ShieldCheck,
-    title: "Reliable Drivers",
-    description: "All our drivers are verified and experienced professionals."
+    title: "Industry-Leading Safety",
+    description: "Travel with confidence thanks to our comprehensive safety features and verified drivers."
   },
   {
     icon: DollarSign,
-    title: "Affordable Pricing",
-    description: "Transparent and budget-friendly fares for every ride."
+    title: "Transparent Pricing",
+    description: "No surge pricing or hidden fees. Get clear upfront fares before confirming your ride."
   },
   {
-    icon: Smartphone,
-    title: "Multiple Ride Options",
-    description: "Choose from sedans, SUVs, bikes, and more based on your needs."
+    icon: Clock,
+    title: "Punctual Pickups",
+    description: "Our intelligent dispatch system ensures drivers arrive on time, respecting your schedule."
   },
   {
     icon: MapPin,
-    title: "Real-Time Tracking",
-    description: "Track your ride from pickup to drop-off with live updates."
+    title: "Extensive Coverage",
+    description: "Available in 150+ cities nationwide with consistent service quality wherever you go."
+  },
+  {
+    icon: Users,
+    title: "Community-Focused",
+    description: "Supporting local economies while building a platform that values both riders and drivers."
   }
 ];
 
 const RIDE_OPTIONS = [
   {
     icon: Car,
-    title: "Standard",
-    description: "Affordable rides for everyday travel."
+    title: "Glide Standard",
+    description: "Comfortable sedans for everyday travel with affordability and reliability."
   },
   {
     icon: Users,
-    title: "Pool",
-    description: "Share rides and save on costs."
+    title: "Glide Share",
+    description: "Eco-friendly carpooling option that reduces costs and environmental impact."
   },
   {
     icon: Briefcase,
-    title: "Business",
-    description: "Luxury rides for professionals."
+    title: "Glide Executive",
+    description: "Premium vehicles with professional drivers for business travel and special occasions."
   },
   {
-    icon: Clock,
-    title: "Hourly",
-    description: "Rent a car with a driver for multiple stops."
+    icon: Calendar,
+    title: "Glide Reserve",
+    description: "Pre-scheduled rides with guaranteed availability for important trips."
   }
 ];
 
 const DRIVER_BENEFITS = [
   {
     icon: DollarSign,
-    title: "Competitive Earnings",
-    description: "Get paid weekly and earn extra through incentives."
+    title: "Maximized Earnings",
+    description: "Competitive base rates, consistent bonuses, and transparent payment systems with weekly deposits."
   },
   {
     icon: Clock,
-    title: "Flexible Hours",
-    description: "Drive when and where you want."
+    title: "Work on Your Terms",
+    description: "Set your own schedule, choose your service areas, and maintain full flexibility as an independent contractor."
+  },
+  
+  
+];
+
+const HOW_IT_WORKS_STEPS = [
+  {
+    number: "1",
+    title: "Download the App",
+    description: "Get the Glide Way app from the App Store or Google Play and create your account in minutes."
   },
   {
-    icon: Star,
-    title: "Incentives & Rewards",
-    description: "Earn bonuses for high ratings and peak-hour driving."
+    number: "2",
+    title: "Enter Your Destination",
+    description: "Input your pickup location and destination to see available ride options and prices."
+  },
+  {
+    number: "3",
+    title: "Choose Your Ride",
+    description: "Select from multiple vehicle types based on your needs, preferences, and group size."
+  },
+  {
+    number: "4",
+    title: "Track & Ride",
+    description: "Watch your driver arrive in real-time, enjoy your journey, and pay seamlessly through the app."
   }
 ];
 
+const DRIVER_STEPS = [
+  {
+    number: "1",
+    title: "Sign Up",
+    description: "Complete our simple online application and verify your identity and driving credentials."
+  },
+  {
+    number: "2",
+    title: "Vehicle Approval",
+    description: "Submit your vehicle details for verification or explore our vehicle partner programs."
+  },
+  {
+    number: "3",
+    title: "Safety Training",
+    description: "Complete our online safety certification course and learn platform best practices."
+  },
+  {
+    number: "4",
+    title: "Start Earning",
+    description: "Activate the driver app, set your availability, and begin accepting ride requests."
+  }
+];
+
+// Main Component
 const HomePage = () => {
   const [openIndex, setOpenIndex] = useState(null);
   const navigate = useNavigate();
   
-  // Initialize scroll animations for elements that don't have individual refs
-  useEffect(() => {
-    const featureElements = document.querySelectorAll('.feature:not(.safety-feature)');
-    const stepElements = document.querySelectorAll('.step');
-    
-    // Create a single IntersectionObserver
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-    
-    // Observe feature elements
-    featureElements.forEach((el, index) => {
-      el.style.setProperty('--card-index', index + 1);
-      observer.observe(el);
-    });
-    
-    // Observe step elements
-    stepElements.forEach((el, index) => {
-      el.style.setProperty('--step-index', index + 1);
-      observer.observe(el);
-    });
-    
-    // Cleanup function to unobserve elements
-    return () => {
-      featureElements.forEach(el => observer.unobserve(el));
-      stepElements.forEach(el => observer.unobserve(el));
-    };
-  }, []);
-
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <div className="homepage">
-      <main>
-        <section className="hero" aria-labelledby="hero-heading">
-          <div className="hero-content">
-            <h1 id="hero-heading">Your Ride, Anytime, Anywhere</h1>
-            <h2>Safe, Reliable, and Affordable Transport at Your Fingertips</h2>
-            <p>With Glide Way, you can book a ride instantly, track your driver in real-time, and travel worry-free with our trusted network of professional drivers.</p>
-            <div className="cta-buttons">
-              <a href="/book-a-ride" className="cta-button primary">Book a Ride</a>
-              <a href="/become-driver" className="cta-button secondary">Become a Driver</a>
+    <div className="hw-home">
+
+      {/* Hero Section */}
+      <section className="hw-hero" aria-labelledby="hero-heading">
+
+        <div className="hw-container hw-hero__container">
+          <div className="hw-hero__content">
+            <h1 id="hero-heading" className="hw-hero__title">Your Journey, Reimagined</h1>
+            <h2 className="hw-hero__subtitle">Travel Smarter, Safer, and More Sustainably</h2>
+            <p className="hw-hero__description">
+              Experience transportation that adapts to your lifestyle. With Glide Way's innovative platform, enjoy hassle-free travel with verified drivers, transparent pricing, and industry-leading safety features.
+            </p>
+            <div className="hw-hero__buttons">
+              <a href="/book-a-ride" className="hw-button hw-button--primary">Book Your Ride</a>
+              <a href="/become-driver" className="hw-button hw-button--outline">Partner With Us</a>
             </div>
           </div>
-          <div className="hero-image">
+          <div className="hw-hero__image-container">
             <img 
-              src="/assets/pngwing.com (2).png" 
-              alt="A car ready for ride-sharing" 
+              src="/assets/whitetaxi.png" 
+              alt="Modern vehicle ready for ride-sharing" 
               loading="eager" 
-              width="500" 
-              height="300" 
+              className="hw-hero__image"
+              width="600" 
+              height="400" 
             />
           </div>
-        </section>
+        </div>
+        <div className="hw-hero__wave" aria-hidden="true"></div>
+      </section>
 
-        <section className="features" aria-labelledby="features-heading">
-          <h2 id="features-heading">Why Choose Glide Way?</h2>
-          <div className="feature-list">
+      {/* Core Benefits Section */}
+      <section className="hw-features-section" aria-labelledby="features-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="features-heading" className="hw-section-title">Why Riders Choose Glide Way</h2>
+            <p className="hw-section-subtitle">Experience the difference with transportation that puts you first</p>
+          </div>
+          <div className="hw-features-grid">
             {FEATURES.map((feature, index) => (
               <FeatureCard 
                 key={`feature-${index}`}
                 Icon={feature.icon}
                 title={feature.title} 
                 description={feature.description}
+                index={index}
               />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="ride-options" aria-labelledby="ride-options-heading">
-          <h2 id="ride-options-heading">Ride Options for Every Need</h2>
-          <div className="feature-list">
+      {/* How It Works Section */}
+      <section className="hw-process-section" aria-labelledby="process-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="process-heading" className="hw-section-title">How Glide Way Works</h2>
+            <p className="hw-section-subtitle">Four simple steps to your perfect ride</p>
+          </div>
+          <div className="hw-process-steps">
+            {HOW_IT_WORKS_STEPS.map((step, index) => (
+              <StepItem
+                key={`step-${index}`}
+                number={step.number}
+                title={step.title}
+                description={step.description}
+                index={index}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Ride Options Section */}
+      <section className="hw-options-section" aria-labelledby="options-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="options-heading" className="hw-section-title">Tailored Options For Every Journey</h2>
+            <p className="hw-section-subtitle">Choose the perfect ride for any situation</p>
+          </div>
+          <div className="hw-options-grid">
             {RIDE_OPTIONS.map((option, index) => (
               <FeatureCard 
                 key={`ride-option-${index}`}
                 Icon={option.icon}
                 title={option.title} 
                 description={option.description}
+                index={index}
+                className="hw-option-card"
               />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FIXED: Your Safety is Our Priority Section */}
-        <section className="safety-section" aria-labelledby="safety-heading">
-          <h2 id="safety-heading">Your Safety is Our Priority</h2>
-          <div className="safety-features-grid">
+      {/* Safety Section */}
+      <section className="hw-safety-section" aria-labelledby="safety-heading">
+        <div className="hw-container">
+          <div className="hw-section-header hw-section-header--light">
+            <h2 id="safety-heading" className="hw-section-title">Safety By Design</h2>
+            <p className="hw-section-subtitle">Your security is built into everything we do</p>
+          </div>
+          <div className="hw-safety-grid">
             {SAFETY_FEATURES.map((feature, index) => (
-              <SafetyFeature
+              <FeatureCard
                 key={`safety-${index}`}
                 Icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
                 index={index}
+                className="hw-safety-card"
               />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="how-it-works" aria-labelledby="how-it-works-heading">
-          <h2 id="how-it-works-heading">How It Works</h2>
-          <div className="steps">
-            <div className="step">
-              <span className="step-number" aria-hidden="true">1</span>
-              <p>Download the app and sign up.</p>
-            </div>
-            <div className="step">
-              <span className="step-number" aria-hidden="true">2</span>
-              <p>Enter your pickup and drop-off location.</p>
-            </div>
-            <div className="step">
-              <span className="step-number" aria-hidden="true">3</span>
-              <p>Choose your ride and confirm your booking.</p>
-            </div>
-            <div className="step">
-              <span className="step-number" aria-hidden="true">4</span>
-              <p>Sit back, relax, and enjoy the ride!</p>
-            </div>
+      {/* Stats Section */}
+      <section className="hw-stats-section" aria-labelledby="stats-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="stats-heading" className="hw-section-title">Our Growing Impact</h2>
+            <p className="hw-section-subtitle">Numbers that drive our success story</p>
           </div>
-        </section>
-
-        <section className="driver-benefits" aria-labelledby="driver-benefits-heading">
-          <h2 id="driver-benefits-heading">Drive with Glide Way</h2>
-          <div className="steps">
-            {DRIVER_BENEFITS.map((benefit, index) => (
-              <div className="step" key={`driver-benefit-${index}`}>
-                <benefit.icon size={40} aria-hidden="true" />
-                <h3>{benefit.title}</h3>
-                <p>{benefit.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* FIXED: Our Impact Section */}
-        <section className="impact-section" aria-labelledby="impact-heading">
-          <h2 id="impact-heading">Our Impact</h2>
-          <div className="stats-grid">
+          <div className="hw-stats-grid">
             {STATS.map((stat, index) => (
               <AnimatedStat
                 key={`stat-${index}`}
@@ -458,70 +451,143 @@ const HomePage = () => {
               />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FIXED: What Our Users Say Section */}
-        <section className="testimonials-section" aria-labelledby="testimonials-heading">
-          <h2 id="testimonials-heading">What Our Users Say</h2>
-          <div className="testimonial-list">
+      {/* Testimonials Section */}
+      <section className="hw-testimonials-section" aria-labelledby="testimonials-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="testimonials-heading" className="hw-section-title">Voices From Our Community</h2>
+            <p className="hw-section-subtitle">Discover what makes the Glide Way experience special</p>
+          </div>
+          <div className="hw-testimonials-grid">
             {TESTIMONIALS.map((testimonial, index) => (
               <Testimonial
                 key={`testimonial-${index}`}
                 quote={testimonial.quote}
                 author={testimonial.author}
+                role={testimonial.role}
                 index={index}
               />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FIXED: FAQ Section */}
-        <section className="faq-section" aria-labelledby="faq-heading">
-          <h2 id="faq-heading">Frequently Asked Questions</h2>
-          <div className="faq-list" role="tablist">
-            {FAQS.slice(0, 3).map((faq, index) => (
+      {/* Driver Benefits Section */}
+      <section className="hw-drivers-section" aria-labelledby="drivers-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="drivers-heading" className="hw-section-title">Drive & Thrive With Glide Way</h2>
+            <p className="hw-section-subtitle">Partner with us for flexibility, fair earnings, and growth opportunities</p>
+          </div>
+          <div className="hw-two-column">
+            <div className="hw-drivers-benefits">
+              {DRIVER_BENEFITS.map((benefit, index) => (
+                <FeatureCard
+                  key={`driver-benefit-${index}`}
+                  Icon={benefit.icon}
+                  title={benefit.title}
+                  description={benefit.description}
+                  index={index}
+                  className="hw-benefit-card"
+                />
+              ))}
+            </div>
+            <div className="hw-drivers-steps">
+              <h3 className="hw-drivers-steps__title">Getting Started Is Easy</h3>
+              {DRIVER_STEPS.map((step, index) => (
+                <StepItem
+                  key={`driver-step-${index}`}
+                  number={step.number}
+                  title={step.title}
+                  description={step.description}
+                  index={index}
+                />
+              ))}
+              <a href="/become-driver" className="hw-button hw-button--primary hw-button--full">Apply Now</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="hw-faq-section" aria-labelledby="faq-heading">
+        <div className="hw-container">
+          <div className="hw-section-header">
+            <h2 id="faq-heading" className="hw-section-title">Questions Answered</h2>
+            <p className="hw-section-subtitle">Find the information you need to get started</p>
+          </div>
+          <div className="hw-faq-container">
+            {FAQS.map((faq, index) => (
               <FAQItem
                 key={`faq-${index}`}
                 question={faq.question}
                 answer={faq.answer}
                 isOpen={openIndex === index}
                 onClick={() => toggleFAQ(index)}
+                index={index}
               />
             ))}
+            <div className="hw-faq-more">
+              <button 
+                className="hw-button hw-button--secondary" 
+                onClick={() => navigate('/faq')}
+                aria-label="View more frequently asked questions"
+              >
+                View All FAQs
+              </button>
+            </div>
           </div>
-          <button 
-            className="view-more-button" 
-            onClick={() => navigate('/faq')}
-            aria-label="View more frequently asked questions"
-          >
-            View More
-          </button>
-        </section>
+        </div>
+      </section>
 
-        <section className="cta-container" aria-labelledby="cta-heading">
-          <div className="cta">
-            <h2 id="cta-heading">Ready to Glide?</h2>
-            <p>Download the app today or sign up as a driver to join the Glide Way family.</p>
-            <div className="cta-buttons">
+      {/* Call to Action Section */}
+      <section className="hw-cta-section" aria-labelledby="cta-heading">
+        <div className="hw-container">
+          <div className="hw-cta-card">
+            <div className="hw-cta-content">
+              <h2 id="cta-heading" className="hw-cta-title">Ready to Transform Your Travel Experience?</h2>
+              <p className="hw-cta-description">Join millions of satisfied users who've made Glide Way their transportation partner of choice.</p>
+              <div className="hw-cta-buttons">
+                <a 
+                  href="/signup" 
+                  className="hw-button hw-button--primary hw-button--large"
+                >
+                  Sign Up Now
+                </a>
+                <a 
+                  href="/become-driver"
+                  className="hw-button hw-button--outline hw-button--large"
+                >
+                  Become A Driver Partner
+                </a>
+              </div>
+            </div>
+            <div className="hw-cta-stores">
               <a 
                 href="https://play.google.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
+                className="hw-store-badge"
                 aria-label="Download our app from Google Play Store"
-                className="cta-button primary"
               >
-                Download the App
+                <img src="/assets/playstore.png" alt="Get it on Google Play" width="60" height="60" />
               </a>
               <a 
-                href="/become-driver"
-                className="cta-button secondary"
+                href="https://apps.apple.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hw-store-badge"
+                aria-label="Download our app from Apple App Store"
               >
-                Sign Up to Drive
+                <img src="/assets/app-store.png" alt="Download on the App Store" width="60" height="60" />
               </a>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
     </div>
   );
 };
