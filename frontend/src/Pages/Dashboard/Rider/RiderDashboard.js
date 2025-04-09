@@ -186,7 +186,7 @@ import React, {
         icon: <Users size={32} />, 
         label: 'Carpool', 
         description: 'Sustainable sharing',
-        onClick: () => navigate('/ride-pooling')
+        onClick: () => navigate('/pooling/dashboard')
       },
       { 
         icon: <MapPin size={32} />, 

@@ -8,6 +8,7 @@ const driverLogin = require("./Routes/DriverLogin")
 const riderRoutes = require("./Routes/rider") 
 const poolrideRoutes = require('./Routes/poolride')
 const navRefresher = require('./Routes/navRefresher')
+const bookpoolRoutes = require('./Routes/bookpool')
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT
@@ -17,7 +18,8 @@ app.use(
   cors({
   origin: process.env.FRONTEND_URL,
   credentials: true, 
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "x-auth-token"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 })
 )
 app.use(express.json())
@@ -26,7 +28,8 @@ app.use("/api/driver", driverRoutes)
 app.use("/api/driver", driverLogin)
 app.use("/api", riderRoutes) 
 app.use('/api/rides', poolrideRoutes);
-// app.use('/api/nav', navRefresher);
+app.use('/api/nav', navRefresher);
+app.use('/api/rides/pool/book', bookpoolRoutes);
 
 
 // MongoDB Connection

@@ -43,7 +43,8 @@ import DriverProfile from "./Pages/Users/Drivers/Profile/Profile";
 import ScheduleRide from "./Pages/Rides/ScheduleRide/ScheduleRide";
 import RideSharing from "./Pages/Rides/RideSharing/RideSharing";
 import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
-
+import CreatePool from "./Pages/Rides/RidePooling/CreatePool";
+import FindPool from "./Pages/Rides/RidePooling/FindPool"; 
 import "./App.css";
 
 // Create an AuthContext for robust state management
@@ -167,7 +168,8 @@ const App = () => {
           <Route path="/book-a-ride" element={<BookARide />} />
           <Route path="/schedule-ride" element={<ScheduleRide />} />
           <Route path="/ride-sharing" element={<RideSharing />} />
-          <Route path="/ride-pooling" element={<RidePooling />} />
+          <Route path="/pooling/dashboard" element={<RidePooling />} />
+
 
           {/* Protected Routes */}
           {/* Rider Protected Routes */}
@@ -195,6 +197,33 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/pooling/create"
+            element={
+              <ProtectedRoute
+
+                isLoggedIn={isLoggedIn}
+                allowedRoles={["rider"]}
+                userRole={userRole}
+              >
+                <CreatePool />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pooling/find"
+            element={
+              <ProtectedRoute
+
+                isLoggedIn={isLoggedIn}
+                allowedRoles={["rider"]}  
+                userRole={userRole}
+              >
+                <FindPool />
+              </ProtectedRoute>
+            }
+          />
+
 
           {/* Driver Protected Routes */}
           <Route
@@ -233,6 +262,7 @@ const App = () => {
               )
             } 
           />
+
 
           {/* Redirect unknown routes */}
           <Route path="*" element={<Navigate to="/" replace />} />

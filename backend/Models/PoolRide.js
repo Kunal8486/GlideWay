@@ -1,61 +1,226 @@
 const mongoose = require('mongoose');
-const axios = require('axios');
+const Schema = mongoose.Schema;
 
-const RideSchema = new mongoose.Schema({
-  origin: { 
-    type: String, 
-    required: true 
+// GeoJSON Point Schema
+const PointSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ['Point'],
+    default: 'Point'
   },
-  destination: { 
-    type: String, 
-    required: true 
-  },
-  date: { 
-    type: Date, 
-    required: true 
-  },
-  time: { 
-    type: String, 
-    required: true 
-  },
-  seats: { 
-    type: Number, 
-    required: true, 
-    min: 1, 
-    max: 6 
-  },
-  fare: { 
-    type: Number, 
-    required: true 
-  },
-  vehicleType: { 
-    type: String, 
-    enum: ['Car', 'SUV', 'Sedan', 'Hatchback'], 
-    required: true 
-  },
-  originCoordinates: {
-    lat: Number,
-    lng: Number
-  },
-  destinationCoordinates: {
-    lat: Number,
-    lng: Number
-  },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: false
+  }
+});
+
+// Create ride schema
+const RideSchema = new Schema({
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+    required: false
   },
-  availableSeats: {
+  driver: {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: false
+    },
+    name: {
+      type: String,
+      required: false
+    },
+    avatar: {
+      type: String
+    }
+  },
+  origin: {
+    type: String,
+    required: false
+  },
+  destination: {
+    type: String,
+    required: false
+  },
+  originCoords: {
+    type: PointSchema,
+    required: false
+  },
+  destinationCoords: {
+    type: PointSchema,
+    required: false
+  },
+  date: {
+    type: String,
+    required: false
+  },
+  time: {
+    type: String,
+    required: false
+  },
+  dateTime: {
+    type: Date,
+    required: false
+  },
+  seats: {
     type: Number,
-    default: function() { return this.seats; }
+    required: false,
+    min: 1
+  },
+  seatsAvailable: {
+    type: Number,
+    required: false,
+    min: 0
+  },
+  fare: {
+    type: Number,
+    required: false,
+    min: 0
+  },
+  vehicleType: {
+    type: String,
+    required: false,
+    enum: ['Car', 'SUV', 'VAN', 'BIKE', 'Other']
+  },
+  notes: {
+    type: String
   },
   status: {
     type: String,
-    enum: ['Open', 'Full', 'Completed'],
-    default: 'Open'
+    enum: ['active', 'completed', 'cancelled'],
+    default: 'active'
+  },
+  
+  // Pooling enhancement fields
+  isFlexiblePickup: {
+    type: Boolean,
+    default: false
+  },
+  pickupRadius: {
+    type: Number,
+    default: 1
+  },
+  isRecurringRide: {
+    type: Boolean,
+    default: false
+  },
+  recurringDays: [{
+    type: String,
+  }],
+  isRecurringInstance: {
+    type: Boolean,
+    default: false
+  },
+  parentRideId: {
+    type: Schema.Types.ObjectId,
+    ref: 'ride'
+  },
+  allowDetour: {
+    type: Boolean,
+    default: false
+  },
+  maxDetourDistance: {
+    type: Number,
+    default: 2
+  },
+  maxWaitTime: {
+    type: Number,
+    default: 10
+  },
+  
+  // Passenger information
+  passengers: [
+    {
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+      },
+      name: {
+        type: String
+      },
+      avatar: {
+        type: String
+      },
+      pickupLocation: {
+        address: {
+          type: String
+        },
+        coordinates: {
+          type: PointSchema
+        }
+      },
+      dropoffLocation: {
+        address: {
+          type: String
+        },
+        coordinates: {
+          type: PointSchema
+        }
+      },
+      status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected', 'cancelled'],
+        default: 'pending'
+      },
+      requestedAt: {
+        type: Date,
+        default: Date.now
+      },
+      updatedAt: {
+        type: Date
+      }
+    }
+  ],
+  
+  // Suggested pickup and dropoff points
+  suggestedPickupPoints: [
+    {
+      name: {
+        type: String
+      },
+      address: {
+        type: String
+      },
+      coords: {
+        lat: Number,
+        lng: Number
+      }
+    }
+  ],
+  suggestedDropoffPoints: [
+    {
+      name: {
+        type: String
+      },
+      address: {
+        type: String
+      },
+      coords: {
+        lat: Number,
+        lng: Number
+      }
+    }
+  ],
+  
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
-}, { timestamps: true });
+});
 
-const Ride = mongoose.model('Ride', RideSchema);
+// Create index for geospatial queries
+RideSchema.index({ originCoords: '2dsphere' });
+RideSchema.index({ destinationCoords: '2dsphere' });
 
-module.exports = Ride;
+// Pre-save middleware to update the updatedAt field
+RideSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+module.exports = mongoose.model('ride', RideSchema);
