@@ -1,111 +1,92 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import {
-    Navigation,
-    Crosshair,
-    Map as MapIcon,
-    Calendar,
-    Clock,
-    Users,
-    Car,
-    CircleDot,
-    Repeat,
-    AlertCircle,
-    Clock4
-} from 'lucide-react';
+import { MapIcon, Calendar, Search, Filter, MapPin, Clock, Users, ChevronsRight, RotateCw, X, DollarSign, Car } from 'lucide-react';
+import './FindPool.css';
 
-function FindPool() {
-    const [rides, setRides] = useState([]);
-    const [searchFilters, setSearchFilters] = useState({
+function FindRide() {
+    // Search parameters state
+    const [searchParams, setSearchParams] = useState({
         origin: '',
         destination: '',
         originCoords: null,
         destinationCoords: null,
-        minSeats: 1,
-        maxFare: '',
         date: '',
-        allowDetour: false,
-        isFlexiblePickup: false,
-        vehicleType: '',
-        isRecurringRide: false
+        time: '',
+        seats: 1,
+        maxFare: '',
+        maxDistance: 5, // km from preferred pickup/dropoff
+        includeRecurring: true,
+        flexibleTiming: false,
+        timeFlexibility: 60, // minutes
     });
-    const [routeDetails, setRouteDetails] = useState(null);
-    const [loading, setLoading] = useState({
-        searchRides: false,
-        routeCalculation: false,
-        geolocation: false
-    });
+
+    // Results and UI state
+    const [rides, setRides] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+    const [filtersVisible, setFiltersVisible] = useState(false);
+    const [selectedRide, setSelectedRide] = useState(null);
+    const [selectedRideRoute, setSelectedRideRoute] = useState(null);
     const [mapVisible, setMapVisible] = useState(false);
     const [activeLocationField, setActiveLocationField] = useState(null);
-    const [advancedFiltersVisible, setAdvancedFiltersVisible] = useState(false);
-    const [selectedRide, setSelectedRide] = useState(null);
-    const [pickupLocation, setPickupLocation] = useState({
-        address: '',
-        coordinates: null
-    });
-    const [dropoffLocation, setDropoffLocation] = useState({
-        address: '',
-        coordinates: null
-    });
-    
+    const [loadingLocation, setLoadingLocation] = useState(false);
+    const [initialLocationFetched, setInitialLocationFetched] = useState(false);
+
     // Refs for Google Maps
     const mapRef = useRef(null);
     const mapInstance = useRef(null);
+    const autocompleteOriginRef = useRef(null);
+    const autocompleteDestinationRef = useRef(null);
     const markerRef = useRef(null);
-    
-    // Initialize map when showing the map modal
+    const directionsRendererRef = useRef(null);
+
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+
+    // Initialize Google Maps & Places Autocomplete
     useEffect(() => {
-        if (mapVisible && mapRef.current && window.google && !mapInstance.current) {
-            const defaultLocation = { lat: 20.5937, lng: 78.9629 }; // Default to center of India
-            
-            mapInstance.current = new window.google.maps.Map(mapRef.current, {
-                center: defaultLocation,
-                zoom: 8,
-                mapTypeControl: true,
-                streetViewControl: false
-            });
-            
-            markerRef.current = new window.google.maps.Marker({
-                position: defaultLocation,
-                map: mapInstance.current,
-                draggable: true,
-                animation: window.google.maps.Animation.DROP
-            });
-            
-            // Add event listener for marker position changes
-            markerRef.current.addListener('dragend', () => {
-                const position = markerRef.current.getPosition();
-                reverseGeocode(position.lat(), position.lng());
-            });
-            
-            // If we have coordinates for the active field, center on them
-            if (activeLocationField === 'searchOrigin' && searchFilters.originCoords) {
-                mapInstance.current.setCenter(searchFilters.originCoords);
-                markerRef.current.setPosition(searchFilters.originCoords);
-            } else if (activeLocationField === 'searchDestination' && searchFilters.destinationCoords) {
-                mapInstance.current.setCenter(searchFilters.destinationCoords);
-                markerRef.current.setPosition(searchFilters.destinationCoords);
-            } else if (activeLocationField === 'customPickup' && pickupLocation.coordinates) {
-                mapInstance.current.setCenter(pickupLocation.coordinates);
-                markerRef.current.setPosition(pickupLocation.coordinates);
-            } else if (activeLocationField === 'customDropoff' && dropoffLocation.coordinates) {
-                mapInstance.current.setCenter(dropoffLocation.coordinates);
-                markerRef.current.setPosition(dropoffLocation.coordinates);
-            } else if (activeLocationField === 'viewRoute' && selectedRide) {
-                // Display both origin and destination with a route for viewRoute mode
-                displayRouteOnMap(selectedRide);
-            } else {
-                // Try to get user's current location if no coordinates are available
-                getUserLocation();
+        const loadGoogleMapsScript = () => {
+            // Check if the script is already loaded
+            if (window.google && window.google.maps) {
+                initializeMapsServices();
+                // Auto-fetch current location after maps are initialized
+                if (!initialLocationFetched) {
+                    autoFetchCurrentLocation();
+                }
+                return;
             }
-        }
-    }, [mapVisible, activeLocationField, selectedRide]);
-    
-    // Function to get user's current location
-    const getUserLocation = () => {
-        setLoading(prev => ({ ...prev, geolocation: true }));
-        
+
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places`;
+            script.async = true;
+            script.defer = true;
+            script.onload = () => {
+                initializeMapsServices();
+                // Auto-fetch current location after maps are loaded
+                if (!initialLocationFetched) {
+                    autoFetchCurrentLocation();
+                }
+            };
+            document.head.appendChild(script);
+        };
+
+        loadGoogleMapsScript();
+
+        // Clean up function
+        return () => {
+            // Clean up any map instances or listeners
+            if (mapInstance.current) {
+                // Remove any event listeners if needed
+            }
+        };
+    }, [initialLocationFetched]);
+
+    // Function to automatically fetch the user's current location when the page loads
+    const autoFetchCurrentLocation = () => {
+        setLoadingLocation(true);
+        setError(null);
+
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -113,935 +94,993 @@ function FindPool() {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
-                    
-                    if (mapInstance.current) {
-                        mapInstance.current.setCenter(userLocation);
-                        markerRef.current.setPosition(userLocation);
-                        reverseGeocode(userLocation.lat, userLocation.lng);
+
+                    // Reverse geocode to get address
+                    if (window.google) {
+                        const geocoder = new window.google.maps.Geocoder();
+                        geocoder.geocode({ location: userLocation }, (results, status) => {
+                            if (status === 'OK' && results[0]) {
+                                const address = results[0].formatted_address;
+
+                                // Set as origin
+                                setSearchParams(prev => ({
+                                    ...prev,
+                                    origin: address,
+                                    originCoords: userLocation
+                                }));
+
+                                setSuccess('Current location set as pickup point');
+                                setTimeout(() => setSuccess(null), 3000);
+                            } else {
+                                setError('Could not get address for your location');
+                            }
+                            setLoadingLocation(false);
+                            setInitialLocationFetched(true);
+                        });
+                    } else {
+                        setLoadingLocation(false);
+                        setInitialLocationFetched(true);
                     }
-                    
-                    setLoading(prev => ({ ...prev, geolocation: false }));
                 },
                 (error) => {
                     console.error('Geolocation error:', error);
-                    setError('Unable to access your location');
-                    setLoading(prev => ({ ...prev, geolocation: false }));
+                    let errorMessage = 'Unable to access your location. ';
+
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Please allow location access in your browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Location request timed out.';
+                            break;
+                        default:
+                            errorMessage += 'An unknown error occurred.';
+                    }
+
+                    setError(errorMessage);
+                    setLoadingLocation(false);
+                    setInitialLocationFetched(true);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
             );
         } else {
             setError('Geolocation is not supported by your browser');
-            setLoading(prev => ({ ...prev, geolocation: false }));
+            setLoadingLocation(false);
+            setInitialLocationFetched(true);
         }
     };
-    
-    // Display route on map with origin and destination markers
-    const displayRouteOnMap = (ride) => {
-        if (!window.google || !mapInstance.current) return;
-        
-        // Create origin and destination points from ride data
-        let originPoint, destinationPoint;
-        
-        if (ride.originCoords && ride.originCoords.coordinates) {
-            // Handle GeoJSON Point format from MongoDB
-            originPoint = { 
-                lat: ride.originCoords.coordinates[1], 
-                lng: ride.originCoords.coordinates[0] 
-            };
-        } else if (ride.originCoords && typeof ride.originCoords === 'object') {
-            originPoint = ride.originCoords;
-        } else if (typeof ride.originCoords === 'string') {
-            const coords = ride.originCoords.split(',').map(Number);
-            originPoint = { lat: coords[0], lng: coords[1] };
-        }
-        
-        if (ride.destinationCoords && ride.destinationCoords.coordinates) {
-            destinationPoint = { 
-                lat: ride.destinationCoords.coordinates[1], 
-                lng: ride.destinationCoords.coordinates[0] 
-            };
-        } else if (ride.destinationCoords && typeof ride.destinationCoords === 'object') {
-            destinationPoint = ride.destinationCoords;
-        } else if (typeof ride.destinationCoords === 'string') {
-            const coords = ride.destinationCoords.split(',').map(Number);
-            destinationPoint = { lat: coords[0], lng: coords[1] };
-        }
-        
-        // If we couldn't extract coordinates, use addresses
-        const origin = originPoint || ride.origin;
-        const destination = destinationPoint || ride.destination;
-        
-        // Clear previous markers and routes
-        if (mapInstance.current) {
-            mapInstance.current.setCenter(originPoint || { lat: 20.5937, lng: 78.9629 });
-            
-            const directionsService = new window.google.maps.DirectionsService();
-            const directionsRenderer = new window.google.maps.DirectionsRenderer({
-                map: mapInstance.current,
-                suppressMarkers: false
+
+    const initializeMapsServices = () => {
+        // Initialize autocomplete for origin and destination inputs
+        const originInput = document.getElementById('search-origin');
+        const destinationInput = document.getElementById('search-destination');
+
+        if (originInput && window.google) {
+            autocompleteOriginRef.current = new window.google.maps.places.Autocomplete(originInput, {
+                fields: ['formatted_address', 'geometry', 'name', 'place_id']
             });
-            
-            const request = {
-                origin: origin,
-                destination: destination,
-                travelMode: 'DRIVING'
-            };
-            
-            directionsService.route(request, (result, status) => {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                    
-                    // If the ride has suggested pickup points, display them
-                    if (ride.suggestedPickupPoints && ride.suggestedPickupPoints.length > 0) {
-                        ride.suggestedPickupPoints.forEach(point => {
-                            new window.google.maps.Marker({
-                                position: { lat: point.coords.lat, lng: point.coords.lng },
-                                map: mapInstance.current,
-                                icon: {
-                                    path: window.google.maps.SymbolPath.CIRCLE,
-                                    scale: 7,
-                                    fillColor: "#4CAF50",
-                                    fillOpacity: 1,
-                                    strokeWeight: 2,
-                                    strokeColor: "#FFFFFF"
-                                },
-                                title: `Pickup: ${point.name}`
-                            });
-                        });
-                    }
-                    
-                    // If the ride has suggested dropoff points, display them
-                    if (ride.suggestedDropoffPoints && ride.suggestedDropoffPoints.length > 0) {
-                        ride.suggestedDropoffPoints.forEach(point => {
-                            new window.google.maps.Marker({
-                                position: { lat: point.coords.lat, lng: point.coords.lng },
-                                map: mapInstance.current,
-                                icon: {
-                                    path: window.google.maps.SymbolPath.CIRCLE,
-                                    scale: 7,
-                                    fillColor: "#F44336",
-                                    fillOpacity: 1,
-                                    strokeWeight: 2,
-                                    strokeColor: "#FFFFFF"
-                                },
-                                title: `Dropoff: ${point.name}`
-                            });
-                        });
-                    }
+            autocompleteOriginRef.current.addListener('place_changed', () => {
+                const place = autocompleteOriginRef.current.getPlace();
+                if (place.geometry) {
+                    setSearchParams(prev => ({
+                        ...prev,
+                        origin: place.formatted_address || place.name,
+                        originCoords: {
+                            lat: place.geometry.location.lat(),
+                            lng: place.geometry.location.lng()
+                        }
+                    }));
+                }
+            });
+        }
+
+        if (destinationInput && window.google) {
+            autocompleteDestinationRef.current = new window.google.maps.places.Autocomplete(destinationInput, {
+                fields: ['formatted_address', 'geometry', 'name', 'place_id']
+            });
+            autocompleteDestinationRef.current.addListener('place_changed', () => {
+                const place = autocompleteDestinationRef.current.getPlace();
+                if (place.geometry) {
+                    setSearchParams(prev => ({
+                        ...prev,
+                        destination: place.formatted_address || place.name,
+                        destinationCoords: {
+                            lat: place.geometry.location.lat(),
+                            lng: place.geometry.location.lng()
+                        }
+                    }));
                 }
             });
         }
     };
-    
+
+    // Handle input changes
+    const handleInputChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        // Handle different input types
+        const updatedValue = type === 'checkbox' ? checked : value;
+
+        setSearchParams(prev => ({
+            ...prev,
+            [name]: updatedValue
+        }));
+    };
+
+    // Open map for location selection
+    const openMapForSelection = (field) => {
+        setActiveLocationField(field);
+        setMapVisible(true);
+        setError(null);
+    };
+
+    // Initialize map when showing the map modal
+    useEffect(() => {
+        if (mapVisible && mapRef.current && window.google) {
+            const defaultLocation = { lat: 20.5937, lng: 78.9629 }; // Default to center of India
+
+            // Create a new map instance each time the modal is opened
+            mapInstance.current = new window.google.maps.Map(mapRef.current, {
+                center: defaultLocation,
+                zoom: 12,
+                mapTypeControl: true,
+                streetViewControl: false,
+                fullscreenControl: true,
+                zoomControl: true
+            });
+
+            // Create a new marker instance
+            markerRef.current = new window.google.maps.Marker({
+                position: defaultLocation,
+                map: mapInstance.current,
+                draggable: true,
+                animation: window.google.maps.Animation.DROP
+            });
+
+            // Add event listener for marker position changes
+            markerRef.current.addListener('dragend', () => {
+                const position = markerRef.current.getPosition();
+                reverseGeocode(position.lat(), position.lng());
+            });
+
+            // Handle different map views based on the active field
+            if (activeLocationField === 'origin' && searchParams.originCoords) {
+                mapInstance.current.setCenter(searchParams.originCoords);
+                markerRef.current.setPosition(searchParams.originCoords);
+            } else if (activeLocationField === 'destination' && searchParams.destinationCoords) {
+                mapInstance.current.setCenter(searchParams.destinationCoords);
+                markerRef.current.setPosition(searchParams.destinationCoords);
+            } else if (activeLocationField === 'viewRoute' && selectedRide) {
+                // Hide the marker when viewing route
+                markerRef.current.setMap(null);
+
+                // Show the selected ride's route instead
+                const originCoords = parseCoordinates(selectedRide.originCoords);
+                const destinationCoords = parseCoordinates(selectedRide.destinationCoords);
+
+                if (originCoords && destinationCoords) {
+                    showRoute(originCoords, destinationCoords);
+                }
+            } else {
+                // Try to get user's current location if no coordinates are available
+                getUserLocation();
+            }
+        }
+
+        // Cleanup function
+        return () => {
+            if (!mapVisible) {
+                // Clean up the directions renderer
+                if (directionsRendererRef.current) {
+                    directionsRendererRef.current.setMap(null);
+                    directionsRendererRef.current = null;
+                }
+
+                // Clean up the marker
+                if (markerRef.current) {
+                    markerRef.current.setMap(null);
+                    markerRef.current = null;
+                }
+            }
+        };
+    }, [mapVisible, activeLocationField, selectedRide]);
+
+    // Function to get user's current location
+    const getUserLocation = () => {
+        setLoadingLocation(true);
+        setError(null);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    if (mapInstance.current) {
+                        mapInstance.current.setCenter(userLocation);
+                        mapInstance.current.setZoom(15); // Zoom in closer
+
+                        if (markerRef.current) {
+                            markerRef.current.setPosition(userLocation);
+                        } else {
+                            markerRef.current = new window.google.maps.Marker({
+                                position: userLocation,
+                                map: mapInstance.current,
+                                draggable: true,
+                                animation: window.google.maps.Animation.DROP
+                            });
+
+                            // Add event listener for marker position changes
+                            markerRef.current.addListener('dragend', () => {
+                                const position = markerRef.current.getPosition();
+                                reverseGeocode(position.lat(), position.lng());
+                            });
+                        }
+
+                        reverseGeocode(userLocation.lat, userLocation.lng);
+                    }
+
+                    setLoadingLocation(false);
+                },
+                (error) => {
+                    console.error('Geolocation error:', error);
+                    let errorMessage = 'Unable to access your location. ';
+
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Please allow location access in your browser settings.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Location request timed out.';
+                            break;
+                        default:
+                            errorMessage += 'An unknown error occurred.';
+                    }
+
+                    setError(errorMessage);
+                    setLoadingLocation(false);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            setError('Geolocation is not supported by your browser');
+            setLoadingLocation(false);
+        }
+    };
+
     // Reverse geocode to get address from coordinates
     const reverseGeocode = (lat, lng) => {
         if (!window.google) return;
-        
+
         const geocoder = new window.google.maps.Geocoder();
         const latlng = { lat, lng };
-        
+
         geocoder.geocode({ location: latlng }, (results, status) => {
             if (status === 'OK' && results[0]) {
                 const address = results[0].formatted_address;
-                
+
                 // Update the appropriate field based on what's active
-                if (activeLocationField === 'searchOrigin') {
-                    setSearchFilters(prev => ({
+                if (activeLocationField === 'origin') {
+                    setSearchParams(prev => ({
                         ...prev,
                         origin: address,
                         originCoords: { lat, lng }
                     }));
-                } else if (activeLocationField === 'searchDestination') {
-                    setSearchFilters(prev => ({
+                } else if (activeLocationField === 'destination') {
+                    setSearchParams(prev => ({
                         ...prev,
                         destination: address,
                         destinationCoords: { lat, lng }
                     }));
-                } else if (activeLocationField === 'customPickup') {
-                    setPickupLocation({
-                        address,
-                        coordinates: { lat, lng }
-                    });
-                } else if (activeLocationField === 'customDropoff') {
-                    setDropoffLocation({
-                        address,
-                        coordinates: { lat, lng }
-                    });
                 }
             } else {
                 console.error('Geocoder failed:', status);
+                setError('Failed to get address for selected location');
             }
         });
     };
-    
-    // Open map modal for location selection
-    const openMapForSelection = (field) => {
-        setActiveLocationField(field);
-        setMapVisible(true);
-        
-        // Reset the map instance so it reinitializes with the proper center
-        mapInstance.current = null;
+
+    // Helper to parse coordinates from string
+    const parseCoordinates = (coordsString) => {
+        if (!coordsString) return null;
+
+        // Handle both string format "lat,lng" and object format {lat, lng}
+        if (typeof coordsString === 'string') {
+            const [lat, lng] = coordsString.split(',').map(Number);
+            return { lat, lng };
+        } else if (typeof coordsString === 'object' && coordsString !== null) {
+            return coordsString;
+        }
+        return null;
     };
-    
+
+    // Function to display the route on the map
+    const showRoute = (originCoords, destinationCoords) => {
+        if (!window.google || !mapInstance.current) return;
+
+        const directionsService = new window.google.maps.DirectionsService();
+
+        // If we already have a directions renderer, clear it
+        if (directionsRendererRef.current) {
+            directionsRendererRef.current.setMap(null);
+            directionsRendererRef.current = null;
+        }
+
+        // Create a new directions renderer
+        directionsRendererRef.current = new window.google.maps.DirectionsRenderer({
+            map: mapInstance.current,
+            suppressMarkers: false,
+            polylineOptions: {
+                strokeColor: '#4285F4',
+                strokeWeight: 5
+            }
+        });
+
+        const request = {
+            origin: originCoords,
+            destination: destinationCoords,
+            travelMode: 'DRIVING'
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === 'OK') {
+                directionsRendererRef.current.setDirections(result);
+
+                // Fit the map to the route bounds
+                const bounds = new window.google.maps.LatLngBounds();
+                bounds.extend(originCoords);
+                bounds.extend(destinationCoords);
+                mapInstance.current.fitBounds(bounds);
+
+                // Extract route details
+                const route = result.routes[0];
+                if (route && route.legs[0]) {
+                    setSelectedRideRoute({
+                        distance: route.legs[0].distance.text,
+                        duration: route.legs[0].duration.text
+                    });
+                }
+            } else {
+                setError('Could not calculate route. Please try again.');
+            }
+        });
+    };
+
     // Confirm the location selected on the map
     const confirmMapLocation = () => {
+        if (!markerRef.current) {
+            setError('Please select a location on the map first');
+            return;
+        }
+
+        setMapVisible(false);
+        setSuccess(`${activeLocationField === 'origin' ? 'Origin' : 'Destination'} location confirmed`);
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+            setSuccess(null);
+        }, 3000);
+    };
+
+    // Close map modal
+    const closeMapModal = () => {
         setMapVisible(false);
     };
-    
-    // Memoized input change handler with improved validation
-    const handleSearchInputChange = useCallback((e) => {
-        const { name, value, type, min, max, checked } = e.target;
-        let processedValue = value;
 
-        if (type === 'number') {
-            processedValue = Math.max(
-                Number(min || 0),
-                Math.min(Number(max || Number.MAX_SAFE_INTEGER), Number(value))
-            );
-        } else if (type === 'checkbox') {
-            processedValue = checked;
-        }
-
-        setSearchFilters(prev => ({
-            ...prev,
-            [name]: processedValue
-        }));
-    }, []);
-
-    const handleSearchRides = async (e) => {
-        e.preventDefault();
-        setLoading(prev => ({ ...prev, searchRides: true }));
-        setError(null);
-
-        try {
-            // Format coordinates for API request
-            const originCoordsFormatted = searchFilters.originCoords ? {
-                type: 'Point',
-                coordinates: [searchFilters.originCoords.lng, searchFilters.originCoords.lat]
-            } : null;
-            
-            const destinationCoordsFormatted = searchFilters.destinationCoords ? {
-                type: 'Point',
-                coordinates: [searchFilters.destinationCoords.lng, searchFilters.destinationCoords.lat]
-            } : null;
-            
-            // Prepare search parameters
-            const searchParams = {
-                ...searchFilters,
-                originCoords: originCoordsFormatted,
-                destinationCoords: destinationCoordsFormatted
-            };
-
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/poolsearch`, {
-                params: searchParams
-            });
-            setRides(response.data);
-        } catch (error) {
-            console.error('Error searching rides:', error);
-            setError('Failed to search rides');
-        } finally {
-            setLoading(prev => ({ ...prev, searchRides: false }));
-        }
+    // Format date for display
+    const formatDate = (dateString) => {
+        const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-IN', options);
     };
 
-    // Enhanced route calculation with more detailed error handling
-    const calculateRoute = async (ride) => {
-        setLoading(prev => ({ ...prev, routeCalculation: true }));
+    // Format time for display
+    const formatTime = (timeString) => {
+        return timeString;
+    };
+
+    // Handle search form submission
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        setLoading(true);
         setError(null);
-        setSelectedRide(ride);
+        setRides([]);
 
         try {
-            // Extract origin and destination coordinates
-            let originCoords, destinationCoords;
-            
-            if (ride.originCoords && ride.originCoords.coordinates) {
-                // Handle GeoJSON Point format from MongoDB
-                originCoords = {
-                    lat: ride.originCoords.coordinates[1],
-                    lng: ride.originCoords.coordinates[0]
-                };
-            } else if (ride.originCoords && typeof ride.originCoords === 'object') {
-                originCoords = ride.originCoords;
+            // Validation
+            if (!searchParams.origin.trim()) {
+                throw new Error('Origin location is required');
             }
-            
-            if (ride.destinationCoords && ride.destinationCoords.coordinates) {
-                destinationCoords = {
-                    lat: ride.destinationCoords.coordinates[1],
-                    lng: ride.destinationCoords.coordinates[0]
-                };
-            } else if (ride.destinationCoords && typeof ride.destinationCoords === 'object') {
-                destinationCoords = ride.destinationCoords;
+            if (!searchParams.destination.trim()) {
+                throw new Error('Destination location is required');
             }
-            
-            // Use coordinates if available, otherwise use addresses
-            const params = originCoords && destinationCoords ? 
-                { 
-                    originCoords: `${originCoords.lat},${originCoords.lng}`, 
-                    destinationCoords: `${destinationCoords.lat},${destinationCoords.lng}` 
-                } : 
-                { origin: ride.origin, destination: ride.destination };
 
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/poolroute`, {
-                params
-            });
-            
-            setRouteDetails(response.data);
-            openMapForSelection('viewRoute');
+            // Format coordinates correctly for API request
+            const formattedParams = {
+                ...searchParams,
+                originCoords: searchParams.originCoords
+                    ? `${searchParams.originCoords.lat},${searchParams.originCoords.lng}`
+                    : null,
+                destinationCoords: searchParams.destinationCoords
+                    ? `${searchParams.destinationCoords.lat},${searchParams.destinationCoords.lng}`
+                    : null,
+                seats: parseInt(searchParams.seats) || 1,
+                maxFare: searchParams.maxFare ? parseFloat(searchParams.maxFare) : null,
+                maxDistance: parseFloat(searchParams.maxDistance) || 5,
+                timeFlexibility: parseInt(searchParams.timeFlexibility) || 60
+            };
+
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error('User is not authenticated. Please log in first.');
+            }
+
+            // Call the API to get matching rides
+            const response = await axios.get(
+                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/search`,
+                {
+                    params: formattedParams,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            // Update rides state with results
+            setRides(response.data.rides || []);
+
+            // Show message if no rides found
+            if (response.data.rides.length === 0) {
+                setSuccess('No matching rides found. Try adjusting your search criteria.');
+                setTimeout(() => setSuccess(null), 5000);
+            } else {
+                setSuccess(`Found ${response.data.rides.length} matching rides!`);
+                setTimeout(() => setSuccess(null), 3000);
+            }
+
         } catch (error) {
-            console.error('Route calculation error:', error);
-            setError('Could not calculate route details');
+            console.error('Error searching for rides:', error);
+
+            // Extract error message
+            const errorMessage =
+                error.response?.data?.message ||
+                error.response?.data?.errors?.[0]?.msg ||
+                error.message ||
+                'Failed to search for rides';
+
+            setError(errorMessage);
         } finally {
-            setLoading(prev => ({ ...prev, routeCalculation: false }));
+            setLoading(false);
         }
     };
 
     // View ride details and route
-    const viewRideDetails = (ride) => {
+    const viewRideRoute = (ride) => {
         setSelectedRide(ride);
-        calculateRoute(ride);
+        setActiveLocationField('viewRoute');
+        setMapVisible(true);
     };
 
-    // Join Ride with enhanced implementation for custom pickup/dropoff points
-    const handleJoinRide = async (ride) => {
+    // Book a ride
+    const bookRide = async (rideId) => {
+        setLoading(true);
+        setError(null);
+
         try {
-            if (!pickupLocation.address && !dropoffLocation.address) {
-                // If no custom locations are set, use the ride's origin and destination
-                const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/rides/${ride._id}/join`);
-                alert('Ride joined successfully!');
-                return;
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error('User is not authenticated. Please log in first.');
             }
-            
-            // Format pickup and dropoff coordinates for MongoDB
-            const pickupCoords = pickupLocation.coordinates ? {
-                type: 'Point',
-                coordinates: [pickupLocation.coordinates.lng, pickupLocation.coordinates.lat]
-            } : null;
-            
-            const dropoffCoords = dropoffLocation.coordinates ? {
-                type: 'Point',
-                coordinates: [dropoffLocation.coordinates.lng, dropoffLocation.coordinates.lat]
-            } : null;
-            
-            // Join with custom pickup/dropoff
-            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/rides/${ride._id}/join`, {
-                pickupLocation: {
-                    address: pickupLocation.address || ride.origin,
-                    coordinates: pickupCoords
-                },
-                dropoffLocation: {
-                    address: dropoffLocation.address || ride.destination,
-                    coordinates: dropoffCoords
+
+            // Call API to book the ride
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book`,
+                { rideId, seats: searchParams.seats },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
-            });
-            
-            alert('Ride joined successfully!');
-            setPickupLocation({ address: '', coordinates: null });
-            setDropoffLocation({ address: '', coordinates: null });
-            setSelectedRide(null);
+            );
+
+            // Show success message
+            setSuccess('Ride booked successfully! Check your rides for details.');
+
+            // Update the ride status in the list
+            setRides(prevRides =>
+                prevRides.map(ride =>
+                    ride.id === rideId
+                        ? { ...ride, isBooked: true, availableSeats: ride.availableSeats - searchParams.seats }
+                        : ride
+                )
+            );
+
+            setTimeout(() => setSuccess(null), 5000);
         } catch (error) {
-            console.error('Error joining ride:', error);
-            alert('Failed to join ride. Please try again.');
+            console.error('Error booking ride:', error);
+
+            // Extract error message
+            const errorMessage =
+                error.response?.data?.message ||
+                error.response?.data?.errors?.[0]?.msg ||
+                error.message ||
+                'Failed to book ride';
+
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Initial rides fetch with more robust error handling
-    useEffect(() => {
-        const fetchRides = async () => {
-            setLoading(prev => ({ ...prev, searchRides: true }));
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/poolsearch`);
-                setRides(response.data);
-            } catch (error) {
-                console.error('Error fetching rides:', error);
-                setError('Could not fetch available rides');
-            } finally {
-                setLoading(prev => ({ ...prev, searchRides: false }));
-            }
-        };
-        fetchRides();
-    }, []);
+    // Toggle advanced filters visibility
+    const toggleFilters = () => {
+        setFiltersVisible(!filtersVisible);
+    };
 
-    // Initialize Google Maps places autocomplete for search inputs
+    // Mock data for testing UI (Comment out when connecting to real API)
+    /*
     useEffect(() => {
-        if (window.google && window.google.maps) {
-            const searchOriginInput = document.getElementById('search-origin');
-            const searchDestinationInput = document.getElementById('search-destination');
-            const customPickupInput = document.getElementById('custom-pickup');
-            const customDropoffInput = document.getElementById('custom-dropoff');
-            
-            if (searchOriginInput) {
-                const autocompleteSearchOrigin = new window.google.maps.places.Autocomplete(searchOriginInput);
-                autocompleteSearchOrigin.addListener('place_changed', () => {
-                    const place = autocompleteSearchOrigin.getPlace();
-                    if (place.geometry) {
-                        setSearchFilters(prev => ({
-                            ...prev,
-                            origin: place.formatted_address || place.name,
-                            originCoords: {
-                                lat: place.geometry.location.lat(),
-                                lng: place.geometry.location.lng()
-                            }
-                        }));
-                    }
-                });
+        const mockRides = [
+            {
+                id: '1',
+                origin: 'Andheri, Mumbai',
+                destination: 'BKC, Mumbai',
+                originCoords: '19.1136,72.8697',
+                destinationCoords: '19.0596,72.8619',
+                date: '2025-04-12',
+                time: '09:00',
+                seats: 3,
+                availableSeats: 2,
+                fare: 150,
+                vehicleType: 'Car',
+                driverName: 'Rahul S.',
+                driverRating: 4.8,
+                isRecurring: true,
+                recurringDays: ['Mon', 'Wed', 'Fri'],
+                isFlexiblePickup: true,
+                pickupRadius: 2,
+                notes: 'Office commute, can pick up from nearby metro stations too.'
+            },
+            {
+                id: '2',
+                origin: 'Powai, Mumbai',
+                destination: 'Lower Parel, Mumbai',
+                originCoords: '19.1176,72.9060',
+                destinationCoords: '18.9982,72.8311',
+                date: '2025-04-14',
+                time: '08:30',
+                seats: 4,
+                availableSeats: 3,
+                fare: 200,
+                vehicleType: 'SUV',
+                driverName: 'Priya M.',
+                driverRating: 4.7,
+                isRecurring: false,
+                isFlexiblePickup: true,
+                pickupRadius: 1,
+                notes: 'AC vehicle, please be on time.'
+            },
+            {
+                id: '3',
+                origin: 'Thane, Mumbai',
+                destination: 'Fort, Mumbai',
+                originCoords: '19.2183,72.9781',
+                destinationCoords: '18.9345,72.8371',
+                date: '2025-04-15',
+                time: '10:00',
+                seats: 2,
+                availableSeats: 2,
+                fare: 250,
+                vehicleType: 'Car',
+                driverName: 'Amar K.',
+                driverRating: 4.9,
+                isRecurring: true,
+                recurringDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                isFlexiblePickup: false,
+                notes: 'Office commute, runs every weekday.'
             }
-            
-            if (searchDestinationInput) {
-                const autocompleteSearchDestination = new window.google.maps.places.Autocomplete(searchDestinationInput);
-                autocompleteSearchDestination.addListener('place_changed', () => {
-                    const place = autocompleteSearchDestination.getPlace();
-                    if (place.geometry) {
-                        setSearchFilters(prev => ({
-                            ...prev,
-                            destination: place.formatted_address || place.name,
-                            destinationCoords: {
-                                lat: place.geometry.location.lat(),
-                                lng: place.geometry.location.lng()
-                            }
-                        }));
-                    }
-                });
-            }
-            
-            if (customPickupInput) {
-                const autocompleteCustomPickup = new window.google.maps.places.Autocomplete(customPickupInput);
-                autocompleteCustomPickup.addListener('place_changed', () => {
-                    const place = autocompleteCustomPickup.getPlace();
-                    if (place.geometry) {
-                        setPickupLocation({
-                            address: place.formatted_address || place.name,
-                            coordinates: {
-                                lat: place.geometry.location.lat(),
-                                lng: place.geometry.location.lng()
-                            }
-                        });
-                    }
-                });
-            }
-            
-            if (customDropoffInput) {
-                const autocompleteCustomDropoff = new window.google.maps.places.Autocomplete(customDropoffInput);
-                autocompleteCustomDropoff.addListener('place_changed', () => {
-                    const place = autocompleteCustomDropoff.getPlace();
-                    if (place.geometry) {
-                        setDropoffLocation({
-                            address: place.formatted_address || place.name,
-                            coordinates: {
-                                lat: place.geometry.location.lat(),
-                                lng: place.geometry.location.lng()
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    }, [selectedRide]);
+        ];
+
+        setTimeout(() => {
+            setRides(mockRides);
+        }, 1000);
+    }, []);
+    */
 
     return (
-        <>
-            {error && (
-                <div className="error-banner">
-                    {error}
-                </div>
-            )}
+        <div className="find-ride-page">
+            <div className="find-ride-container">
+                {error && (
+                    <div className="error-message">
+                        <span>{error}</span>
+                        <button onClick={() => setError(null)}>×</button>
+                    </div>
+                )}
+                {success && (
+                    <div className="success-message">
+                        <span>{success}</span>
+                        <button onClick={() => setSuccess(null)}>×</button>
+                    </div>
+                )}
 
-            <section id="find-ride" className="ride-search-section">
-                <div className="card ride-search-card">
-                    <h2>Search Rides</h2>
-                    <form onSubmit={handleSearchRides} className="search-form">
-                        <div className="form-grid">
-                            <div className="form-group location-input-group">
-                                <label>From</label>
-                                <div className="input-with-icon">
-                                    <input
-                                        id="search-origin"
-                                        type="text"
-                                        name="origin"
-                                        value={searchFilters.origin}
-                                        onChange={handleSearchInputChange}
-                                        placeholder="Starting location"
-                                    />
-                                    <button 
-                                        type="button" 
-                                        className="location-picker-btn"
-                                        onClick={() => openMapForSelection('searchOrigin')}
-                                        title="Pick location on map"
-                                    >
-                                        <MapIcon size={16} />
-                                    </button>
-                                    <button 
-                                        type="button" 
-                                        className="current-location-btn"
-                                        onClick={getUserLocation}
-                                        title="Use current location"
-                                    >
-                                        <Crosshair size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="form-group location-input-group">
-                                <label>To</label>
-                                <div className="input-with-icon">
-                                    <input
-                                        id="search-destination"
-                                        type="text"
-                                        name="destination"
-                                        value={searchFilters.destination}
-                                        onChange={handleSearchInputChange}
-                                        placeholder="Destination"
-                                    />
-                                    <button 
-                                        type="button" 
-                                        className="location-picker-btn"
-                                        onClick={() => openMapForSelection('searchDestination')}
-                                        title="Pick location on map"
-                                    >
-                                        <MapIcon size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Date</label>
-                                <div className="input-with-icon">
-                                    <input
-                                        type="date"
-                                        name="date"
-                                        value={searchFilters.date}
-                                        onChange={handleSearchInputChange}
-                                    />
-                                    <Calendar size={16} className="input-icon" />
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <label>Min Seats</label>
+                <h2 className="page-title">Find Carpooling Rides</h2>
+
+                <form onSubmit={handleSearch} className="search-form">
+                    <div className="search-basic-inputs">
+                        <div className="form-group">
+                            <label htmlFor="search-origin">From</label>
+                            <div className="location-input-container">
                                 <input
-                                    type="number"
-                                    name="minSeats"
-                                    value={searchFilters.minSeats}
-                                    onChange={handleSearchInputChange}
-                                    min="1"
-                                    max="6"
+                                    type="text"
+                                    id="search-origin"
+                                    name="origin"
+                                    value={searchParams.origin}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter pickup location"
+                                    required
                                 />
-                            </div>
-                            <div className="form-group">
-                                <label>Max Fare (₹)</label>
-                                <input
-                                    type="number"
-                                    name="maxFare"
-                                    value={searchFilters.maxFare}
-                                    onChange={handleSearchInputChange}
-                                    min="0"
-                                    step="10"
-                                    placeholder="Maximum fare"
-                                />
+                                <button
+                                    type="button"
+                                    className="map-button"
+                                    onClick={() => openMapForSelection('origin')}
+                                >
+                                    <MapIcon size={18} />
+                                </button>
                             </div>
                         </div>
-                        
-                        <div className="advanced-filters-toggle">
-                            <button 
-                                type="button" 
-                                className="toggle-filters-btn"
-                                onClick={() => setAdvancedFiltersVisible(!advancedFiltersVisible)}
-                            >
-                                {advancedFiltersVisible ? 'Hide Advanced Filters' : 'Show Advanced Filters'}
-                            </button>
-                        </div>
-                        
-                        {advancedFiltersVisible && (
-                            <div className="advanced-filters">
-                                <div className="form-grid">
-                                    <div className="form-group">
-                                        <label>Vehicle Type</label>
-                                        <select 
-                                            name="vehicleType"
-                                            value={searchFilters.vehicleType}
-                                            onChange={handleSearchInputChange}
-                                        >
-                                            <option value="">Any</option>
-                                            <option value="Car">Car</option>
-                                            <option value="SUV">SUV</option>
-                                            <option value="VAN">Van</option>
-                                            <option value="BIKE">Bike</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="allow-detour"
-                                            name="allowDetour"
-                                            checked={searchFilters.allowDetour}
-                                            onChange={handleSearchInputChange}
-                                        />
-                                        <label htmlFor="allow-detour">Allow Detour</label>
-                                    </div>
-                                    <div className="form-group checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="flexible-pickup"
-                                            name="isFlexiblePickup"
-                                            checked={searchFilters.isFlexiblePickup}
-                                            onChange={handleSearchInputChange}
-                                        />
-                                        <label htmlFor="flexible-pickup">Flexible Pickup</label>
-                                    </div>
-                                    <div className="form-group checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="recurring-ride"
-                                            name="isRecurringRide"
-                                            checked={searchFilters.isRecurringRide}
-                                            onChange={handleSearchInputChange}
-                                        />
-                                        <label htmlFor="recurring-ride">Recurring Rides</label>
-                                    </div>
-                                </div>
+
+                        <div className="form-group">
+                            <label htmlFor="search-destination">To</label>
+                            <div className="location-input-container">
+                                <input
+                                    type="text"
+                                    id="search-destination"
+                                    name="destination"
+                                    value={searchParams.destination}
+                                    onChange={handleInputChange}
+                                    placeholder="Enter drop-off location"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    className="map-button"
+                                    onClick={() => openMapForSelection('destination')}
+                                >
+                                    <MapIcon size={18} />
+                                </button>
                             </div>
-                        )}
-                        
-                        <button type="submit" className="search-rides-btn" disabled={loading.searchRides}>
-                            {loading.searchRides ? 'Searching...' : 'Search Rides'}
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="search-date">Date</label>
+                            <input
+                                type="date"
+                                id="search-date"
+                                name="date"
+                                min={today}
+                                value={searchParams.date}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="search-seats">Seats</label>
+                            <input
+                                type="number"
+                                id="search-seats"
+                                name="seats"
+                                min="1"
+                                max="6"
+                                value={searchParams.seats}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="button"
+                            className="filter-toggle-button"
+                            onClick={toggleFilters}
+                        >
+                            <Filter size={16} />
+                            {filtersVisible ? 'Hide Filters' : 'More Filters'}
                         </button>
-                    </form>
-                </div>
+                    </div>
 
-                <div className="card ride-list-card">
-                    <h2>Available Rides</h2>
-                    {rides.length === 0 ? (
-                        <p className="no-rides-message">No rides available with your search criteria</p>
-                    ) : (
-                        <div className="rides-grid">
+                    {filtersVisible && (
+                        <div className="advanced-filters">
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="search-max-fare">Maximum Fare (₹)</label>
+                                    <input
+                                        type="number"
+                                        id="search-max-fare"
+                                        name="maxFare"
+                                        min="0"
+                                        value={searchParams.maxFare}
+                                        onChange={handleInputChange}
+                                        placeholder="Any price"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="search-time">Preferred Time</label>
+                                    <input
+                                        type="time"
+                                        id="search-time"
+                                        name="time"
+                                        value={searchParams.time}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="search-max-distance">Maximum Distance from Route (km)</label>
+                                    <input
+                                        type="range"
+                                        id="search-max-distance"
+                                        name="maxDistance"
+                                        min="1"
+                                        max="10"
+                                        step="1"
+                                        value={searchParams.maxDistance}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span className="range-value">{searchParams.maxDistance} km</span>
+                                </div>
+                            </div>
+
+                            <div className="form-row checkbox-row">
+                                <div className="form-group checkbox-group">
+                                    <input
+                                        type="checkbox"
+                                        id="search-include-recurring"
+                                        name="includeRecurring"
+                                        checked={searchParams.includeRecurring}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label htmlFor="search-include-recurring">Include recurring rides</label>
+                                </div>
+
+                                <div className="form-group checkbox-group">
+                                    <input
+                                        type="checkbox"
+                                        id="search-flexible-timing"
+                                        name="flexibleTiming"
+                                        checked={searchParams.flexibleTiming}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label htmlFor="search-flexible-timing">Flexible timing</label>
+                                </div>
+                            </div>
+
+                            {searchParams.flexibleTiming && (
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label htmlFor="search-time-flexibility">Time Flexibility (minutes)</label>
+                                        <input
+                                            type="range"
+                                            id="search-time-flexibility"
+                                            name="timeFlexibility"
+                                            min="15"
+                                            max="180"
+                                            step="15"
+                                            value={searchParams.timeFlexibility}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span className="range-value">{searchParams.timeFlexibility} minutes</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="search-actions">
+                        <button
+                            type="submit"
+                            className="search-button"
+                            disabled={loading}
+                        >
+                            {loading ? <RotateCw className="icon-spin" size={16} /> : <Search size={16} />}
+                            {loading ? 'Searching...' : 'Search Rides'}
+                        </button>
+                    </div>
+                </form>
+
+                <div className="search-results">
+                    {loading ? (
+                        <div className="loading-container">
+                            <RotateCw className="icon-spin" size={24} />
+                            <p>Searching for rides...</p>
+                        </div>
+                    ) : rides.length > 0 ? (
+                        <div className="rides-list">
+                            <h3>Available Rides</h3>
                             {rides.map(ride => (
-                                <div key={ride._id} className="ride-card">
+                                <div key={ride.id} className="ride-card">
+                                    <div className="ride-header">
+                                        <div className="ride-info-main">
+                                            <h4>
+                                                <Car size={16} className="icon" />
+                                                {ride.vehicleType || 'Car'} • {ride.availableSeats} seats available
+                                            </h4>
+                                            <div className="ride-fare">
+                                                <DollarSign size={16} className="icon" />
+                                                <span>₹{ride.fare} per seat</span>
+                                            </div>
+                                        </div>
+                                        <div className="driver-info">
+                                            <span>Driver: {ride.driverName}</span>
+                                            <span className="rating">★ {ride.driverRating}</span>
+                                        </div>
+                                    </div>
+
                                     <div className="ride-details">
-                                        <div className="ride-route">
-                                            <div className="route-points">
-                                                <p><strong>From:</strong> {ride.origin}</p>
-                                                <p><strong>To:</strong> {ride.destination}</p>
+                                        <div className="route-info">
+                                            <div className="location origin">
+                                                <MapPin size={16} className="icon" />
+                                                <span>{ride.origin}</span>
                                             </div>
-                                            <button 
-                                                className="view-route-btn-small"
-                                                onClick={() => viewRideDetails(ride)}
-                                            >
-                                                <Navigation size={16} /> View Route
-                                            </button>
-                                        </div>
-                                        
-                                        <div className="ride-info-grid">
-                                            <div className="ride-info-item">
-                                                <Calendar size={16} />
-                                                <p>{ride.date}</p>
+                                            <div className="route-line">
+                                                <span className="dot"></span>
+                                                <span className="line"></span>
+                                                <span className="dot"></span>
                                             </div>
-                                            <div className="ride-info-item">
-                                                <Clock size={16} />
-                                                <p>{ride.time}</p>
-                                            </div>
-                                            <div className="ride-info-item">
-                                                <Users size={16} />
-                                                <p>{ride.seatsAvailable || ride.seats} seats</p>
-                                            </div>
-                                            <div className="ride-info-item">
-                                                <span className="fare-badge">₹{ride.fare}</span>
-                                            </div>
-                                            <div className="ride-info-item">
-                                                <Car size={16} />
-                                                <p>{ride.vehicleType}</p>
+                                            <div className="location destination">
+                                                <MapPin size={16} className="icon" />
+                                                <span>{ride.destination}</span>
                                             </div>
                                         </div>
-                                        
-                                        {/* Show additional pool-specific features */}
-                                        {(ride.isFlexiblePickup || ride.allowDetour || ride.isRecurringRide) && (
-                                            <div className="ride-features">
-                                                {ride.isFlexiblePickup && (
-                                                    <div className="feature-badge">
-                                                        <CircleDot size={14} />
-                                                        <span>Flexible Pickup ({ride.pickupRadius}km)</span>
-                                                    </div>
-                                                )}
-                                                {ride.allowDetour && (
-                                                    <div className="feature-badge">
-                                                        <AlertCircle size={14} />
-                                                        <span>Detour Allowed ({ride.maxDetourDistance}km)</span>
-                                                    </div>
-                                                )}
-                                                {ride.isRecurringRide && (
-                                                    <div className="feature-badge">
-                                                        <Repeat size={14} />
-                                                        <span>Recurring</span>
-                                                    </div>
-                                                )}
-                                                {ride.maxWaitTime > 0 && (
-                                                    <div className="feature-badge">
-                                                        <Clock4 size={14} />
-                                                        <span>Wait: {ride.maxWaitTime}min</span>
-                                                    </div>
-                                                )}
+
+                                        <div className="ride-timing">
+                                            <div className="ride-date">
+                                                <Calendar size={16} className="icon" />
+                                                <span>{formatDate(ride.date)}</span>
+                                            </div>
+                                            <div className="ride-time">
+                                                <Clock size={16} className="icon" />
+                                                <span>{formatTime(ride.time)}</span>
+                                            </div>
+                                        </div>
+
+                                        {ride.isRecurring && (
+                                            <div className="recurring-info">
+                                                <span className="recurring-label">Recurring:</span>
+                                                <span className="recurring-days">
+                                                    {ride.recurringDays?.join(', ') || 'Weekly'}
+                                                </span>
                                             </div>
                                         )}
-                                        
-                                        {/* Display suggested pickup/dropoff points if available */}
-                                        {(ride.suggestedPickupPoints && ride.suggestedPickupPoints.length > 0) && (
-                                            <div className="suggested-points">
-                                                <p><strong>Suggested Pickup Points:</strong></p>
-                                                <ul className="points-list">
-                                                    {ride.suggestedPickupPoints.map((point, idx) => (
-                                                        <li key={`pickup-${idx}`}>{point.name}</li>
-                                                    ))}
-                                                </ul>
+
+                                        {ride.notes && (
+                                            <div className="ride-notes">
+                                                <p>{ride.notes}</p>
                                             </div>
                                         )}
                                     </div>
-                                    <button 
-                                        className="join-ride-btn"
-                                        onClick={() => viewRideDetails(ride)}
-                                    >
-                                        View Details & Join
-                                    </button>
+
+                                    <div className="ride-actions">
+                                        <button
+                                            type="button"
+                                            className="action-button view-route"
+                                            onClick={() => viewRideRoute(ride)}
+                                        >
+                                            <MapIcon size={16} className="icon" />
+                                            View Route
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="action-button book-ride"
+                                            onClick={() => bookRide(ride.id)}
+                                            disabled={ride.isBooked || ride.availableSeats < searchParams.seats || loading}
+                                        >
+                                            {ride.isBooked ? 'Booked' : 'Book Ride'}
+                                            <ChevronsRight size={16} className="icon" />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
+                    ) : (
+                        <div className="no-results">
+                            <p>No rides found. Adjust your search criteria and try again.</p>
+                        </div>
                     )}
                 </div>
-            </section>
+            </div>
 
-            {/* Map Modal for Location Selection */}
+            {/* Map Modal */}
             {mapVisible && (
                 <div className="map-modal">
-                    <div className="map-modal-content">
+                    <div className="map-container">
                         <div className="map-header">
                             <h3>
-                                {activeLocationField === 'searchOrigin' 
-                                    ? 'Select Origin Location' 
-                                    : activeLocationField === 'searchDestination'
-                                    ? 'Select Destination Location'
-                                    : activeLocationField === 'customPickup'
-                                    ? 'Select Your Pickup Location'
-                                    : activeLocationField === 'customDropoff'
-                                    ? 'Select Your Dropoff Location'
-                                    : 'View Route'}
+                                {activeLocationField === 'origin' && 'Select Pickup Location'}
+                                {activeLocationField === 'destination' && 'Select Drop-off Location'}
+                                {activeLocationField === 'viewRoute' && 'View Ride Route'}
                             </h3>
-                            <button className="close-map-btn" onClick={() => setMapVisible(false)}>✕</button>
+                            <button className="close-button" onClick={closeMapModal}>
+                                <X size={18} />
+                            </button>
                         </div>
-                        <div className="map-container" ref={mapRef}></div>
-                        <div className="map-controls">
-                            {loading.geolocation ? (
-                                <p>Getting your location...</p>
-                            ) : (
-                                <>
-                                    <button 
-                                        className="get-location-btn"
-                                        onClick={getUserLocation}
-                                    >
-                                        <Crosshair size={16} /> Use My Location
-                                    </button>
-                                    {activeLocationField !== 'viewRoute' && (
-                                        <button 
-                                            className="confirm-location-btn"
-                                            onClick={confirmMapLocation}
-                                        >
-                                            Confirm Location
-                                        </button>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {/* Ride Details Modal */}
-            {selectedRide && (
-                <div className="ride-details-modal">
-                    <div className="ride-details-content">
-                        <div className="ride-details-header">
-                            <h3>Ride Details</h3>
-                            <button className="close-details-btn" onClick={() => setSelectedRide(null)}>✕</button>
-                        </div>
-                        
-                        <div className="ride-details-body">
-                            <div className="ride-route-details">
-                                <h4>Route Information</h4>
-                                <p><strong>From:</strong> {selectedRide.origin}</p>
-                                <p><strong>To:</strong> {selectedRide.destination}</p>
-                                
-                                {routeDetails && (
-                                    <div className="route-stats">
-                                        <p><strong>Distance:</strong> {routeDetails.routes[0].legs[0].distance.text}</p>
-                                        <p><strong>Duration:</strong> {routeDetails.routes[0].legs[0].duration.text}</p>
+                        <div className="map-content">
+                            <div
+                                id="map"
+                                ref={mapRef}
+                                className="map-element"
+                            ></div>
+
+                            {activeLocationField === 'viewRoute' && selectedRideRoute && (
+                                <div className="route-details">
+                                    <div className="route-info-item">
+                                        <strong>Distance:</strong> {selectedRideRoute.distance}
                                     </div>
-                                )}
-                                
-                                <button 
-                                    className="view-on-map-btn"
-                                    onClick={() => setMapVisible(true)}
-                                >
-                                    <MapIcon size={16} /> View on Map
-                                </button>
-                            </div>
-                            
-                            <div className="ride-features-details">
-                                <h4>Ride Features</h4>
-                                <ul className="features-list">
-                                    <li><strong>Date:</strong> {selectedRide.date}</li>
-                                    <li><strong>Time:</strong> {selectedRide.time}</li>
-                                    <li><strong>Vehicle:</strong> {selectedRide.vehicleType}</li>
-                                    <li><strong>Seats Available:</strong> {selectedRide.seatsAvailable || selectedRide.seats}</li>
-                                    <li><strong>Fare:</strong> ₹{selectedRide.fare}</li>
-                                    
-                                    {selectedRide.isFlexiblePickup && (
-                                        <li><strong>Flexible Pickup:</strong> Yes (within {selectedRide.pickupRadius}km)</li>
-                                    )}
-                                    
-                                    {selectedRide.allowDetour && (
-                                        <li><strong>Detour Allowed:</strong> Yes (up to {selectedRide.maxDetourDistance}km)</li>
-                                    )}
-                                    
-                                    {selectedRide.maxWaitTime > 0 && (
-                                        <li><strong>Max Wait Time:</strong> {selectedRide.maxWaitTime} minutes</li>
-                                    )}
-                                    
-                                    {selectedRide.isRecurringRide && (
-                                        <li>
-                                            <strong>Recurring Ride:</strong> Yes
-                                            {selectedRide.recurringDays && selectedRide.recurringDays.length > 0 && (
-                                                <span> ({selectedRide.recurringDays.join(', ')})</span>
-                                            )}
-                                        </li>
-                                    )}
-                                </ul>
-                                
-                                {selectedRide.notes && (
-                                    <div className="ride-notes">
-                                        <h4>Notes</h4>
-                                        <p>{selectedRide.notes}</p>
+                                    <div className="route-info-item">
+                                        <strong>Estimated Travel Time:</strong> {selectedRideRoute.duration}
                                     </div>
-                                )}
-                            </div>
-                            
-                            {/* Custom Pickup/Dropoff Section */}
-                            {(selectedRide.isFlexiblePickup || selectedRide.allowDetour) && (
-                                <div className="custom-locations">
-                                    <h4>Set Your Locations</h4>
-                                    
-                                    <div className="form-group">
-                                        <label>Your Pickup Location</label>
-                                        <div className="input-with-icon">
-                                            <input
-                                                id="custom-pickup"
-                                                type="text"
-                                                value={pickupLocation.address}
-                                                onChange={(e) => setPickupLocation({
-                                                    ...pickupLocation,
-                                                    address: e.target.value
-                                                })}
-                                                placeholder={selectedRide.isFlexiblePickup ? "Custom pickup location" : selectedRide.origin}
-                                                disabled={!selectedRide.isFlexiblePickup}
-                                            />
-                                            {selectedRide.isFlexiblePickup && (
-                                                <button 
-                                                    type="button" 
-                                                    className="location-picker-btn"
-                                                    onClick={() => openMapForSelection('customPickup')}
-                                                    title="Pick location on map"
-                                                >
-                                                    <MapIcon size={16} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="form-group">
-                                        <label>Your Dropoff Location</label>
-                                        <div className="input-with-icon">
-                                            <input
-                                                id="custom-dropoff"
-                                                type="text"
-                                                value={dropoffLocation.address}
-                                                onChange={(e) => setDropoffLocation({
-                                                    ...dropoffLocation,
-                                                    address: e.target.value
-                                                })}
-                                                placeholder={selectedRide.allowDetour ? "Custom dropoff location" : selectedRide.destination}
-                                                disabled={!selectedRide.allowDetour}
-                                            />
-                                            {selectedRide.allowDetour && (
-                                                <button 
-                                                    type="button" 
-                                                    className="location-picker-btn"
-                                                    onClick={() => openMapForSelection('customDropoff')}
-                                                    title="Pick location on map"
-                                                >
-                                                    <MapIcon size={16} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Suggested Pickup Points */}
-                                    {selectedRide.suggestedPickupPoints && selectedRide.suggestedPickupPoints.length > 0 && (
-                                        <div className="suggested-points-section">
-                                            <h5>Suggested Pickup Points</h5>
-                                            <div className="suggested-points-grid">
-                                                {selectedRide.suggestedPickupPoints.map((point, idx) => (
-                                                    <div 
-                                                        key={`pickup-point-${idx}`}
-                                                        className="suggested-point-card"
-                                                        onClick={() => setPickupLocation({
-                                                            address: point.address || point.name,
-                                                            coordinates: point.coords
-                                                        })}
-                                                    >
-                                                        <CircleDot size={16} className="point-icon" />
-                                                        <div className="point-info">
-                                                            <p className="point-name">{point.name}</p>
-                                                            <p className="point-address">{point.address}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    {/* Suggested Dropoff Points */}
-                                    {selectedRide.suggestedDropoffPoints && selectedRide.suggestedDropoffPoints.length > 0 && (
-                                        <div className="suggested-points-section">
-                                            <h5>Suggested Dropoff Points</h5>
-                                            <div className="suggested-points-grid">
-                                                {selectedRide.suggestedDropoffPoints.map((point, idx) => (
-                                                    <div 
-                                                        key={`dropoff-point-${idx}`}
-                                                        className="suggested-point-card"
-                                                        onClick={() => setDropoffLocation({
-                                                            address: point.address || point.name,
-                                                            coordinates: point.coords
-                                                        })}
-                                                    >
-                                                        <CircleDot size={16} className="point-icon" />
-                                                        <div className="point-info">
-                                                            <p className="point-name">{point.name}</p>
-                                                            <p className="point-address">{point.address}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             )}
-                            
-                            <div className="join-ride-section">
-                                <button 
-                                    className="join-ride-btn-large"
-                                    onClick={() => handleJoinRide(selectedRide)}
+                        </div>
+
+                        <div className="map-footer">
+                            {loadingLocation && (
+                                <span className="loading-location">
+                                    <RotateCw className="icon-spin" size={16} />
+                                    Getting location...
+                                </span>
+                            )}
+
+                            {activeLocationField !== 'viewRoute' && (
+                                <button
+                                    className="user-location-button"
+                                    onClick={getUserLocation}
+                                    disabled={loadingLocation}
                                 >
-                                    Join This Ride
+                                    <MapPin size={16} />
+                                    Use Current Location
                                 </button>
-                            </div>
+                            )}
+
+                            {activeLocationField !== 'viewRoute' ? (
+                                <button
+                                    className="confirm-location-button"
+                                    onClick={confirmMapLocation}
+                                >
+                                    Confirm Location
+                                </button>
+                            ) : (
+                                <button
+                                    className="close-view-button"
+                                    onClick={closeMapModal}
+                                >
+                                    Close View
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }
 
-export default FindPool;
+export default FindRide;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { MapIcon, Crosshair, Calendar, Users, MapPin, RotateCw } from 'lucide-react';
-import './RideCreationForm.css';
+import './CreatePool.css';
 
 function CreateRide() {
     // State for ride details

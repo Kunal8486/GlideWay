@@ -616,12 +616,12 @@ textarea {
 }
 
 /* Map Container */
-.map-container {
+.map-container-book {
   flex: 1;
   position: relative;
 }
 
-.map-view {
+.map-view-book {
   margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
@@ -667,7 +667,7 @@ textarea {
   z-index: 5;
 }
 
-.map-tooltip {
+.map-tooltip-book {
   position: absolute;
   top: 80px;
   left: 50%;
@@ -822,7 +822,7 @@ textarea {
     border-top: 1px solid var(--light-gray);
   }
   
-  .map-container {
+  .map-container-book {
     height: 40vh;
   }
   

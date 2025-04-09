@@ -623,7 +623,7 @@ const BookARide = () => {
           </div>
         </div>
         
-        <div className="map-view">
+        <div className="map-view-book">
           <GoogleMap 
             mapContainerStyle={{ width: '100%', height: '300px' }} 
             center={pickupLocation} 
@@ -940,7 +940,7 @@ const BookARide = () => {
       </div>
 
       {/* Map container */}
-      <div className="map-container">
+      <div className="map-container-book">
         <GoogleMap 
           mapContainerStyle={containerStyle} 
           center={center} 
@@ -1060,7 +1060,7 @@ const BookARide = () => {
           
           {/* Map tooltip when editing location */}
           {showMapTooltip && (
-            <div className="map-tooltip">
+            <div className="map-tooltip-book">
               Click on the map to set your {isEditingLocation} location
             </div>
           )}
