@@ -88,31 +88,6 @@
   opacity: 1;
 }
 
-.fp-icon {
-  margin-right: 10px;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .fp-page-container {
-    padding: 15px;
-  }
-  
-  .fp-search-section, 
-  .fp-results-section {
-    padding: 16px;
-  }
-  
-  .fp-page-title {
-    font-size: 1.6rem;
-  }
-  
-  .fp-results-header {
-    font-size: 1.2rem;
-  }
-}
-
-
 
 
 
@@ -128,19 +103,3 @@
   border-left: 4px solid #8d6e63;
 }
 
-.fp-results-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(121, 85, 72, 0.08);
-}
-
-.fp-results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #6d4c41;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #efebe9;
-}

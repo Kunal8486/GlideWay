@@ -644,9 +644,7 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
                     </div>
                 )}
 
-                
-            </form>
-            <div className="sp-search-actions">
+                <div className="sp-search-actions">
                     <button
                         type="submit"
                         className="sp-search-button"
@@ -656,6 +654,7 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
                         {loading ? 'Searching...' : 'Search Rides'}
                     </button>
                 </div>
+            </form>
 
             {/* Map Modal */}
             {mapVisible && (

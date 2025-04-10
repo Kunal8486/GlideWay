@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapIcon, Calendar, Clock, Users, ChevronsRight, RotateCw, X, DollarSign, Car, MapPin } from 'lucide-react';
+import { MapIcon, Calendar, Clock, Users, ChevronsRight, RotateCw, X, IndianRupee, Car, MapPin } from 'lucide-react';
 import axios from 'axios';
 import './PoolResult.css';
 
@@ -292,8 +292,8 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                         {ride.vehicle || 'Vehicle not specified'} • {ride.availableSeats} seats available
                                     </h4>
                                     <div className="pr-ride-fare">
-                                        <DollarSign size={16} className="pr-icon" />
-                                        <span>₹{ride.farePerSeat} per seat</span>
+                                        <IndianRupee size={16} className="pr-icon" />
+                                        <span>{ride.farePerSeat} per seat</span>
                                     </div>
                                 </div>
                             </div>
@@ -427,8 +427,8 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                     Driver: {selectedRide.driver?.name || 'Unknown Driver'}
                                 </p>
                                 <p>
-                                    <DollarSign size={16} className="pr-icon" />
-                                    ₹{(selectedRide.farePerSeat || 0) * getSeatsCount()} for {getSeatsCount()} seat(s)
+                                    <IndianRupee size={16} className="pr-icon" />
+                                    {(selectedRide.farePerSeat || 0) * getSeatsCount()} for {getSeatsCount()} seat(s)
                                 </p>
                             </div>
                             
