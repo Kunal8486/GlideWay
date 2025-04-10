@@ -1,0 +1,429 @@
+/* Profile.css - Enhanced Light Brown and White Theme */
+
+:root {
+    --primary-brown: #a67c52;
+    --secondary-brown: #d4b59e;
+    --light-brown: #f5efe6;
+    --dark-brown: #6e4c33;
+    --white: #ffffff;
+    --light-gray: #f7f7f7;
+    --medium-gray: #e0e0e0;
+    --text-dark: #333333;
+    --text-medium: #666666;
+    --text-light: #909090;
+    --success: #5d9b6c;
+    --shadow: rgba(0, 0, 0, 0.08);
+  }
+  
+  .driver-profile {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    color: var(--text-dark);
+  }
+  
+  .profile-card {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+    padding: 30px;
+    color: var(--white);
+  }
+  
+  .profile-header-content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  
+  .profile-image-container {
+    flex-shrink: 0;
+  }
+  
+  .profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .profile-info {
+    flex-grow: 1;
+  }
+  
+  .profile-info h1 {
+    margin: 0 0 6px 0;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  
+  .driver-id {
+    font-size: 14px;
+    margin: 0 0 12px 0;
+    opacity: 0.9;
+  }
+  
+  .driver-stats {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+  }
+  
+  .star-icon {
+    color: #ffd700;
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .rating {
+    font-weight: 600;
+  }
+  
+  .separator {
+    margin: 0 8px;
+    opacity: 0.7;
+  }
+  
+  .contact-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background-color: var(--light-brown);
+    border-bottom: 1px solid var(--medium-gray);
+  }
+  
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-medium);
+    font-size: 14px;
+  }
+  
+  .contact-icon {
+    color: var(--primary-brown);
+    width: 16px;
+    height: 16px;
+  }
+  
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--medium-gray);
+    padding: 0 30px;
+    background-color: var(--white);
+  }
+  
+  .tab {
+    padding: 16px 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-medium);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .tab:hover {
+    color: var(--primary-brown);
+  }
+  
+  .tab.active {
+    color: var(--primary-brown);
+    border-bottom-color: var(--primary-brown);
+  }
+  
+  .tab-content-container {
+    padding: 30px;
+  }
+  
+  .tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .stats-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  
+  .stats-card, .license-card, .vehicle-card, .trips-card {
+    background-color: var(--white);
+    border-radius: 10px;
+    border: 1px solid var(--medium-gray);
+    box-shadow: 0 4px 12px var(--shadow);
+    padding: 20px;
+  }
+  
+  .stats-card h3, .license-card h3, .vehicle-card h3, .trips-card h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 18px;
+    color: var(--dark-brown);
+    border-bottom: 1px solid var(--medium-gray);
+    padding-bottom: 10px;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .stat-item {
+    background-color: var(--light-brown);
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .stat-label {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: var(--text-medium);
+  }
+  
+  .stat-value {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-brown);
+  }
+  
+  .earnings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .earning-item {
+    background-color: var(--light-brown);
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .earning-label {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: var(--text-medium);
+  }
+  
+  .earning-value {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-brown);
+  }
+  
+  .license-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .license-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: var(--light-brown);
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .license-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .license-icon {
+    color: var(--primary-brown);
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .vehicle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .vehicle-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background-color: var(--light-brown);
+    border-radius: 8px;
+    gap: 16px;
+  }
+  
+  .vehicle-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-brown);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: 600;
+  }
+  
+  .vehicle-details {
+    flex-grow: 1;
+  }
+  
+  .vehicle-model {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .vehicle-info {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-medium);
+  }
+  
+  .trips-table-container {
+    overflow-x: auto;
+  }
+  
+  .trips-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .trips-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-medium);
+    border-bottom: 1px solid var(--medium-gray);
+  }
+  
+  .trips-table td {
+    padding: 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--medium-gray);
+  }
+  
+  .trips-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .trips-table tr:hover {
+    background-color: var(--light-brown);
+  }
+  
+  .route-arrow {
+    color: var(--text-light);
+    margin: 0 6px;
+  }
+  
+  .trip-amount {
+    font-weight: 600;
+    color: var(--primary-brown);
+  }
+  
+  .trip-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: #e6f4ea;
+    color: var(--success);
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  
+  .primary-button, .secondary-button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  
+  .primary-button {
+    background-color: var(--primary-brown);
+    color: var(--white);
+  }
+  
+  .primary-button:hover {
+    background-color: var(--dark-brown);
+  }
+  
+  .secondary-button {
+    background-color: var(--light-brown);
+    color: var(--primary-brown);
+    border: 1px solid var(--primary-brown);
+  }
+  
+  .secondary-button:hover {
+    background-color: var(--secondary-brown);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .stats-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .profile-header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .contact-info {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .earnings-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .tabs {
+      padding: 0;
+    }
+    
+    .tab {
+      padding: 12px 10px;
+      font-size: 14px;
+    }
+    
+    .tab-content-container {
+      padding: 20px;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
