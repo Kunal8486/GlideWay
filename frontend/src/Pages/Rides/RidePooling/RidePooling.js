@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RidePooling.css';
-import CreateRide from './CreatePool.js';
-import FindPool from './FindPool.js'; // Import the new component
+import CreateRide from './CreatePool/CreatePool.js';
+import FindPool from './FindPool/FindPool.js';
 
 function RidePooling() {
     const navigate = useNavigate();
@@ -26,9 +26,10 @@ function RidePooling() {
                 <section id="create-ride" className="ride-creation-section">
                     <CreateRide />
                 </section>
-                <FindPool />
+                <section id="find-ride" className="find-pool-section">
+                    <FindPool />
+                </section>
             </main>
-
         </div>
     );
 }

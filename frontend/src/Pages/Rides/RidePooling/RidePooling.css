@@ -1,32 +1,46 @@
-/* RidePooling.css - Improved Contrast with Light Brown and White */
+/* RidePooling.css - Light Brown Theme with Side-by-Side Layout */
 
 /* Main container */
 .glide-way-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: #ffffff;
-  color: #5c4326; /* Darker brown for better contrast on white */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5efe8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Header Styles */
+/* Enhanced Header */
 .glide-way-header {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
+    url('https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?ixlib=rb-4.0.3&fit=fillmax&h=1080&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: white;
+  padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, #e3d0b5, #d4b795); /* Darker gradient for contrast */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(89, 69, 50, 0.2);
-  color: #3d2e1a; /* Much darker brown for text contrast */
+  box-shadow: 0 4px 15px rgba(139, 113, 85, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .glide-way-header h1 {
-  font-size: 2.2rem;
+  margin: 0;
+  font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: #3d2e1a;
+  display: flex;
+  align-items: center;
+  color: #8d6e63;
+}
+
+.glide-way-header h1::before {
+  content: "";
+  margin-right: 12px;
+  font-size: 1.8rem;
 }
 
 .glide-way-header nav {
@@ -35,401 +49,307 @@
 }
 
 .glide-way-header nav a {
-  color: #3d2e1a;
+  color: #8d6e63;
   text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glide-way-header nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: #8d6e63;
+  transition: width 0.3s ease;
 }
 
 .glide-way-header nav a:hover {
-  background-color: rgba(90, 71, 50, 0.2);
-  color: #3d2e1a;
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
 }
 
-/* Main Content Layout */
-.glide-way-main {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+.glide-way-header nav a:hover::after {
+  width: 100%;
 }
 
-@media (min-width: 992px) {
-  .glide-way-main {
-    grid-template-columns: 1fr 1fr;
+.glide-way-header nav a.active {
+  background-color: rgba(255, 255, 255, 0.25);
+  font-weight: 600;
+}
+
+.glide-way-header nav a.active::after {
+  width: 100%;
+}
+
+/* Responsive header styles */
+@media (max-width: 768px) {
+  .glide-way-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .glide-way-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .glide-way-header nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .glide-way-header nav a {
+    padding: 0.5rem 0.8rem;
+    text-align: center;
   }
 }
-
-/* Cards & Sections */
-.card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 12px rgba(89, 69, 50, 0.2);
-  border: 2px solid #d4b795;
+/* Main content - Side by Side Layout */
+.glide-way-main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: row;
+  /* Changed to row for side-by-side */
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-.card h2 {
-  color: #5c4326;
-  margin-bottom: 1.2rem;
-  font-size: 1.8rem;
+/* Ride Creation Section - Left Side */
+.ride-creation-section {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(139, 113, 85, 0.15);
+  flex: 1;
+  /* Take up 50% of the space */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
+    url('https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?ixlib=rb-4.0.3&fit=fillmax&h=1080&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  max-width: 50%;
+}
+
+/* Find Pool Section (right side) styling */
+.find-pool-section {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(139, 113, 85, 0.15);
+  flex: 1;
+  /* Take up 50% of the space */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
+    url('https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?ixlib=rb-4.0.3&fit=fillmax&h=1080&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  max-width: 50%;
+}
+
+.section-title {
+  color: #6e4c1e;
+  font-size: 1.75rem;
   font-weight: 600;
-  padding-bottom: 0.8rem;
-  border-bottom: 3px solid #d4b795;
-  position: relative;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2d5c0;
 }
 
-.card h2::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-  width: 60px;
-  height: 3px;
-  background-color: #8a7248; /* Darker accent for contrast */
+/* Panels */
+.panel {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 10px rgba(139, 113, 85, 0.15);
 }
 
-/* Form Styles */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.panel-title {
+  color: #6e4c1e;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background-color: #9e7d50;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #886a43;
+}
+
+.btn-secondary {
+  background-color: #eee2d1;
+  color: #6e4c1e;
+  border: 1px solid #d7c5b0;
+}
+
+.btn-secondary:hover {
+  background-color: #e6d7c3;
+}
+
+/* Form elements */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-@media (min-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 .form-group {
-  margin-bottom: 1rem;
+  flex: 1;
+  min-width: 250px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #5c4326;
+  color: #6e4c1e;
+  font-weight: 500;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.form-control {
   width: 100%;
-  padding: 0.8rem;
-  border: 2px solid #d4b795;
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: #3d2e1a;
-  transition: all 0.3s ease;
+  padding: 0.75rem;
+  border: 1px solid #d7c5b0;
+  border-radius: 4px;
+  background-color: white;
+  color: #5a3d1b;
+  transition: border-color 0.2s;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-control:focus {
   outline: none;
-  border-color: #8a7248;
-  box-shadow: 0 0 0 3px rgba(138, 114, 72, 0.2);
+  border-color: #9e7d50;
+  box-shadow: 0 0 0 2px rgba(158, 125, 80, 0.2);
 }
 
-/* Location Input Groups */
-.location-input-group {
-  position: relative;
-}
-
-.input-with-icon {
+/* Tabs */
+.tabs {
   display: flex;
-  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e2d5c0;
 }
 
-.input-with-icon input {
-  flex-grow: 1;
-  padding-right: 4.5rem;
+.tab {
+  padding: 0.75rem 1.5rem;
+  color: #6e4c1e;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
 }
 
-.location-picker-btn,
-.current-location-btn {
-  position: absolute;
-  background-color: #e3d0b5;
-  border: none;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
+.tab:hover {
+  background-color: #f8f3ee;
+}
+
+.tab.active {
+  color: #9e7d50;
+  border-bottom-color: #9e7d50;
+  font-weight: 500;
+}
+
+/* Cards */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(139, 113, 85, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(139, 113, 85, 0.2);
+}
+
+.card-header {
+  padding: 1rem;
+  background-color: #f8f3ee;
+  border-bottom: 1px solid #e2d5c0;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.card-footer {
+  padding: 1rem;
+  background-color: #f8f3ee;
+  border-top: 1px solid #e2d5c0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.location-picker-btn {
-  right: 2.8rem;
-  color: #3d2e1a;
-}
-
-.current-location-btn {
-  right: 0.5rem;
-  color: #3d2e1a;
-}
-
-.location-picker-btn:hover,
-.current-location-btn:hover {
-  background-color: #d4b795;
-  color: #3d2e1a;
-}
-
-/* Buttons */
-button {
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.search-rides-btn,
-.join-ride-btn,
-.create-ride-btn {
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0.5rem;
 }
 
-.search-rides-btn {
-  background: #8a7248; /* Darker brown for contrast against white text */
-  color: #ffffff;
-  width: 100%;
-  box-shadow: 0 4px 6px rgba(89, 69, 50, 0.2);
-}
+/* For mobile screens */
+@media (max-width: 992px) {
+  .glide-way-main {
+    flex-direction: column;
+    /* Stack on mobile */
+  }
 
-.search-rides-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(89, 69, 50, 0.2);
-  background: #76603c;
-}
-
-.join-ride-btn {
-  background-color: #8a7248;
-  color: #ffffff;
-  padding: 0.6rem 1.2rem;
-  margin-top: 1rem;
-}
-
-.join-ride-btn:hover {
-  background-color: #76603c;
-}
-
-.view-route-btn-small {
-  background-color: transparent;
-  color: #5c4326;
-  border: 1px solid #5c4326;
-  border-radius: 15px;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.5rem;
-}
-
-.view-route-btn-small:hover {
-  background-color: #e3d0b5;
-  color: #3d2e1a;
-}
-
-/* Ride Cards Styles */
-.rides-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .rides-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  .ride-creation-section,
+  .find-pool-section {
+    max-width: 100%;
   }
 }
 
-.ride-card {
-  background-color: #ffffff;
-  border-radius: 10px;
-  padding: 1.2rem;
-  transition: all 0.3s ease;
-  border-left: 5px solid #d4b795;
-  box-shadow: 0 3px 10px rgba(89, 69, 50, 0.2);
-}
-
-.ride-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(89, 69, 50, 0.2);
-}
-
-.ride-details {
-  font-size: 0.9rem;
-  color: #5c4326;
-}
-
-.ride-details p {
-  margin-bottom: 0.5rem;
-}
-
-.ride-route {
-  margin-bottom: 1rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px dashed #d4b795;
-}
-
-/* Map Modal */
-.map-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(90, 71, 50, 0.6); /* Darker overlay for visibility */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.map-modal-content {
-  width: 90%;
-  max-width: 800px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(90, 71, 50, 0.3);
-}
-
-.map-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background-color: #e3d0b5;
-  color: #3d2e1a;
-}
-
-.close-map-btn {
-  background: none;
-  border: none;
-  color: #3d2e1a;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.map-container {
-  height: 400px;
-  width: 100%;
-}
-
-.map-controls {
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  background-color: #e3d0b5;
-}
-
-.get-location-btn,
-.confirm-location-btn {
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.get-location-btn {
-  background-color: #d4b795;
-  color: #3d2e1a;
-}
-
-.confirm-location-btn {
-  background-color: #8a7248;
-  color: #ffffff;
-}
-
-/* Route Details Panel */
-.route-details-panel {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ffffff;
-  padding: 1.2rem;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(90, 71, 50, 0.25);
-  z-index: 900;
-  min-width: 280px;
-  max-width: 90%;
-  border-left: 5px solid #8a7248;
-}
-
-.route-details-panel h3 {
-  color: #5c4326;
-  margin-bottom: 0.8rem;
-  font-size: 1.2rem;
-}
-
-.close-details-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #e3d0b5;
-  color: #3d2e1a;
-  border: none;
-  border-radius: 6px;
-  float: right;
-}
-
-/* Error Banner */
-.error-banner {
-  background-color: #c17878; /* Darker red for better contrast with white text */
-  color: #ffffff;
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-/* No Rides Message */
-.no-rides-message {
-  text-align: center;
-  padding: 2rem;
-  color: #5c4326;
-  font-style: italic;
-}
-
-
-
-/* Responsive Adjustments */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
   .glide-way-header {
     flex-direction: column;
     gap: 1rem;
-    text-align: center;
+    padding: 1rem;
   }
-  
+
+  .glide-way-header nav {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .glide-way-main {
+    padding: 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
   .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  .location-input-group {
-    margin-bottom: 2rem;
+    min-width: 100%;
   }
 }

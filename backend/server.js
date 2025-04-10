@@ -27,7 +27,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/driver", driverRoutes)
 app.use("/api/driver", driverLogin)
 app.use("/api", riderRoutes) 
-app.use('/api/rides', poolrideRoutes);
+app.use('/api/rides/pool', poolrideRoutes);
 app.use('/api/nav', navRefresher);
 app.use('/api/rides/pool/book', bookpoolRoutes);
 

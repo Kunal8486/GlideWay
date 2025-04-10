@@ -43,8 +43,8 @@ import DriverProfile from "./Pages/Users/Drivers/Profile/Profile";
 import ScheduleRide from "./Pages/Rides/ScheduleRide/ScheduleRide";
 import RideSharing from "./Pages/Rides/RideSharing/RideSharing";
 import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
-import CreatePool from "./Pages/Rides/RidePooling/CreatePool";
-import FindPool from "./Pages/Rides/RidePooling/FindPool"; 
+import CreatePool from "./Pages/Rides/RidePooling/CreatePool/CreatePool";
+import FindPool from "./Pages/Rides/RidePooling/FindPool/FindPool"; 
 import "./App.css";
 
 // Create an AuthContext for robust state management

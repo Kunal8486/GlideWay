@@ -1,0 +1,146 @@
+/*  RideCreationForm.css - Light Brown Theme */
+.fp-find-pool-page{
+  margin: 0 auto;
+  padding: 20px;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)), 
+                    url('https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?ixlib=rb-4.0.3&fit=fillmax&h=1080&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #5d4037;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(121, 85, 72, 0.08);
+}
+
+.fp-page-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-image: linear-gradient(rgba(255, 252, 245, 0.94), rgba(255, 252, 245, 0.94)), 
+                    url('https://images.unsplash.com/photo-1515569067071-ec3b51335dd0?ixlib=rb-4.0.3&fit=fillmax&h=1080&w=1920');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #5d4037;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(121, 85, 72, 0.08);
+}
+
+.fp-reset-search-button {
+  background-color: #efebe9;
+  border: 1px solid #d7ccc8;
+  color: #5d4037;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.fp-reset-search-button:hover {
+  background-color: #d7ccc8;
+  transform: translateY(-1px);
+}
+
+
+/* Notification Messages */
+.fp-error-message, .fp-success-message {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  0% { transform: translateY(-20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.fp-error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  border-left: 4px solid #c62828;
+}
+
+.fp-success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-left: 4px solid #2e7d32;
+}
+
+.fp-error-message button, .fp-success-message button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0 0 0 14px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.fp-error-message button:hover, .fp-success-message button:hover {
+  opacity: 1;
+}
+
+.fp-icon {
+  margin-right: 10px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .fp-page-container {
+    padding: 15px;
+  }
+  
+  .fp-search-section, 
+  .fp-results-section {
+    padding: 16px;
+  }
+  
+  .fp-page-title {
+    font-size: 1.6rem;
+  }
+  
+  .fp-results-header {
+    font-size: 1.2rem;
+  }
+}
+
+
+
+
+
+
+
+/* Results Section */
+.fp-results-section {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(121, 85, 72, 0.06);
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid #8d6e63;
+}
+
+.fp-results-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(121, 85, 72, 0.08);
+}
+
+.fp-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #6d4c41;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #efebe9;
+}
