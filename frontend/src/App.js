@@ -45,6 +45,7 @@ import RideSharing from "./Pages/Rides/RideSharing/RideSharing";
 import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
 import CreatePool from "./Pages/Rides/RidePooling/CreatePool/CreatePool";
 import FindPool from "./Pages/Rides/RidePooling/FindPool/FindPool"; 
+import MyTrips from "./Pages/Dashboard/Rider/Trips/MyTrip";
 import "./App.css";
 
 // Create an AuthContext for robust state management
@@ -197,6 +198,19 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/my-trips"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["rider"]} 
+                userRole={userRole}
+              >
+                <MyTrips />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/pooling/create"
             element={

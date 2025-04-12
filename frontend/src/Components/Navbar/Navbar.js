@@ -200,7 +200,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         }
         return [
             { path: '/profile', label: 'My Profile', icon: 'fas fa-user' },
-            { path: '/trips', label: 'My Trips', icon: 'fas fa-home' },
+            { path: '/my-trips', label: 'My Trips', icon: 'fas fa-home' },
             { path: '/payment', label: 'Payment Methods', icon: 'fas fa-credit-card' }
         ];
     };

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapIcon, Calendar, Clock, Users, ChevronsRight, RotateCw, X, IndianRupee, Car, MapPin } from 'lucide-react';
 import axios from 'axios';
 import './PoolResult.css';
+import { useNavigate } from 'react-router-dom'
+
 
 function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) {
     const [selectedRide, setSelectedRide] = useState(null);
@@ -10,6 +12,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
     const [loadingAction, setLoadingAction] = useState(false);
     const [loadingMap, setLoadingMap] = useState(false);
     const [bookingStatus, setBookingStatus] = useState({});
+    const navigate = useNavigate()
 
     // Refs for Google Maps
     const mapRef = useRef(null);
@@ -261,6 +264,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
 
     // Book a ride
     const bookRide = async (rideId) => {
+        
         // Set loading state for this specific ride
         setBookingStatus(prev => ({ ...prev, [rideId]: 'loading' }));
         onError(null);
@@ -302,9 +306,8 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
             
             // Show success message
             onSuccess('Ride booked successfully! Check your rides for details.');
-            
-            // Optionally, you could redirect the user to their bookings page
-            // history.push('/my-rides');
+            navigate('/my-trips');
+
         } catch (error) {
             console.error('Error booking ride:', error);
             

@@ -24,7 +24,6 @@
   box-shadow: 0 4px 15px rgba(139, 113, 85, 0.3);
   position: sticky;
   top: 0;
-  z-index: 1000;
 }
 
 .glide-way-header h1 {
