@@ -223,4 +223,4 @@ RideSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('ride', RideSchema);
+module.exports = mongoose.model('PoolRides', RideSchema);

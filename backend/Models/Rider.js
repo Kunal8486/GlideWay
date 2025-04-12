@@ -5,12 +5,11 @@ const riderSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    googleId: { type: String, unique: true, sparse: true },
+    googleId: { type: String, unique: true, sparse: true }, // Removed duplicate
     phone_number: { type: String, required: false },
     password: { type: String, required: false },
     profile_picture_url: { type: String },
-    googleId: { type: String, unique: true, sparse: true },
-    gender: { type: String,required: false },
+    gender: { type: String, required: false },
     dob: { type: Date, required: false },  
     age: { type: Number, required: false },
     wallet_balance: { type: Number, default: 0 },

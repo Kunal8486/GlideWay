@@ -9,6 +9,14 @@ const riderRoutes = require("./Routes/rider")
 const poolrideRoutes = require('./Routes/poolride')
 const navRefresher = require('./Routes/navRefresher')
 const bookpoolRoutes = require('./Routes/bookpool')
+
+
+
+require('./Models/Rider.js');
+require('./Models/Ride.js'); 
+
+
+
 dotenv.config()
 const app = express()
 const PORT = process.env.PORT

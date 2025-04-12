@@ -9,6 +9,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
     const [mapVisible, setMapVisible] = useState(false);
     const [loadingAction, setLoadingAction] = useState(false);
     const [loadingMap, setLoadingMap] = useState(false);
+    const [bookingStatus, setBookingStatus] = useState({});
 
     // Refs for Google Maps
     const mapRef = useRef(null);
@@ -93,11 +94,20 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                     return { lat, lng };
                 }
             } 
-            // Handle object format {lat, lng}
+            // Handle MongoDB GeoJSON Point format
             else if (typeof coordsString === 'object' && coordsString !== null) {
-                const { lat, lng } = coordsString;
-                if (typeof lat === 'number' && typeof lng === 'number') {
+                // Check if it's GeoJSON format
+                if (coordsString.type === 'Point' && Array.isArray(coordsString.coordinates)) {
+                    // GeoJSON coordinates are [longitude, latitude]
+                    const [lng, lat] = coordsString.coordinates;
                     return { lat, lng };
+                }
+                // Handle regular lat/lng object
+                else if ('lat' in coordsString && 'lng' in coordsString) {
+                    const { lat, lng } = coordsString;
+                    if (typeof lat === 'number' && typeof lng === 'number') {
+                        return { lat, lng };
+                    }
                 }
             }
             
@@ -235,9 +245,24 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
         return (searchParams && searchParams.seats) || 1;
     };
 
+    // Get user's pickup and dropoff locations from search params
+    const getUserLocations = () => {
+        return {
+            pickupLocation: {
+                address: searchParams.origin || '',
+                coordinates: searchParams.originCoords || null
+            },
+            dropoffLocation: {
+                address: searchParams.destination || '',
+                coordinates: searchParams.destinationCoords || null
+            }
+        };
+    };
+
     // Book a ride
     const bookRide = async (rideId) => {
-        setLoadingAction(true);
+        // Set loading state for this specific ride
+        setBookingStatus(prev => ({ ...prev, [rideId]: 'loading' }));
         onError(null);
 
         try {
@@ -246,10 +271,22 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                 throw new Error('User is not authenticated. Please log in first.');
             }
 
-            // Call API to book the ride
+            // Get user's location data from search params
+            const userLocations = getUserLocations();
+            
+            // Calculate the total fare based on seat count
+            const ride = rides.find(r => r.id === rideId);
+            const totalFare = ride ? ride.farePerSeat * getSeatsCount() : 0;
+
+            // Call API to book the ride with passenger details
             const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book`,
-                { rideId, seats: getSeatsCount() },
+                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/${rideId}/join`,
+                {
+                    seats: getSeatsCount(),
+                    pickupLocation: userLocations.pickupLocation,
+                    dropoffLocation: userLocations.dropoffLocation,
+                    fare: totalFare
+                },
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -258,19 +295,62 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                 }
             );
 
+            // Update status for this ride to 'success'
+            setBookingStatus(prev => ({ ...prev, [rideId]: 'success' }));
+            
+            // Show success message
             onSuccess('Ride booked successfully! Check your rides for details.');
+            
+            // Optionally, you could redirect the user to their bookings page
+            // history.push('/my-rides');
         } catch (error) {
             console.error('Error booking ride:', error);
-            const errorMessage =
+            
+            // Set status to 'error'
+            setBookingStatus(prev => ({ ...prev, [rideId]: 'error' }));
+            
+            // Handle different types of errors
+            const errorMessage = 
                 error.response?.data?.message ||
+                error.response?.data?.error ||
                 error.response?.data?.errors?.[0]?.msg ||
                 error.message ||
                 'Failed to book ride';
 
             onError(errorMessage);
         } finally {
-            setLoadingAction(false);
+            // Clear loading status after 3 seconds to reset button state
+            setTimeout(() => {
+                setBookingStatus(prev => {
+                    const newStatus = { ...prev };
+                    delete newStatus[rideId];
+                    return newStatus;
+                });
+            }, 3000);
         }
+    };
+
+    // Get button text based on booking status
+    const getBookButtonText = (rideId) => {
+        const status = bookingStatus[rideId];
+        if (!status) return 'Book Now';
+        if (status === 'loading') return 'Booking...';
+        if (status === 'success') return 'Booked!';
+        if (status === 'error') return 'Try Again';
+        return 'Book Now';
+    };
+
+    // Check if button should be disabled
+    const isBookButtonDisabled = (rideId) => {
+        return bookingStatus[rideId] === 'loading' || bookingStatus[rideId] === 'success';
+    };
+
+    // Get button class based on booking status
+    const getBookButtonClass = (rideId) => {
+        const status = bookingStatus[rideId];
+        if (status === 'success') return 'pr-book-button pr-book-success';
+        if (status === 'error') return 'pr-book-button pr-book-error';
+        return 'pr-book-button';
     };
 
     return (
@@ -289,11 +369,11 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 <div className="pr-ride-info-main">
                                     <h4>
                                         <Car size={16} className="pr-icon" />
-                                        {ride.vehicle || 'Vehicle not specified'} • {ride.availableSeats} seats available
+                                        {ride.vehicleType || 'Vehicle not specified'} • {ride.seatsAvailable} seats available
                                     </h4>
                                     <div className="pr-ride-fare">
                                         <IndianRupee size={16} className="pr-icon" />
-                                        <span>{ride.farePerSeat} per seat</span>
+                                        <span>{ride.fare / ride.seats} per seat</span>
                                     </div>
                                 </div>
                             </div>
@@ -316,11 +396,11 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 <div className="pr-ride-schedule">
                                     <div className="pr-ride-date">
                                         <Calendar size={16} className="pr-icon" />
-                                        <span>{formatDate(ride.departureTime)}</span>
+                                        <span>{formatDate(ride.dateTime || ride.date)}</span>
                                     </div>
                                     <div className="pr-ride-time">
                                         <Clock size={16} className="pr-icon" />
-                                        <span>{formatTime(ride.departureTime)}</span>
+                                        <span>{formatTime(ride.dateTime || ride.time)}</span>
                                     </div>
                                 </div>
                                 
@@ -344,17 +424,17 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                     View Route
                                 </button>
                                 <button 
-                                    className="pr-book-button" 
+                                    className={getBookButtonClass(ride.id)} 
                                     onClick={() => bookRide(ride.id)}
-                                    disabled={loadingAction}
+                                    disabled={isBookButtonDisabled(ride.id)}
                                 >
-                                    {loadingAction ? (
+                                    {bookingStatus[ride.id] === 'loading' ? (
                                         <>
                                             <RotateCw className="pr-icon-spin" size={16} />
                                             Booking...
                                         </>
                                     ) : (
-                                        'Book Now'
+                                        getBookButtonText(ride.id)
                                     )}
                                 </button>
                             </div>
@@ -420,7 +500,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                             <div className="pr-ride-summary">
                                 <p>
                                     <Calendar size={16} className="pr-icon" />
-                                    {formatDate(selectedRide.departureTime)} at {formatTime(selectedRide.departureTime)}
+                                    {formatDate(selectedRide.dateTime || selectedRide.date)} at {formatTime(selectedRide.dateTime || selectedRide.time)}
                                 </p>
                                 <p>
                                     <Users size={16} className="pr-icon" />
@@ -428,25 +508,25 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 </p>
                                 <p>
                                     <IndianRupee size={16} className="pr-icon" />
-                                    {(selectedRide.farePerSeat || 0) * getSeatsCount()} for {getSeatsCount()} seat(s)
+                                    {(selectedRide.fare / selectedRide.seats || 0) * getSeatsCount()} for {getSeatsCount()} seat(s)
                                 </p>
                             </div>
                             
                             <button 
-                                className="pr-book-button-large" 
+                                className={getBookButtonClass(selectedRide.id)} 
                                 onClick={() => {
                                     bookRide(selectedRide.id);
                                     closeMapModal();
                                 }}
-                                disabled={loadingAction}
+                                disabled={isBookButtonDisabled(selectedRide.id)}
                             >
-                                {loadingAction ? (
+                                {bookingStatus[selectedRide.id] === 'loading' ? (
                                     <>
                                         <RotateCw className="pr-icon-spin" size={16} />
                                         Booking...
                                     </>
                                 ) : (
-                                    'Book This Ride'
+                                    getBookButtonText(selectedRide.id)
                                 )}
                             </button>
                         </div>

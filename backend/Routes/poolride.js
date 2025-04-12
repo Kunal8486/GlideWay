@@ -2,8 +2,10 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 const Ride = require('../Models/PoolRide');
-const { body, validationResult } = require('express-validator');
+const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+const User = require('../Models/Rider');
+
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -482,6 +484,290 @@ router.get('/search', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Search rides error:', err.message);
     return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
+
+
+/**
+ * @route   POST api/rides/:id/join
+ * @desc    Join an existing ride
+ * @access  Private
+ */
+router.post('/:id/join', [
+  authenticateToken,
+  [
+    check('seats', 'Number of seats is required').isInt({ min: 1 }),
+    check('pickupLocation', 'Pickup location is required').notEmpty(),
+    check('dropoffLocation', 'Dropoff location is required').notEmpty(),
+    check('fare', 'Fare amount is required').isNumeric()
+  ]
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    // Get ride by ID
+    const ride = await Ride.findById(req.params.id);
+
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    // Check if ride is active
+    if (ride.status !== 'active') {
+      return res.status(400).json({ message: 'This ride is no longer active' });
+    }
+
+    // Check if enough seats are available
+    const { seats } = req.body;
+    if (ride.seatsAvailable < seats) {
+      return res.status(400).json({ 
+        message: `Only ${ride.seatsAvailable} seats available, but requested ${seats}` 
+      });
+    }
+
+    // Check if user is already a passenger in this ride
+    const isAlreadyPassenger = ride.passengers.some(
+      passenger => passenger.user && passenger.user.toString() === req.user.id
+    );
+
+    if (isAlreadyPassenger) {
+      return res.status(400).json({ message: 'You have already requested to join this ride' });
+    }
+
+    // Check if user is the driver of this ride
+    if (ride.user && ride.user.toString() === req.user.id) {
+      return res.status(400).json({ message: 'You cannot join your own ride' });
+    }
+
+    // Get current user info
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Format the pickup and dropoff location data
+    const { pickupLocation, dropoffLocation, fare } = req.body;
+    
+    // Create passenger object
+    const newPassenger = {
+      user: req.user.id,
+      name: user.name,
+      avatar: user.avatar,
+      pickupLocation: {
+        address: pickupLocation.address,
+        coordinates: pickupLocation.coordinates ? {
+          type: 'Point',
+          coordinates: [
+            parseFloat(pickupLocation.coordinates.longitude || pickupLocation.coordinates.lng || 0),
+            parseFloat(pickupLocation.coordinates.latitude || pickupLocation.coordinates.lat || 0)
+          ]
+        } : undefined
+      },
+      dropoffLocation: {
+        address: dropoffLocation.address,
+        coordinates: dropoffLocation.coordinates ? {
+          type: 'Point',
+          coordinates: [
+            parseFloat(dropoffLocation.coordinates.longitude || dropoffLocation.coordinates.lng || 0),
+            parseFloat(dropoffLocation.coordinates.latitude || dropoffLocation.coordinates.lat || 0)
+          ]
+        } : undefined
+      },
+      status: 'pending',
+      requestedAt: Date.now()
+    };
+
+    // Add passenger to ride
+    ride.passengers.unshift(newPassenger);
+    
+    // Update available seats (tentatively, will be confirmed when request is accepted)
+    if (ride.seatsAvailable) {
+      ride.seatsAvailable -= seats;
+    }
+
+    await ride.save();
+
+    // Create a notification for the ride owner (implementation depends on your notification system)
+    // This is where you would create a notification for the ride creator
+
+    return res.json({ 
+      message: 'Ride join request sent successfully',
+      passenger: newPassenger,
+      ride: {
+        id: ride._id,
+        origin: ride.origin,
+        destination: ride.destination,
+        date: ride.date,
+        time: ride.time,
+        dateTime: ride.dateTime,
+        driver: ride.driver
+      }
+    });
+    
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+/**
+ * @route   GET api/rides/joined
+ * @desc    Get all rides that the current user has joined
+ * @access  Private
+ */
+router.get('/joined', authenticateToken, async (req, res) => {
+  try {
+    // Find all rides where current user is a passenger
+    const rides = await Ride.find({
+      'passengers.user': req.user.id
+    }).sort({ dateTime: 1 });
+
+    res.json(rides);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+/**
+ * @route   PATCH api/rides/:id/passengers/:passengerId
+ * @desc    Update passenger status (accept/reject)
+ * @access  Private (ride owner only)
+ */
+router.patch('/:id/passengers/:passengerId', [
+  authenticateToken,
+  [
+    check('status', 'Status is required').isIn(['accepted', 'rejected', 'cancelled'])
+  ]
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const ride = await Ride.findById(req.params.id);
+
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    // Check if the current user is the ride owner
+    if (ride.user && ride.user.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'Not authorized to update this ride' });
+    }
+
+    // Find the passenger in the ride
+    const passengerIndex = ride.passengers.findIndex(
+      passenger => passenger._id.toString() === req.params.passengerId
+    );
+
+    if (passengerIndex === -1) {
+      return res.status(404).json({ message: 'Passenger not found in this ride' });
+    }
+
+    const { status } = req.body;
+    
+    // Update passenger status
+    ride.passengers[passengerIndex].status = status;
+    ride.passengers[passengerIndex].updatedAt = Date.now();
+
+    // If rejecting, add the seats back to available seats
+    if ((status === 'rejected' || status === 'cancelled') && 
+        ride.passengers[passengerIndex].status === 'pending') {
+      // Since the number of seats requested isn't stored in the passenger object,
+      // we'll need to get it from the request body
+      const seatsToAdd = req.body.seats || 1; // Default to 1 if not specified
+      ride.seatsAvailable += seatsToAdd;
+    }
+
+    await ride.save();
+
+    // Create a notification for the passenger
+    // Notification logic would go here
+
+    res.json({
+      message: `Passenger request ${status}`,
+      passenger: ride.passengers[passengerIndex]
+    });
+    
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Ride or passenger not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+/**
+ * @route   DELETE api/rides/:id/passengers/:passengerId
+ * @desc    Remove a passenger from a ride (cancel request)
+ * @access  Private (passenger or ride owner)
+ */
+router.delete('/:id/passengers/:passengerId', authenticateToken, async (req, res) => {
+  try {
+    const ride = await Ride.findById(req.params.id);
+
+    if (!ride) {
+      return res.status(404).json({ message: 'Ride not found' });
+    }
+
+    // Find the passenger in the ride
+    const passenger = ride.passengers.find(
+      p => p._id.toString() === req.params.passengerId
+    );
+
+    if (!passenger) {
+      return res.status(404).json({ message: 'Passenger not found in this ride' });
+    }
+
+    // Check if the current user is the passenger or the ride owner
+    const isPassenger = passenger.user && passenger.user.toString() === req.user.id;
+    const isRideOwner = ride.user && ride.user.toString() === req.user.id;
+    
+    if (!isPassenger && !isRideOwner) {
+      return res.status(401).json({ message: 'Not authorized to cancel this request' });
+    }
+
+    // Remove passenger from ride
+    const passengerIndex = ride.passengers.findIndex(
+      p => p._id.toString() === req.params.passengerId
+    );
+    
+    // Before removing, get the seat count (using a default if not available)
+    const seatsToAdd = req.body.seats || 1; // Default to 1 if not specified
+    
+    ride.passengers.splice(passengerIndex, 1);
+    
+    // Update available seats
+    if (ride.seatsAvailable !== undefined) {
+      ride.seatsAvailable += seatsToAdd;
+    }
+
+    await ride.save();
+
+    // Create a notification for the relevant party
+    // If passenger cancelled, notify ride owner
+    // If ride owner cancelled, notify passenger
+
+    res.json({ message: 'Ride request cancelled successfully' });
+    
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ message: 'Ride or passenger not found' });
+    }
+    res.status(500).send('Server Error');
   }
 });
 
