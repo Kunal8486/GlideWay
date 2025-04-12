@@ -419,7 +419,7 @@ const Login = ({ handleLogin }) => {
               </div>
 
               <div className="rid-forgot-password">
-                <a href="/rider-forgot-password" className="rid-link">Forgot password?</a>
+                <a href="/forgot-password" className="rid-link">Forgot password?</a>
               </div>
             </div>
 

@@ -26,7 +26,6 @@
   flex-direction: column;
   position: relative;
   overflow-x: hidden;
-  zoom: -50%;
 }
 
 /* Background Animation */
@@ -116,35 +115,37 @@
 .rid-login-wrapper {
   display: flex;
   flex: 1;
-  margin-top: -20px;
   z-index: 1;
-  padding: 3rem 1rem;
+  padding: 1rem;
+  width: 100%;
   max-width: 1200px;
-  width: 85%;
   margin: 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 3rem;
+  gap: 1.5rem;
+  flex-direction: column;
 }
 
 /* Brand Section */
 .rid-login-brand {
   flex: 1;
   max-width: 450px;
-  padding: 2rem;
+  padding: 1rem;
   display: none;
+  text-align: center;
 }
 
 .rid-logo-container {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .rid-logo {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 800;
   color: var(--primary-dark);
   letter-spacing: -0.5px;
   position: relative;
+  display: inline-block;
 }
 
 .rid-logo:after {
@@ -154,19 +155,20 @@
   height: 4px;
   background-color: var(--primary-light);
   bottom: -8px;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   border-radius: 2px;
 }
 
 .rid-brand-message h2 {
-  font-size: 2.2rem;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--primary-dark);
 }
 
 .rid-brand-message p {
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
   line-height: 1.6;
   color: var(--text-light);
 }
@@ -174,10 +176,11 @@
 /* Login Card */
 .rid-login-card {
   flex: 1;
-  max-width: 550px;
+  width: 100%;
+  max-width: 450px;
   background-color: var(--input-bg);
   border-radius: 16px;
-  padding: 2.5rem;
+  padding: 1.5rem;
   box-shadow: var(--card-shadow);
   animation: card-appear 0.6s ease-out;
   position: relative;
@@ -207,12 +210,12 @@
 
 /* Header */
 .rid-login-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
 .rid-login-header h2 {
-  font-size: 1.8rem;
+  font-size: clamp(1.5rem, 4vw, 1.8rem);
   font-weight: 700;
   color: var(--primary-dark);
   margin-bottom: 0.5rem;
@@ -220,13 +223,14 @@
 
 .rid-login-header p {
   color: var(--text-light);
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 /* Alerts */
 .rid-alert {
   display: flex;
-  align-items: center;
-  padding: 1rem;
+  align-items: flex-start;
+  padding: 0.875rem;
   border-radius: 8px;
   margin-bottom: 1.5rem;
   animation: alert-slide-in 0.3s ease-out;
@@ -243,23 +247,28 @@
 }
 
 .rid-alert-icon {
-  margin-right: 1rem;
+  margin-right: 0.75rem;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .rid-alert-error .rid-alert-icon svg {
   stroke: var(--error-color);
+  width: 18px;
+  height: 18px;
 }
 
 .rid-alert-success .rid-alert-icon svg {
   stroke: var(--success-color);
+  width: 18px;
+  height: 18px;
 }
 
 .rid-alert p {
   flex: 1;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
 @keyframes alert-slide-in {
@@ -277,7 +286,7 @@
 .rid-login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .rid-form-group {
@@ -289,7 +298,7 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: var(--text-color);
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .rid-input-wrapper {
@@ -300,16 +309,24 @@
 
 .rid-input-icon {
   position: absolute;
-  left: 1rem;
+  left: 0.75rem;
   color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rid-input-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .rid-input {
   flex: 1;
-  padding: 0.875rem 1rem 0.875rem 2.8rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   background-color: var(--input-bg);
   transition: all var(--transition-speed);
   width: 100%;
@@ -327,7 +344,7 @@
 
 .rid-password-toggle {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   background: none;
   border: none;
   color: var(--text-light);
@@ -343,9 +360,14 @@
   color: var(--primary-dark);
 }
 
+.rid-password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
 .rid-error-message {
   color: var(--error-color);
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 1.8vw, 0.8rem);
   margin-top: 0.5rem;
 }
 
@@ -355,7 +377,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-  margin-top: -0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .rid-remember-me {
@@ -374,6 +397,7 @@
   position: relative;
   cursor: pointer;
   transition: all var(--transition-speed);
+  flex-shrink: 0;
 }
 
 .rid-checkbox:checked {
@@ -394,14 +418,14 @@
 }
 
 .rid-checkbox-label {
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   color: var(--text-light);
   cursor: pointer;
 }
 
 .rid-link {
   color: var(--primary-color);
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   text-decoration: none;
   transition: color var(--transition-speed);
 }
@@ -417,23 +441,28 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 1rem;
+  overflow: hidden;
+  width: 100%;
 }
 
 /* Form Actions */
 .rid-form-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .rid-submit-button {
   flex: 3;
-  padding: 0.875rem;
+  min-width: 120px;
+  padding: 0.75rem;
   background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   cursor: pointer;
   transition: background-color var(--transition-speed);
   display: flex;
@@ -453,12 +482,14 @@
 
 .rid-reset-button {
   flex: 1;
-  padding: 0.875rem;
+  min-width: 80px;
+  padding: 0.75rem;
   background-color: transparent;
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
   border-radius: 8px;
   font-weight: 600;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   cursor: pointer;
   transition: all var(--transition-speed);
 }
@@ -483,8 +514,8 @@
 
 .rid-spinner {
   display: inline-block;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top: 2px solid white;
   border-radius: 50%;
@@ -500,7 +531,7 @@
 .rid-separator {
   display: flex;
   align-items: center;
-  margin: 1.5rem 0;
+  margin: 1.25rem 0;
 }
 
 .rid-separator::before,
@@ -512,35 +543,38 @@
 }
 
 .rid-separator span {
-  padding: 0 1rem;
+  padding: 0 0.75rem;
   color: var(--text-light);
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  white-space: nowrap;
 }
 
 /* Social Login Buttons */
 .rid-social-login {
   display: flex;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Sign Up Prompt */
 .rid-signup-prompt {
   text-align: center;
   margin-top: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .rid-signup-prompt p {
   margin-bottom: 0.5rem;
   color: var(--text-light);
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
 .rid-signup-link {
   color: var(--primary-color);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   text-decoration: none;
   transition: color var(--transition-speed);
 }
@@ -558,13 +592,13 @@
 
 .rid-partner-login-btn {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   background-color: transparent;
   color: var(--accent-color);
   border: 1px dashed var(--accent-color);
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   text-decoration: none;
   transition: all var(--transition-speed);
 }
@@ -575,38 +609,129 @@
 }
 
 /* Responsive Styles */
-@media (min-width: 768px) {
-  .rid-login-brand {
-      display: block;
-  }
-  
-  .rid-login-wrapper {
-      padding: 3rem;
-  }
-}
-
-@media (max-width: 767px) {
+@media (max-width: 480px) {
   .rid-login-card {
-      padding: 2rem;
-      max-width: 100%;
+    padding: 1.25rem;
+    border-radius: 12px;
   }
   
-  .rid-login-wrapper {
-      padding: 1.5rem 1rem;
+  .rid-form-actions {
+    flex-direction: column;
   }
   
-  .rid-login-header h2 {
-      font-size: 1.5rem;
-  }
-  
-  .rid-form-options {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.8rem;
+  .rid-submit-button, .rid-reset-button {
+    width: 100%;
   }
   
   .rid-recaptcha-container {
-      transform: scale(0.85);
-      transform-origin: left center;
+    transform-origin: center;
+    transform: scale(0.8);
+  }
+  
+  .rid-form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  .rid-login-card {
+    padding: 1.5rem;
+  }
+  
+  .rid-recaptcha-container {
+    transform-origin: center;
+    transform: scale(0.9);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .rid-login-wrapper {
+    flex-direction: row;
+    padding: 2rem;
+  }
+  
+  .rid-login-brand {
+    display: block;
+    text-align: left;
+    padding: 0 1rem;
+  }
+  
+  .rid-logo:after {
+    left: 0;
+    transform: none;
+  }
+  
+  .rid-login-card {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rid-login-wrapper {
+    flex-direction: row;
+    padding: 3rem;
+    gap: 3rem;
+  }
+  
+  .rid-login-brand {
+    display: block;
+    text-align: left;
+    padding: 2rem;
+  }
+  
+  .rid-logo:after {
+    left: 0;
+    transform: none;
+  }
+  
+  .rid-login-card {
+    padding: 2.5rem;
+    max-width: 500px;
+  }
+}
+
+/* Tablet Landscape and Medium Screens */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .rid-login-wrapper {
+    width: 90%;
+  }
+}
+
+/* Larger Screens */
+@media (min-width: 1200px) {
+  .rid-login-wrapper {
+    width: 85%;
+  }
+}
+
+/* Fix reCAPTCHA responsiveness */
+@media (max-width: 350px) {
+  .rid-recaptcha-container {
+    transform: scale(0.7);
+  }
+}
+
+/* Remove zoom property that was likely a mistake */
+@media (any-pointer: fine) {
+  .rid-login-container {
+    zoom: unset;
+  }
+}
+
+/* Print styles */
+@media print {
+  .rid-login-bg-animation {
+    display: none;
+  }
+  
+  .rid-login-wrapper {
+    display: block;
+  }
+  
+  .rid-login-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
   }
 }

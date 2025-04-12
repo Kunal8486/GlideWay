@@ -160,10 +160,14 @@ const Registration = () => {
         verification_code: formData.email_verification_code
       }, { timeout: 10000 })
 
+      // First set verification status, then update success message
       setIsEmailVerified(true)
       setSuccess(res.data.message || "Email verified successfully")
-      setResendTimer(900)
-      nextStep()
+      
+      // Add a slight delay before moving to next step to ensure state updates
+      setTimeout(() => {
+        setCurrentStep(currentStep + 1)
+      }, 500)
     } catch (err) {
       if (!err.response) {
         setServerError("Network error. Please check your connection and try again.")

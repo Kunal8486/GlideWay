@@ -160,10 +160,10 @@ const App = () => {
           />
 
           {/* Common Authentication Routes */}
-          <Route path="/rider-forgot-password" element={<RiderForgetPassword />} />
-          <Route path="/rider-reset-password/:token" element={<RiderResetPassword />} />
-          <Route path="/driver-forgot-password" element={<DriverForgetPassword />} />
-          <Route path="/driver-reset-password/:token" element={<DriverResetPassword />} />
+          <Route path="/forgot-password" element={<RiderForgetPassword />} />
+          <Route path="/reset-password/:token" element={<RiderResetPassword />} />
+          <Route path="/driver/forgot-password" element={<DriverForgetPassword />} />
+          <Route path="/driver/reset-password/:token" element={<DriverResetPassword />} />
 
           {/* Ride-related Routes */}
           <Route path="/book-a-ride" element={<BookARide />} />

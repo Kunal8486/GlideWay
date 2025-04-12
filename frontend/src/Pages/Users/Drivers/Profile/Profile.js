@@ -49,7 +49,7 @@ export default function DriverProfile({ driverId }) {
         const isCurrentUserProfile = effectiveDriverId === 'me' || (!driverId && !userId);
         const endpoint = isCurrentUserProfile ? 'profile' : effectiveDriverId;
         
-        const apiUrl = `${process.env.REACT_APP_API_BASE_URL || ''}/api/drivers/${endpoint}`;
+        const apiUrl = `${process.env.REACT_APP_API_BASE_URL || ''}/api/driver/${endpoint}`;
         console.log(`Full request URL: ${apiUrl}`);
         
         const response = await fetch(apiUrl, {
@@ -407,7 +407,7 @@ export default function DriverProfile({ driverId }) {
         throw new Error('Driver ID is missing');
       }
       
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/drivers/${driver._id}/status`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL || ''}/api/driver/${driver._id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -437,12 +437,12 @@ export default function DriverProfile({ driverId }) {
           <div className="profile-header-content">
             <div className="profile-image-container">
               <img 
-                src={driver.profile_picture_url || "/api/placeholder/150/150"} 
+                src={driver.profile_picture_url} 
                 alt={driver.name || "Driver"} 
                 className="profile-image"
                 onError={(e) => {
                   console.error("Error loading image, falling back to placeholder");
-                  e.target.src = "/api/placeholder/150/150";
+                  e.target.src = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
                 }}
               />
             </div>

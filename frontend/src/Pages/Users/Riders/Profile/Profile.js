@@ -30,7 +30,7 @@ const ProfileHeader = ({ rider }) => (
           className="ridp-profile-image"
           onError={(e) => {
             e.target.onerror = null;
-            e.target.src = "/api/placeholder/150/150";
+            e.target.src = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
           }}
         />
         {rider.is_verified && (

@@ -1,7 +1,7 @@
 /* Registration Styles with Light Brown Theme */
 
-/* Global Variables */
-:root {
+/* Base Styles */
+.usreg-registration-page {
   --primary-color: #8B6E4E;
   --primary-light: #A88D70;
   --primary-dark: #6D5B43;
@@ -17,10 +17,7 @@
   --input-focus: #C5B4A0;
   --card-shadow: 0 8px 30px rgba(139, 110, 78, 0.12);
   --transition-speed: 0.3s;
-}
-
-/* Base Styles */
-.usreg-registration-page {
+  
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   background-color: var(--background-color);
@@ -120,21 +117,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: clamp(1rem, 5vw, 2rem);
   position: relative;
   z-index: 1;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 .usreg-logo-container {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   text-align: center;
 }
 
 .usreg-logo {
-  height: 60px;
+  height: clamp(40px, 8vw, 60px);
   width: auto;
   object-fit: contain;
 }
@@ -144,17 +142,18 @@
   background-color: var(--input-bg);
   border-radius: 16px;
   box-shadow: var(--card-shadow);
-  padding: 2.5rem;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
   width: 100%;
   max-width: 550px;
   position: relative;
   overflow: hidden;
   transition: all var(--transition-speed);
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-
-margin-top: 5%;
+  margin: auto;
 }
 
 .usreg-card:hover {
@@ -163,32 +162,35 @@ margin-top: 5%;
 
 .usreg-card-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+  width: 100%;
 }
 
 .usreg-title {
   color: var(--primary-dark);
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 5vw, 2rem);
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .usreg-subtitle {
   color: var(--text-light);
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 3vw, 1rem);
 }
 
 /* Progress Indicator */
 .usreg-progress-container {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   padding: 0 1rem;
+  width: 100%;
+  max-width: 350px;
 }
 
 .usreg-progress-step {
-  width: 12px;
-  height: 12px;
+  width: clamp(8px, 2vw, 12px);
+  height: clamp(8px, 2vw, 12px);
   border-radius: 50%;
   background-color: var(--input-border);
   transition: all var(--transition-speed);
@@ -201,7 +203,8 @@ margin-top: 5%;
 
 /* OAuth Container */
 .usreg-oauth-container {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
+  width: 100%;
 }
 
 .usreg-divider {
@@ -210,6 +213,7 @@ margin-top: 5%;
   text-align: center;
   margin: 1.5rem 0;
   color: var(--text-light);
+  width: 100%;
 }
 
 .usreg-divider::before,
@@ -222,21 +226,25 @@ margin-top: 5%;
 .usreg-divider span {
   padding: 0 1rem;
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 /* Form Styles */
 .usreg-form {
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .usreg-form-group {
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .usreg-form-row {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .usreg-half-width {
@@ -249,12 +257,14 @@ margin-top: 5%;
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: var(--text-color);
+  text-align: left;
 }
 
 .usreg-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .usreg-input-icon {
@@ -272,7 +282,7 @@ margin-top: 5%;
   padding: 0.75rem 1rem 0.75rem 2.8rem;
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 3vw, 1rem);
   color: var(--text-color);
   background-color: var(--input-bg);
   transition: all var(--transition-speed);
@@ -300,6 +310,7 @@ margin-top: 5%;
   color: var(--error-color);
   font-size: 0.85rem;
   margin-top: 0.5rem;
+  text-align: left;
 }
 
 /* Select Styles */
@@ -307,6 +318,7 @@ margin-top: 5%;
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .usreg-select {
@@ -328,6 +340,7 @@ margin-top: 5%;
 .usreg-verification-container {
   display: flex;
   gap: 1rem;
+  width: 100%;
 }
 
 .usreg-verification-text {
@@ -346,6 +359,7 @@ margin-top: 5%;
   font-weight: 500;
   white-space: nowrap;
   transition: all var(--transition-speed);
+  min-width: 120px;
 }
 
 .usreg-verification-button:hover:not(:disabled) {
@@ -364,17 +378,19 @@ margin-top: 5%;
   justify-content: space-between;
   gap: 1rem;
   margin-top: 2rem;
+  width: 100%;
 }
 
 .usreg-button {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   border: none;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 3vw, 1rem);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-speed);
   margin-top: 20px;
+  min-height: 48px;
 }
 
 .usreg-next-button,
@@ -389,6 +405,11 @@ margin-top: 5%;
   background-color: var(--primary-dark);
 }
 
+.usreg-next-button:active,
+.usreg-submit-button:active {
+  transform: translateY(1px);
+}
+
 .usreg-prev-button {
   background-color: transparent;
   color: var(--text-light);
@@ -400,11 +421,17 @@ margin-top: 5%;
   color: var(--accent-color);
 }
 
+.usreg-prev-button:active {
+  transform: translateY(1px);
+}
+
 /* reCAPTCHA Styles */
 .usreg-recaptcha-container {
   display: flex;
   justify-content: center;
   margin-bottom: 1.5rem;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Checkbox Styles */
@@ -413,10 +440,14 @@ margin-top: 5%;
   align-items: flex-start;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .usreg-checkbox {
   margin-top: 0.25rem;
+  min-width: 16px;
+  min-height: 16px;
+  width: 10px;
 }
 
 .usreg-checkbox-label {
@@ -443,6 +474,8 @@ margin-top: 5%;
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  width: 100%;
+  text-align: left;
 }
 
 .usreg-error {
@@ -460,6 +493,8 @@ margin-top: 5%;
   text-align: center;
   font-size: 0.95rem;
   color: var(--text-light);
+  width: 100%;
+  margin-top: 1rem;
 }
 
 /* Loading Spinner */
@@ -490,32 +525,85 @@ margin-top: 5%;
   }
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
+/* Responsive Adjustments */
+@media (max-width: 576px) {
   .usreg-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
   }
-
-  .usreg-title {
-    font-size: 1.75rem;
-  }
-
+  
   .usreg-form-row {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
   }
-
+  
   .usreg-verification-container {
     flex-direction: column;
+    gap: 0.75rem;
   }
-
+  
   .usreg-verification-button {
-    padding: 0.75rem;
     width: 100%;
+    padding: 0.75rem;
   }
+  
+  .usreg-button {
+    padding: 0.75rem 1rem;
+  }
+  
+  .usreg-form-button-group {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  
+  .usreg-prev-button {
+    margin-top: 0.5rem;
+  }
+}
 
+@media (max-width: 380px) {
   .usreg-recaptcha-container {
     transform: scale(0.85);
-    transform-origin: left top;
+    transform-origin: center;
   }
+  
+  .usreg-input,
+  .usreg-select {
+    font-size: 14px;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
+  }
+  
+  .usreg-input-icon {
+    left: 0.75rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .usreg-button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .usreg-input:focus,
+  .usreg-select:focus {
+    font-size: 16px; /* Prevents iOS zoom on input focus */
+  }
+  
+  .usreg-card {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* Fix for date input on Safari */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Better ReCAPTCHA centering */
+.usreg-recaptcha-container > div {
+  margin: 0 auto;
 }

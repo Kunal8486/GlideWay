@@ -58,7 +58,7 @@ function CreateRide() {
     useEffect(() => {
         const fetchFrequentLocations = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book/frequent-locations`);
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/frequent-locations`);
                 if (response.data && response.data.locations) {
                     setUserFrequentLocations(response.data.locations);
                 }
@@ -251,7 +251,7 @@ function CreateRide() {
         try {
             setLoadingSuggestions(true);
             // Fetch from backend or using Google Places API
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book/nearby-pickup-points`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/nearby-pickup-points`, {
                 params: { lat, lng, radius: rideDetails.pickupRadius * 1000 }
             });
 
@@ -292,7 +292,7 @@ function CreateRide() {
         try {
             setLoadingSuggestions(true);
             // Fetch from backend or using Google Places API
-            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book/nearby-dropoff-points`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/nearby-dropoff-points`, {
                 params: { lat, lng, radius: rideDetails.pickupRadius * 1000 }
             });
 
@@ -924,7 +924,7 @@ function CreateRide() {
 
             // Send data to backend
             const response = await axios.post(
-                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book/createpool`,
+                `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/createpool`,
                 rideDataWithCoords,
                 {
                     headers: {
@@ -1002,36 +1002,35 @@ function CreateRide() {
         setMapVisible(false);
         // The cleanup in useEffect will handle the rest
     };
-
     return (
-        <div className='pooling-create-page'>
-            <div className="create-ride-container">
+        <div className='cp-pooling-create-page'>
+            <div className="cp-create-ride-container">
                 {error && (
-                    <div className="error-message">
+                    <div className="cp-error-message">
                         <span>{error}</span>
                         <button onClick={() => setError(null)}>×</button>
                     </div>
                 )}
                 {success && (
-                    <div className="success-message">
+                    <div className="cp-success-message">
                         <span>{success}</span>
                         <button onClick={() => setSuccess(null)}>×</button>
                     </div>
                 )}
 
-                <h2 className="form-title">Create a Carpooling Ride</h2>
+                <h2 className="cp-form-title">Create a Carpooling Ride</h2>
 
-                <form onSubmit={handleSubmitRide} className="ride-form">
-                    <div className="form-section">
-                        <h3 className="section-title">
-                            <MapPin className="section-icon" />
+                <form onSubmit={handleSubmitRide} className="cp-ride-form">
+                    <div className="cp-form-section">
+                        <h3 className="cp-section-title">
+                            <MapPin className="cp-section-icon" />
                             Ride Locations
                         </h3>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-origin">Pickup Location</label>
-                                <div className="location-input-container">
+                                <div className="cp-location-input-container">
                                     <input
                                         type="text"
                                         id="ride-origin"
@@ -1043,7 +1042,7 @@ function CreateRide() {
                                     />
                                     <button
                                         type="button"
-                                        className="map-button"
+                                        className="cp-map-button"
                                         onClick={() => openMapForSelection('origin')}
                                     >
                                         <MapIcon size={18} />
@@ -1051,14 +1050,14 @@ function CreateRide() {
                                 </div>
 
                                 {userFrequentLocations.length > 0 && (
-                                    <div className="frequent-locations">
+                                    <div className="cp-frequent-locations">
                                         <span>Frequent locations:</span>
-                                        <div className="frequent-location-chips">
+                                        <div className="cp-frequent-location-chips">
                                             {userFrequentLocations.slice(0, 3).map((location, index) => (
                                                 <button
                                                     key={index}
                                                     type="button"
-                                                    className="location-chip"
+                                                    className="cp-location-chip"
                                                     onClick={() => selectFrequentLocation(location, 'origin')}
                                                 >
                                                     {location.name}
@@ -1070,10 +1069,10 @@ function CreateRide() {
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-destination">Drop-off Location</label>
-                                <div className="location-input-container">
+                                <div className="cp-location-input-container">
                                     <input
                                         type="text"
                                         id="ride-destination"
@@ -1085,7 +1084,7 @@ function CreateRide() {
                                     />
                                     <button
                                         type="button"
-                                        className="map-button"
+                                        className="cp-map-button"
                                         onClick={() => openMapForSelection('destination')}
                                     >
                                         <MapIcon size={18} />
@@ -1093,14 +1092,14 @@ function CreateRide() {
                                 </div>
 
                                 {userFrequentLocations.length > 0 && (
-                                    <div className="frequent-locations">
+                                    <div className="cp-frequent-locations">
                                         <span>Frequent locations:</span>
-                                        <div className="frequent-location-chips">
+                                        <div className="cp-frequent-location-chips">
                                             {userFrequentLocations.slice(0, 3).map((location, index) => (
                                                 <button
                                                     key={index}
                                                     type="button"
-                                                    className="location-chip"
+                                                    className="cp-location-chip"
                                                     onClick={() => selectFrequentLocation(location, 'destination')}
                                                 >
                                                     {location.name}
@@ -1113,10 +1112,10 @@ function CreateRide() {
                         </div>
 
                         {rideDetails.originCoords && rideDetails.destinationCoords && (
-                            <div className="form-row view-route-container">
+                            <div className="cp-form-row cp-view-route-container">
                                 <button
                                     type="button"
-                                    className="view-route-button"
+                                    className="cp-view-route-button"
                                     onClick={calculateRoute}
                                 >
                                     <MapIcon size={18} />
@@ -1126,8 +1125,8 @@ function CreateRide() {
                         )}
 
                         {/* Flexible pickup options */}
-                        <div className="form-row">
-                            <div className="form-group checkbox-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group cp-checkbox-group">
                                 <input
                                     type="checkbox"
                                     id="flexible-pickup"
@@ -1142,8 +1141,8 @@ function CreateRide() {
 
 
                         {rideDetails.isFlexiblePickup && (
-                            <div className="form-row">
-                                <div className="form-group">
+                            <div className="cp-form-row">
+                                <div className="cp-form-group">
                                     <label htmlFor="pickup-radius">Pickup Radius (km)</label>
                                     <input
                                         type="range"
@@ -1155,14 +1154,14 @@ function CreateRide() {
                                         value={rideDetails.pickupRadius}
                                         onChange={handleRideInputChange}
                                     />
-                                    <span className="range-value">{rideDetails.pickupRadius} km</span>
+                                    <span className="cp-range-value">{rideDetails.pickupRadius} km</span>
                                 </div>
                             </div>
                         )}
 
                         {/* Detour options */}
-                        <div className="form-row">
-                            <div className="form-group checkbox-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group cp-checkbox-group">
                                 <input
                                     type="checkbox"
                                     id="allow-detour"
@@ -1176,8 +1175,8 @@ function CreateRide() {
 
                         {rideDetails.allowDetour && (
                             <>
-                                <div className="form-row">
-                                    <div className="form-group">
+                                <div className="cp-form-row">
+                                    <div className="cp-form-group">
                                         <label htmlFor="max-detour-distance">Maximum Detour Distance (km)</label>
                                         <input
                                             type="range"
@@ -1189,11 +1188,11 @@ function CreateRide() {
                                             value={rideDetails.maxDetourDistance}
                                             onChange={handleRideInputChange}
                                         />
-                                        <span className="range-value">{rideDetails.maxDetourDistance} km</span>
+                                        <span className="cp-range-value">{rideDetails.maxDetourDistance} km</span>
                                     </div>
                                 </div>
-                                <div className="form-row">
-                                    <div className="form-group">
+                                <div className="cp-form-row">
+                                    <div className="cp-form-group">
                                         <label htmlFor="max-wait-time">Maximum Wait Time (minutes)</label>
                                         <input
                                             type="range"
@@ -1205,21 +1204,21 @@ function CreateRide() {
                                             value={rideDetails.maxWaitTime}
                                             onChange={handleRideInputChange}
                                         />
-                                        <span className="range-value">{rideDetails.maxWaitTime} minutes</span>
+                                        <span className="cp-range-value">{rideDetails.maxWaitTime} minutes</span>
                                     </div>
                                 </div>
                             </>
                         )}
                     </div>
 
-                    <div className="form-section">
-                        <h3 className="section-title">
-                            <Calendar className="section-icon" />
+                    <div className="cp-form-section">
+                        <h3 className="cp-section-title">
+                            <Calendar className="cp-section-icon" />
                             Ride Schedule
                         </h3>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-date">Date</label>
                                 <input
                                     type="date"
@@ -1231,7 +1230,7 @@ function CreateRide() {
                                     required
                                 />
                             </div>
-                            <div className="form-group">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-time">Time</label>
                                 <input
                                     type="time"
@@ -1245,8 +1244,8 @@ function CreateRide() {
                         </div>
 
                         {/* Recurring ride options */}
-                        <div className="form-row">
-                            <div className="form-group checkbox-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group cp-checkbox-group">
                                 <input
                                     type="checkbox"
                                     id="recurring-ride"
@@ -1259,15 +1258,15 @@ function CreateRide() {
                         </div>
 
                         {rideDetails.isRecurringRide && (
-                            <div className="form-row">
-                                <div className="form-group recurring-days">
+                            <div className="cp-form-row">
+                                <div className="cp-form-group cp-recurring-days">
                                     <label>Select days that repeat:</label>
-                                    <div className="day-buttons">
+                                    <div className="cp-day-buttons">
                                         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                                             <button
                                                 key={day}
                                                 type="button"
-                                                className={`day-button ${rideDetails.recurringDays.includes(day) ? 'active' : ''}`}
+                                                className={`cp-day-button ${rideDetails.recurringDays.includes(day) ? 'active' : ''}`}
                                                 onClick={() => handleRecurringDayToggle(day)}
                                             >
                                                 {day}
@@ -1279,14 +1278,14 @@ function CreateRide() {
                         )}
                     </div>
 
-                    <div className="form-section">
-                        <h3 className="section-title">
-                            <Users className="section-icon" />
+                    <div className="cp-form-section">
+                        <h3 className="cp-section-title">
+                            <Users className="cp-section-icon" />
                             Ride Details
                         </h3>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-seats">Available Seats</label>
                                 <input
                                     type="number"
@@ -1299,7 +1298,7 @@ function CreateRide() {
                                     required
                                 />
                             </div>
-                            <div className="form-group">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-fare">Fare (₹ per person)</label>
                                 <input
                                     type="number"
@@ -1314,8 +1313,8 @@ function CreateRide() {
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="vehicle-type">Vehicle Type</label>
                                 <select
                                     id="vehicle-type"
@@ -1333,8 +1332,8 @@ function CreateRide() {
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="cp-form-row">
+                            <div className="cp-form-group">
                                 <label htmlFor="ride-notes">Additional Notes</label>
                                 <textarea
                                     id="ride-notes"
@@ -1348,14 +1347,14 @@ function CreateRide() {
                         </div>
                     </div>
 
-                    <div className="form-actions">
+                    <div className="cp-form-actions">
                         <button
                             type="submit"
-                            className="submit-button"
+                            className="cp-submit-button"
                             disabled={loading}
                         >
                             {loading ? (
-                                <><RotateCw className="spinner" size={18} /> Creating Ride...</>
+                                <><RotateCw className="cp-spinner" size={18} /> Creating Ride...</>
                             ) : (
                                 'Create Ride'
                             )}
@@ -1365,9 +1364,9 @@ function CreateRide() {
 
                 {/* Map Modal */}
                 {mapVisible && (
-                    <div className="map-modal">
-                        <div className="map-modal-content">
-                            <h3 className="map-title">
+                    <div className="cp-map-modal">
+                        <div className="cp-map-modal-content">
+                            <h3 className="cp-map-title">
                                 {activeLocationField === 'origin'
                                     ? 'Select Pickup Location'
                                     : activeLocationField === 'destination'
@@ -1376,19 +1375,19 @@ function CreateRide() {
                             </h3>
 
                             {loadingLocation && (
-                                <div className="loading-location">
-                                    <RotateCw className="spinner" size={20} />
+                                <div className="cp-loading-location">
+                                    <RotateCw className="cp-spinner" size={20} />
                                     Getting your location...
                                 </div>
                             )}
 
-                            <div className="map-container" ref={mapRef}></div>
+                            <div className="cp-map-container" ref={mapRef}></div>
 
                             {activeLocationField !== 'viewRoute' && (
-                                <div className="suggested-locations">
+                                <div className="cp-suggested-locations">
                                     <h4>
                                         {loadingSuggestions ? (
-                                            <><RotateCw className="spinner" size={16} /> Loading suggestions...</>
+                                            <><RotateCw className="cp-spinner" size={16} /> Loading suggestions...</>
                                         ) : activeLocationField === 'origin' && suggestedPickupPoints.length > 0 ? (
                                             'Suggested Pickup Points'
                                         ) : activeLocationField === 'destination' && suggestedDropoffPoints.length > 0 ? (
@@ -1397,12 +1396,12 @@ function CreateRide() {
                                     </h4>
 
                                     {activeLocationField === 'origin' && !loadingSuggestions && suggestedPickupPoints.length > 0 && (
-                                        <div className="location-suggestions">
+                                        <div className="cp-location-suggestions">
                                             {suggestedPickupPoints.map((point, index) => (
                                                 <button
                                                     key={index}
                                                     type="button"
-                                                    className="suggestion-item"
+                                                    className="cp-suggestion-item"
                                                     onClick={() => selectSuggestedLocation(point, 'origin')}
                                                 >
                                                     <strong>{point.name}</strong>
@@ -1413,12 +1412,12 @@ function CreateRide() {
                                     )}
 
                                     {activeLocationField === 'destination' && !loadingSuggestions && suggestedDropoffPoints.length > 0 && (
-                                        <div className="location-suggestions">
+                                        <div className="cp-location-suggestions">
                                             {suggestedDropoffPoints.map((point, index) => (
                                                 <button
                                                     key={index}
                                                     type="button"
-                                                    className="suggestion-item"
+                                                    className="cp-suggestion-item"
                                                     onClick={() => selectSuggestedLocation(point, 'destination')}
                                                 >
                                                     <strong>{point.name}</strong>
@@ -1431,17 +1430,17 @@ function CreateRide() {
                             )}
 
                             {activeLocationField === 'viewRoute' && routeDetails && routeDetails.routes && routeDetails.routes[0] && (
-                                <div className="route-details">
-                                    <div className="detail-item">
+                                <div className="cp-route-details">
+                                    <div className="cp-detail-item">
                                         <strong>Distance:</strong>
                                         <span>{routeDetails.routes[0].legs[0].distance.text}</span>
                                     </div>
-                                    <div className="detail-item">
+                                    <div className="cp-detail-item">
                                         <strong>Duration:</strong>
                                         <span>{routeDetails.routes[0].legs[0].duration.text}</span>
                                     </div>
                                     {rideDetails.fare && (
-                                        <div className="detail-item">
+                                        <div className="cp-detail-item">
                                             <strong>Fare:</strong>
                                             <span>₹{rideDetails.fare} per person</span>
                                         </div>
@@ -1449,10 +1448,10 @@ function CreateRide() {
                                 </div>
                             )}
 
-                            <div className="map-modal-actions">
+                            <div className="cp-map-modal-actions">
                                 <button
                                     type="button"
-                                    className="locate-me-button"
+                                    className="cp-locate-me-button"
                                     onClick={getUserLocation}
                                     disabled={loadingLocation || activeLocationField === 'viewRoute'}
                                 >
@@ -1463,7 +1462,7 @@ function CreateRide() {
                                 {activeLocationField !== 'viewRoute' && (
                                     <button
                                         type="button"
-                                        className="confirm-location-button"
+                                        className="cp-confirm-location-button"
                                         onClick={confirmMapLocation}
                                     >
                                         Confirm Location
@@ -1472,7 +1471,7 @@ function CreateRide() {
 
                                 <button
                                     type="button"
-                                    className="close-map-button"
+                                    className="cp-close-map-button"
                                     onClick={closeMapModal}
                                 >
                                     Close
@@ -1487,4 +1486,3 @@ function CreateRide() {
 }
 
 export default CreateRide;
-

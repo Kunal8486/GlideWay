@@ -8,7 +8,7 @@ const riderSchema = new Schema(
     googleId: { type: String, unique: true, sparse: true }, // Removed duplicate
     phone_number: { type: String, required: false },
     password: { type: String, required: false },
-    profile_picture_url: { type: String },
+    profile_picture_url: { type: String, default: "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png" },
     gender: { type: String, required: false },
     dob: { type: Date, required: false },  
     age: { type: Number, required: false },
@@ -24,7 +24,7 @@ const riderSchema = new Schema(
       longitude: { type: Number },
     },
     ride_history: [{ type: Schema.Types.ObjectId, ref: "Ride" }],
-    is_verified: { type: Boolean, default: false },
+    is_verified: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

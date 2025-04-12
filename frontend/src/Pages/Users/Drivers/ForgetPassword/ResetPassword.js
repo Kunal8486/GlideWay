@@ -13,7 +13,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (success) {
-      const timer = setTimeout(() => navigate("/login"), 3000);
+      const timer = setTimeout(() => navigate("/driver/login"), 3000);
       return () => clearTimeout(timer);
     }
   }, [success, navigate]);
@@ -52,7 +52,7 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/driver-reset-password/${token}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/driver/reset-password/${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

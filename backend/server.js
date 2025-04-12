@@ -2,15 +2,10 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 const dotenv = require("dotenv")
-const authRoutes = require("./Routes/auth")
-const driverRoutes = require("./Routes/driver")
-const driverLogin = require("./Routes/DriverLogin")
-const riderRoutes = require("./Routes/rider") 
+const authRoutes = require("./Routes/userAuth.js")
+const driverRoutes = require("./Routes/userDriver.js")
+const riderRoutes = require("./Routes/userRider.js") 
 const poolrideRoutes = require('./Routes/poolride')
-const navRefresher = require('./Routes/navRefresher')
-const bookpoolRoutes = require('./Routes/bookpool')
-const DriverProfile = require('./Routes/DriverProfile')
-
 
 
 require('./Models/Rider.js');
@@ -32,15 +27,11 @@ app.use(
 })
 )
 app.use(express.json())
+app.use('/driver/uploads', express.static('uploads'));
 app.use("/api/auth", authRoutes) 
 app.use("/api/driver", driverRoutes)
-app.use("/api/driver", driverLogin)
 app.use("/api", riderRoutes) 
 app.use('/api/rides/pool', poolrideRoutes);
-app.use('/api/nav', navRefresher);
-app.use('/api/rides/pool/book', bookpoolRoutes);
-app.use('/driver/uploads', express.static('uploads'));
-app.use('/', DriverProfile);
 
 
 // MongoDB Connection

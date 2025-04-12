@@ -4,27 +4,15 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const dotenv = require("dotenv");
 const Rider = require("../Models/Rider.js");
-const Ride = require("../Models/Ride.js"); // Assuming a Ride model exists
+const Ride = require("../Models/Ride.js");
 const axios = require("axios");
-
+const authenticateToken = require("../middleware/RiderAuth.js");
 dotenv.config();
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-// Authentication Middleware
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Unauthorized: No token provided" });
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ error: "Forbidden: Invalid token" });
-    req.user = decoded;
-    next();
-  });
-};
+JWT_SECRET = process.env.JWT_SECRET;
 
 // 📌 Register Route
 router.post("/register", async (req, res) => {
@@ -52,15 +40,15 @@ router.post("/login", async (req, res) => {
     const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
     const recaptchaResponse = await axios.post(recaptchaVerifyUrl, null, {
       params: {
-        secret: process.env.RECAPTCHA_SECRET_KEY || "6Le-vAArAAAAAINVH521Vd5qDFNlDu3NMR2-t-eu",
+        secret: process.env.RECAPTCHA_SECRET_KEY,
         response: captchaToken
       }
     });
 
     // Check if reCAPTCHA verification failed
     if (!recaptchaResponse.data.success) {
-      return res.status(400).json({ 
-        error: "reCAPTCHA verification failed. Please try again." 
+      return res.status(400).json({
+        error: "reCAPTCHA verification failed. Please try again."
       });
     }
 
@@ -74,34 +62,26 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
+      {
         id: rider._id.toString(),
         email: rider.email
-      }, 
-      JWT_SECRET, 
+      },
+      JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // Optional: Add additional security logging
-    console.log(`Successful login attempt for email: ${email}`);
-
     // Send successful response
-    res.json({ 
-      message: "Logged in successfully", 
+    res.json({
+      message: "Logged in successfully",
       token,
       userId: rider._id.toString()
     });
 
   } catch (error) {
     console.error("Login error:", error);
-    
-    // Differentiate between different types of errors
     if (error.response) {
-      // reCAPTCHA verification error
       return res.status(500).json({ error: "reCAPTCHA verification failed" });
     }
-
-    // Generic server error
     res.status(500).json({ error: "Server error during login" });
   }
 });
@@ -139,10 +119,11 @@ router.post("/auth/google", async (req, res) => {
 
 // 📌 Logout Route
 router.post("/logout", (req, res) => {
-  res.json({ message: "Logged out successfully" }); 
+  res.json({ message: "Logged out successfully" });
 });
 
-// 📌 Profile Routes
+
+
 // Get rider profile
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
@@ -154,20 +135,20 @@ router.get('/profile', authenticateToken, async (req, res) => {
     const rider = await Rider.findById(req.user.id)
       .populate('ride_history')
       .select('-password');
-    
+
     if (!rider) {
       return res.status(404).json({ error: 'Rider not found' });
     }
-    
+
     res.json(rider);
   } catch (err) {
     console.error('Profile fetch error:', err);
-    
+
     // More specific error handling
     if (err.kind === 'ObjectId') {
       return res.status(400).json({ error: 'Invalid user ID format' });
     }
-    
+
     res.status(500).json({ error: 'Server error while fetching profile' });
   }
 });
@@ -179,7 +160,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
     if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'Invalid authentication token' });
     }
-    
+
     const {
       name,
       phone_number,
@@ -195,16 +176,16 @@ router.put('/profile', authenticateToken, async (req, res) => {
     if (name) riderFields.name = name;
     if (phone_number) riderFields.phone_number = phone_number;
     if (gender) riderFields.gender = gender;
-    
+
     // Validate date format before processing
     if (dob) {
       const birthDate = new Date(dob);
       if (isNaN(birthDate.getTime())) {
         return res.status(400).json({ error: 'Invalid date format for date of birth' });
       }
-      
+
       riderFields.dob = birthDate;
-      
+
       // Calculate age if dob is provided
       const today = new Date();
       let age = today.getFullYear() - birthDate.getFullYear();
@@ -214,7 +195,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
       }
       riderFields.age = age;
     }
-    
+
     // Validate payment type
     if (preferred_payment) {
       if (!['card', 'wallet', 'cash'].includes(preferred_payment)) {
@@ -222,7 +203,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
       }
       riderFields.preferred_payment = preferred_payment;
     }
-    
+
     // Validate location data
     if (home_location) {
       if (home_location.latitude === undefined || home_location.longitude === undefined) {
@@ -230,7 +211,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
       }
       riderFields.home_location = home_location;
     }
-    
+
     if (work_location) {
       if (work_location.latitude === undefined || work_location.longitude === undefined) {
         return res.status(400).json({ error: 'Work location must include both latitude and longitude' });
@@ -254,16 +235,16 @@ router.put('/profile', authenticateToken, async (req, res) => {
     res.json({ message: 'Profile updated successfully', rider });
   } catch (err) {
     console.error('Profile update error:', err);
-    
+
     // More specific error handling
     if (err.name === 'ValidationError') {
       return res.status(400).json({ error: 'Validation error', details: err.message });
     }
-    
+
     if (err.kind === 'ObjectId') {
       return res.status(400).json({ error: 'Invalid user ID format' });
     }
-    
+
     res.status(500).json({ error: 'Server error while updating profile' });
   }
 });
@@ -294,8 +275,8 @@ router.put('/profile/password', authenticateToken, async (req, res) => {
 
     // If rider uses social login and has no password set
     if (!rider.password && rider.googleId) {
-      return res.status(400).json({ 
-        error: 'Your account uses Google authentication. Please set up a password first.' 
+      return res.status(400).json({
+        error: 'Your account uses Google authentication. Please set up a password first.'
       });
     }
 
@@ -365,7 +346,7 @@ router.post('/wallet/deposit', authenticateToken, async (req, res) => {
 
     // Update wallet balance
     rider.wallet_balance = (rider.wallet_balance || 0) + parseFloat(amount);
-    
+
     // Add transaction record (if you have a transactions collection)
     const transaction = {
       amount: parseFloat(amount),
@@ -383,10 +364,10 @@ router.post('/wallet/deposit', authenticateToken, async (req, res) => {
 
     await rider.save();
 
-    res.json({ 
-      message: 'Funds added successfully', 
+    res.json({
+      message: 'Funds added successfully',
       newBalance: rider.wallet_balance,
-      transaction 
+      transaction
     });
   } catch (err) {
     console.error('Wallet deposit error:', err);
@@ -406,23 +387,23 @@ router.get('/rides', authenticateToken, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    
+
     // Get rider to check if they exist
     const rider = await Rider.findById(req.user.id);
     if (!rider) {
       return res.status(404).json({ error: 'Rider not found' });
     }
-    
+
     // Get rides directly from Ride model instead of through populated field
     const rides = await Ride.find({ rider: req.user.id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('driver', 'name rating vehicle_details');
-    
+
     // Get total count for pagination
     const total = await Ride.countDocuments({ rider: req.user.id });
-    
+
     res.json({
       rides,
       pagination: {
@@ -457,11 +438,11 @@ router.get('/rides/:rideId', authenticateToken, async (req, res) => {
     res.json(ride);
   } catch (err) {
     console.error('Ride details fetch error:', err);
-    
+
     if (err.kind === 'ObjectId') {
       return res.status(400).json({ error: 'Invalid ride ID format' });
     }
-    
+
     res.status(500).json({ error: 'Server error while fetching ride details' });
   }
 });
@@ -506,9 +487,9 @@ router.put('/locations', authenticateToken, async (req, res) => {
 
     await rider.save();
 
-    res.json({ 
-      message: `${type} location updated successfully`, 
-      location 
+    res.json({
+      message: `${type} location updated successfully`,
+      location
     });
   } catch (err) {
     console.error('Location update error:', err);
@@ -524,7 +505,7 @@ router.delete('/locations/:type', authenticateToken, async (req, res) => {
     }
 
     const locationType = req.params.type;
-    
+
     // Find the rider
     const rider = await Rider.findById(req.user.id);
     if (!rider) {
@@ -562,7 +543,7 @@ router.get('/notifications', authenticateToken, async (req, res) => {
     const rider = await Rider.findById(req.user.id)
       .select('notifications')
       .sort({ 'notifications.timestamp': -1 });
-    
+
     if (!rider) {
       return res.status(404).json({ error: 'Rider not found' });
     }
@@ -582,12 +563,12 @@ router.put('/notifications/:notificationId/read', authenticateToken, async (req,
     }
 
     const rider = await Rider.findOneAndUpdate(
-      { 
+      {
         _id: req.user.id,
-        'notifications._id': req.params.notificationId 
+        'notifications._id': req.params.notificationId
       },
-      { 
-        $set: { 'notifications.$.read': true } 
+      {
+        $set: { 'notifications.$.read': true }
       },
       { new: true }
     );
@@ -628,7 +609,7 @@ router.post('/profile/picture', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Rider not found' });
     }
 
-    res.json({ 
+    res.json({
       message: 'Profile picture updated successfully',
       profile_picture_url: rider.profile_picture_url
     });
@@ -709,7 +690,7 @@ router.post('/reset-password/:token', async (req, res) => {
     rider.password = hashedPassword;
     rider.reset_password_token = undefined;
     rider.reset_password_expires = undefined;
-    
+
     await rider.save();
 
     res.json({ message: 'Password has been reset successfully' });
