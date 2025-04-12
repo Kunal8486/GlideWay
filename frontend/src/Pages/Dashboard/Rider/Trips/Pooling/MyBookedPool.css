@@ -1,0 +1,658 @@
+/* MyBookedPool.css - Light Brown & White Theme */
+
+.mbp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #5a4636;
+    background-color: #f9f5f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(90, 70, 54, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  /* Dashboard Header */
+  .mbp-dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .mbp-dashboard-header h1 {
+    margin: 0;
+    color: #7c5e45;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  
+  .mbp-header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .mbp-refresh-btn, .mbp-new-ride-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mbp-refresh-btn {
+    background-color: #f0e6db;
+    color: #7c5e45;
+  }
+  
+  .mbp-refresh-btn:hover {
+    background-color: #e6d7c3;
+  }
+  
+  .mbp-new-ride-btn {
+    background-color: #9c7c5d;
+    color: white;
+  }
+  
+  .mbp-new-ride-btn:hover {
+    background-color: #8a6d51;
+  }
+  
+  /* Button hover effects */
+  .mbp-refresh-btn::after,
+  .mbp-new-ride-btn::after,
+  .mbp-primary-button::after,
+  .mbp-secondary-button::after,
+  .mbp-danger-button::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: -100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+    transition: all 0.6s ease;
+  }
+  
+  .mbp-refresh-btn:hover::after,
+  .mbp-new-ride-btn:hover::after,
+  .mbp-primary-button:hover::after,
+  .mbp-secondary-button:hover::after,
+  .mbp-danger-button:hover::after {
+    left: 100%;
+  }
+  
+  /* Tabs */
+  .mbp-tabs {
+    display: flex;
+    border-bottom: 2px solid #e6d7c3;
+    margin-bottom: 24px;
+  }
+  
+  .mbp-tab {
+    padding: 12px 24px;
+    font-weight: 500;
+    color: #7c5e45;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+  }
+  
+  .mbp-tab.mbp-active {
+    color: #9c7c5d;
+    font-weight: 600;
+  }
+  
+  .mbp-tab.mbp-active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #9c7c5d;
+    animation: expandWidth 0.3s ease;
+  }
+  
+  @keyframes expandWidth {
+    from {
+      width: 0;
+      left: 50%;
+    }
+    to {
+      width: 100%;
+      left: 0;
+    }
+  }
+  
+  /* Notification */
+  .mbp-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    z-index: 1100;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .mbp-notification p {
+    margin: 0;
+    flex: 1;
+  }
+  
+  .mbp-notification-icon {
+    margin-right: 8px;
+  }
+  
+  .mbp-notification.mbp-success {
+    background-color: #ecf7ed;
+    color: #2e7735;
+    border-left: 4px solid #2e7735;
+  }
+  
+  .mbp-notification.mbp-error {
+    background-color: #fef0f0;
+    color: #b73c3c;
+    border-left: 4px solid #b73c3c;
+  }
+  
+  .mbp-notification.mbp-info {
+    background-color: #e8eefa;
+    color: #3a57a8;
+    border-left: 4px solid #3a57a8;
+  }
+  
+  .mbp-close-notification {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    margin-left: 16px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    padding: 0;
+    font-size: 20px;
+  }
+  
+  .mbp-close-notification:hover {
+    opacity: 1;
+  }
+  
+  /* Ride Cards */
+  .mbp-ride-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .mbp-ride-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(90, 70, 54, 0.08);
+    padding: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0e6db;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  
+  .mbp-ride-card:hover {
+    box-shadow: 0 8px 20px rgba(90, 70, 54, 0.15);
+    transform: translateY(-4px) rotateX(2deg);
+  }
+  
+  .mbp-ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  
+  .mbp-trip-details {
+    flex: 1;
+  }
+  
+  .mbp-trip-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #5a4636;
+    margin-bottom: 4px;
+  }
+  
+  .mbp-trip-date {
+    color: #8a766a;
+    font-size: 14px;
+  }
+  
+  .mbp-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+  
+  .mbp-status-active {
+    background-color: #ecf7ed;
+    color: #2e7735;
+  }
+  
+  .mbp-status-pending {
+    background-color: #fdf6e3;
+    color: #a87b00;
+  }
+  
+  .mbp-status-completed {
+    background-color: #e8eefa;
+    color: #3a57a8;
+  }
+  
+  .mbp-status-cancelled {
+    background-color: #fef0f0;
+    color: #b73c3c;
+  }
+  
+  .mbp-ride-body {
+    margin-bottom: 16px;
+  }
+  
+  .mbp-location-section {
+    margin-bottom: 12px;
+  }
+  
+  .mbp-location-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a766a;
+    margin-bottom: 4px;
+  }
+  
+  .mbp-location-value {
+    color: #5a4636;
+    font-weight: 500;
+  }
+  
+  .mbp-route-map {
+    height: 120px;
+    background-color: #f0e6db;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a766a;
+    font-size: 14px;
+    margin: 16px 0;
+  }
+  
+  .mbp-details-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .mbp-detail-item {
+    margin-bottom: 12px;
+  }
+  
+  .mbp-detail-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #8a766a;
+    margin-bottom: 4px;
+  }
+  
+  .mbp-detail-value {
+    color: #5a4636;
+    font-weight: 500;
+  }
+  
+  .mbp-driver-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #f9f5f0;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 16px;
+  }
+  
+  .mbp-driver-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .mbp-driver-info {
+    flex: 1;
+  }
+  
+  .mbp-driver-name {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #5a4636;
+  }
+  
+  .mbp-driver-contact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    color: #7c5e45;
+  }
+  
+  .mbp-icon {
+    color: #9c7c5d;
+  }
+  
+  /* Ride Actions */
+  .mbp-ride-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  .mbp-action-button {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .mbp-primary-button {
+    background-color: #9c7c5d;
+    color: white;
+  }
+  
+  .mbp-primary-button:hover {
+    background-color: #8a6d51;
+  }
+  
+  .mbp-secondary-button {
+    background-color: #f0e6db;
+    color: #7c5e45;
+  }
+  
+  .mbp-secondary-button:hover {
+    background-color: #e6d7c3;
+  }
+  
+  .mbp-danger-button {
+    background-color: #f0e6db;
+    color: #b73c3c;
+  }
+  
+  .mbp-danger-button:hover {
+    background-color: #e6d7c3;
+  }
+  
+  .mbp-cancel-reason {
+    text-align: center;
+    color: #b73c3c;
+    font-size: 14px;
+    font-style: italic;
+  }
+  
+  /* Empty State */
+  .mbp-no-rides {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(90, 70, 54, 0.08);
+  }
+  
+  .mbp-no-rides h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #7c5e45;
+  }
+  
+  .mbp-no-rides p {
+    color: #8a766a;
+    margin-bottom: 0;
+  }
+  
+  /* Loading State */
+  .mbp-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+  }
+  
+  .mbp-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0e6db;
+    border-radius: 50%;
+    border-top-color: #9c7c5d;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Error State */
+  .mbp-error {
+    text-align: center;
+    color: #b73c3c;
+    background-color: #fef0f0;
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+  
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    .mbp-container {
+      background-color: #2a2420;
+      color: #e6d7c3;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+  
+    .mbp-dashboard-header h1 {
+      color: #e6d7c3;
+    }
+  
+    .mbp-ride-card {
+      background-color: #3a3430;
+      border-color: #2a2420;
+    }
+  
+    .mbp-trip-title,
+    .mbp-location-value,
+    .mbp-detail-value,
+    .mbp-driver-name {
+      color: #e6d7c3;
+    }
+  
+    .mbp-trip-date,
+    .mbp-location-title,
+    .mbp-detail-label {
+      color: #c5b6a5;
+    }
+  
+    .mbp-tabs {
+      border-bottom-color: #3a3430;
+    }
+    
+    .mbp-route-map {
+      background-color: #3a3430;
+      color: #c5b6a5;
+    }
+    
+    .mbp-driver-section {
+      background-color: #3a3430;
+    }
+    
+    .mbp-refresh-btn {
+      background-color: #4a443e;
+      color: #e6d7c3;
+    }
+    
+    .mbp-refresh-btn:hover {
+      background-color: #5a544e;
+    }
+    
+    .mbp-secondary-button,
+    .mbp-danger-button {
+      background-color: #4a443e;
+      color: #e6d7c3;
+    }
+    
+    .mbp-secondary-button:hover,
+    .mbp-danger-button:hover {
+      background-color: #5a544e;
+    }
+    
+    .mbp-danger-button {
+      color: #f8b9b9;
+    }
+    
+    .mbp-no-rides {
+      background-color: #3a3430;
+    }
+    
+    .mbp-no-rides h3 {
+      color: #e6d7c3;
+    }
+    
+    .mbp-no-rides p {
+      color: #c5b6a5;
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .mbp-dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .mbp-ride-list {
+      grid-template-columns: 1fr;
+    }
+    
+    .mbp-details-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mbp-ride-actions {
+      flex-direction: column;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .mbp-header-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .mbp-refresh-btn, 
+    .mbp-new-ride-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .mbp-tabs {
+      flex-direction: column;
+      border-bottom: none;
+    }
+    
+    .mbp-tab {
+      border-bottom: 1px solid #e6d7c3;
+      text-align: left;
+    }
+    
+    .mbp-tab.mbp-active::after {
+      height: 0;
+    }
+    
+    .mbp-tab.mbp-active {
+      background-color: #f9f5f0;
+    }
+  
+    .mbp-details-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Custom Scrollbar */
+  .mbp-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .mbp-container::-webkit-scrollbar-track {
+    background: #f0e6db;
+    border-radius: 4px;
+  }
+  
+  .mbp-container::-webkit-scrollbar-thumb {
+    background: #9c7c5d;
+    border-radius: 4px;
+  }
+  
+  /* Print styles */
+  @media print {
+    .mbp-container {
+      background: white;
+      color: black;
+      box-shadow: none;
+    }
+  
+    .mbp-header-actions,
+    .mbp-tabs {
+      display: none !important;
+    }
+  
+    .mbp-ride-card {
+      break-inside: avoid;
+      border: 1px solid #ccc;
+      transform: none !important;
+      box-shadow: none !important;
+      page-break-inside: avoid;
+    }
+    
+    .mbp-action-button {
+      display: none;
+    }
+  }
