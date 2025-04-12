@@ -46,6 +46,9 @@ import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
 import CreatePool from "./Pages/Rides/RidePooling/CreatePool/CreatePool";
 import FindPool from "./Pages/Rides/RidePooling/FindPool/FindPool"; 
 import MyTrips from "./Pages/Dashboard/Rider/Trips/MyTrip";
+import EditRide from './Pages/Dashboard/Rider/Trips/Pooling/EditPooling';
+
+
 import "./App.css";
 
 // Create an AuthContext for robust state management
@@ -234,6 +237,18 @@ const App = () => {
                 userRole={userRole}
               >
                 <FindPool />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pooling/edit-ride/:id"
+            element={
+              <ProtectedRoute
+                isLoggedIn={isLoggedIn}
+                allowedRoles={["rider"]}
+                userRole={userRole}
+              >
+                <EditRide />
               </ProtectedRoute>
             }
           />

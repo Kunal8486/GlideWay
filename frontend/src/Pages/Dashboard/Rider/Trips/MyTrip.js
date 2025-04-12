@@ -1,10 +1,9 @@
 import React from 'react';
-
+import PoolingTrips from './Pooling/Dashboard/PoolingTrips';
 const MyTrip = () => {
     return (
         <div>
-            <h1>Hello World</h1>
-            <p>Welcome to My Trip page!</p>
+            <PoolingTrips />
         </div>
     );
 };

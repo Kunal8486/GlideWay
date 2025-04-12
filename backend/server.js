@@ -6,7 +6,7 @@ const authRoutes = require("./Routes/userAuth.js")
 const driverRoutes = require("./Routes/userDriver.js")
 const riderRoutes = require("./Routes/userRider.js") 
 const poolrideRoutes = require('./Routes/poolride')
-
+const poolride2Routes = require('./Routes/poolride2.js')
 
 require('./Models/Rider.js');
 require('./Models/Ride.js'); 
@@ -32,6 +32,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/driver", driverRoutes)
 app.use("/api", riderRoutes) 
 app.use('/api/rides/pool', poolrideRoutes);
+app.use('/api/rides/pool', poolride2Routes);
 
 
 // MongoDB Connection

@@ -31,9 +31,6 @@ const RideSchema = new Schema({
       type: String,
       required: false
     },
-    avatar: {
-      type: String
-    }
   },
   origin: {
     type: String,
@@ -90,6 +87,9 @@ const RideSchema = new Schema({
     type: String,
     enum: ['active', 'completed', 'cancelled'],
     default: 'active'
+  },
+  cancelReason: {
+    type: String
   },
   
   // Pooling enhancement fields
@@ -163,6 +163,7 @@ const RideSchema = new Schema({
         enum: ['pending', 'accepted', 'rejected', 'cancelled'],
         default: 'pending'
       },
+      
       requestedAt: {
         type: Date,
         default: Date.now
