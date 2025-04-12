@@ -587,7 +587,7 @@ router.put('/:id/cancel-booking', authenticateToken, async (req, res) => {
  * @desc    Search for rides with filters
  * @access  Private
  */
-router.get('/search',  async (req, res) => {
+router.get('/search', authenticateToken, async (req, res) => {
   try {
     const {
       near,

@@ -274,8 +274,10 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
             // Get user's location data from search params
             const userLocations = getUserLocations();
             
-            // Calculate the total fare based on seat count
+            // Find the selected ride
             const ride = rides.find(r => r.id === rideId);
+            
+            // Calculate the total fare based on seat count
             const totalFare = ride ? ride.farePerSeat * getSeatsCount() : 0;
 
             // Call API to book the ride with passenger details
@@ -369,11 +371,11 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 <div className="pr-ride-info-main">
                                     <h4>
                                         <Car size={16} className="pr-icon" />
-                                        {ride.vehicleType || 'Vehicle not specified'} • {ride.seatsAvailable} seats available
+                                        {ride.vehicle || 'Vehicle not specified'} • {ride.availableSeats} seats available
                                     </h4>
                                     <div className="pr-ride-fare">
                                         <IndianRupee size={16} className="pr-icon" />
-                                        <span>{ride.fare / ride.seats} per seat</span>
+                                        <span>₹{ride.farePerSeat} per seat</span>
                                     </div>
                                 </div>
                             </div>
@@ -396,11 +398,11 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 <div className="pr-ride-schedule">
                                     <div className="pr-ride-date">
                                         <Calendar size={16} className="pr-icon" />
-                                        <span>{formatDate(ride.dateTime || ride.date)}</span>
+                                        <span>{formatDate(ride.departureTime)}</span>
                                     </div>
                                     <div className="pr-ride-time">
                                         <Clock size={16} className="pr-icon" />
-                                        <span>{formatTime(ride.dateTime || ride.time)}</span>
+                                        <span>{formatTime(ride.departureTime)}</span>
                                     </div>
                                 </div>
                                 
@@ -500,7 +502,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                             <div className="pr-ride-summary">
                                 <p>
                                     <Calendar size={16} className="pr-icon" />
-                                    {formatDate(selectedRide.dateTime || selectedRide.date)} at {formatTime(selectedRide.dateTime || selectedRide.time)}
+                                    {formatDate(selectedRide.departureTime)} at {formatTime(selectedRide.departureTime)}
                                 </p>
                                 <p>
                                     <Users size={16} className="pr-icon" />
@@ -508,7 +510,7 @@ function RideResults({ rides, loading, onError, onSuccess, searchParams = {} }) 
                                 </p>
                                 <p>
                                     <IndianRupee size={16} className="pr-icon" />
-                                    {(selectedRide.fare / selectedRide.seats || 0) * getSeatsCount()} for {getSeatsCount()} seat(s)
+                                    ₹{selectedRide.farePerSeat * getSeatsCount()} for {getSeatsCount()} seat(s)
                                 </p>
                             </div>
                             

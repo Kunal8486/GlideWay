@@ -1,6 +1,5 @@
-// SearchRides.js
 import React, { useState, useEffect, useRef } from 'react';
-import { MapIcon, Calendar, Search, Filter, MapPin, RotateCw, X } from 'lucide-react';
+import { MapIcon, Calendar, Search, Filter, MapPin, RotateCw, X, Car } from 'lucide-react';
 import './SearchPool.css'; // Import your CSS file for styling
 import axios from 'axios';
 
@@ -19,16 +18,32 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
         includeRecurring: true,
         flexibleTiming: false,
         timeFlexibility: 60, // minutes
-        
+        // New parameters matching backend
+        nearbyDays: 0,
+        includeFlexiblePickup: true,
+        includeDetours: false,
+        maxDetourDistance: 2,
+        flexiblePickupRadius: 1,
+        vehicleType: '',
     });
 
     // UI state
     const [loading, setLoading] = useState(false);
     const [filtersVisible, setFiltersVisible] = useState(false);
+    const [advancedFiltersVisible, setAdvancedFiltersVisible] = useState(false);
     const [mapVisible, setMapVisible] = useState(false);
     const [activeLocationField, setActiveLocationField] = useState(null);
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [initialLocationFetched, setInitialLocationFetched] = useState(false);
+
+    // Available vehicle types
+    const vehicleTypes = [
+        { value: '', label: 'Any Vehicle' },
+        { value: 'sedan', label: 'Sedan' },
+        { value: 'suv', label: 'SUV' },
+        { value: 'hatchback', label: 'Hatchback' },
+        { value: 'minivan', label: 'Minivan' },
+    ];
 
     // Refs for Google Maps
     const mapRef = useRef(null);
@@ -390,9 +405,14 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
         setMapVisible(false);
     };
 
-    // Toggle advanced filters visibility
+    // Toggle filters visibility
     const toggleFilters = () => {
         setFiltersVisible(!filtersVisible);
+    };
+
+    // Toggle advanced filters visibility
+    const toggleAdvancedFilters = () => {
+        setAdvancedFiltersVisible(!advancedFiltersVisible);
     };
 
     // Handle search form submission
@@ -422,7 +442,12 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
                 seats: parseInt(searchParams.seats) || 1,
                 maxFare: searchParams.maxFare ? parseFloat(searchParams.maxFare) : null,
                 maxDistance: parseFloat(searchParams.maxDistance) || 5,
-                timeFlexibility: parseInt(searchParams.timeFlexibility) || 60
+                timeFlexibility: parseInt(searchParams.timeFlexibility) || 60,
+                nearbyDays: parseInt(searchParams.nearbyDays) || 0,
+                maxDetourDistance: parseFloat(searchParams.maxDetourDistance) || 2,
+                flexiblePickupRadius: parseFloat(searchParams.flexiblePickupRadius) || 1,
+                includeFlexiblePickup: searchParams.includeFlexiblePickup.toString(),
+                includeDetours: searchParams.includeDetours.toString(),
             };
 
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -590,12 +615,51 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
                                     id="search-max-distance"
                                     name="maxDistance"
                                     min="1"
-                                    max="10"
+                                    max="20"
                                     step="1"
                                     value={searchParams.maxDistance}
                                     onChange={handleInputChange}
                                 />
                                 <span className="sp-range-value">{searchParams.maxDistance} km</span>
+                            </div>
+                        </div>
+
+                        <div className="sp-form-row">
+                            <div className="sp-form-group">
+                                <label htmlFor="search-nearby-days">Search Nearby Days</label>
+                                <input
+                                    type="range"
+                                    id="search-nearby-days"
+                                    name="nearbyDays"
+                                    min="0"
+                                    max="3"
+                                    step="1"
+                                    value={searchParams.nearbyDays}
+                                    onChange={handleInputChange}
+                                />
+                                <span className="sp-range-value">
+                                    {searchParams.nearbyDays === 0 
+                                        ? 'Exact date only' 
+                                        : `±${searchParams.nearbyDays} day${searchParams.nearbyDays > 1 ? 's' : ''}`}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="sp-form-row">
+                            <div className="sp-form-group">
+                                <label htmlFor="search-vehicle-type">Vehicle Type</label>
+                                <select
+                                    id="search-vehicle-type"
+                                    name="vehicleType"
+                                    value={searchParams.vehicleType}
+                                    onChange={handleInputChange}
+                                >
+                                    {vehicleTypes.map(type => (
+                                        <option key={type.value} value={type.value}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 
@@ -639,6 +703,80 @@ function SearchRides({ onSearchComplete, onError, onSuccess }) {
                                     />
                                     <span className="sp-range-value">{searchParams.timeFlexibility} minutes</span>
                                 </div>
+                            </div>
+                        )}
+
+                        <button
+                            type="button"
+                            className="sp-advanced-filters-toggle"
+                            onClick={toggleAdvancedFilters}
+                        >
+                            {advancedFiltersVisible ? 'Hide Advanced Options' : 'Show Advanced Options'}
+                        </button>
+
+                        {advancedFiltersVisible && (
+                            <div className="sp-very-advanced-filters">
+                                <div className="sp-form-row sp-checkbox-row">
+                                    <div className="sp-form-group sp-checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="search-include-flexible-pickup"
+                                            name="includeFlexiblePickup"
+                                            checked={searchParams.includeFlexiblePickup}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="search-include-flexible-pickup">Include flexible pickup rides</label>
+                                    </div>
+
+                                    <div className="sp-form-group sp-checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="search-include-detours"
+                                            name="includeDetours"
+                                            checked={searchParams.includeDetours}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor="search-include-detours">Include rides allowing detours</label>
+                                    </div>
+                                </div>
+
+                                {searchParams.includeFlexiblePickup && (
+                                    <div className="sp-form-row">
+                                        <div className="sp-form-group">
+                                            <label htmlFor="search-flexible-pickup-radius">Flexible Pickup Radius (km)</label>
+                                            <input
+                                                type="range"
+                                                id="search-flexible-pickup-radius"
+                                                name="flexiblePickupRadius"
+                                                min="0.5"
+                                                max="5"
+                                                step="0.5"
+                                                value={searchParams.flexiblePickupRadius}
+                                                onChange={handleInputChange}
+                                            />
+                                            <span className="sp-range-value">{searchParams.flexiblePickupRadius} km</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {searchParams.includeDetours && (
+                                    <div className="sp-form-row">
+                                        <div className="sp-form-group">
+                                            <label htmlFor="search-max-detour-distance">Maximum Detour Distance (km)</label>
+                                            <input
+                                                type="range"
+                                                id="search-max-detour-distance"
+                                                name="maxDetourDistance"
+                                                min="1"
+                                                max="10"
+                                                step="1"
+                                                value={searchParams.maxDetourDistance}
+                                                onChange={handleInputChange}
+                                            />
+                                            <span className="sp-range-value">{searchParams.maxDetourDistance} km</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
