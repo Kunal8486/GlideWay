@@ -1,16 +1,8 @@
-import React, { 
-  useState, 
-  useEffect, 
-  useMemo, 
-  useCallback, 
-  useRef 
+import React, {
+  useState, useEffect, useMemo, useRef
 } from 'react';
-import { 
-  Car, Calendar, Users, Home, MapPin, 
-  CreditCard, Bell, Settings, UserCircle, 
-  Menu, X, Navigation, Leaf, Gauge, TrendingUp,
-  ChevronRight, PieChart, Star, Shield, 
-  RefreshCw, Share2, Battery, Zap
+import {
+  Car, Calendar, Users, MapPin, UserCircle, Menu, X, Navigation, Leaf, TrendingUp, PieChart, Star, Shield, Share2,Share, Battery, Zap
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,17 +29,17 @@ const rideService = {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve([
-          { 
-            id: 1, 
-            destination: 'Downtown Office', 
-            time: '08:30 AM', 
+          {
+            id: 1,
+            destination: 'Downtown Office',
+            time: '08:30 AM',
             date: 'Tomorrow',
             status: 'Confirmed'
           },
-          { 
-            id: 2, 
-            destination: 'Weekend Meetup', 
-            time: '02:00 PM', 
+          {
+            id: 2,
+            destination: 'Weekend Meetup',
+            time: '02:00 PM',
             date: 'Saturday',
             status: 'Pending'
           }
@@ -65,7 +57,7 @@ const RiderDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Enhanced state management
   const [rideStats, setRideStats] = useState({
     totalRides: 0,
@@ -124,79 +116,79 @@ const RiderDashboard = () => {
 
   // Enhanced navigation and action items
   const navItems = useMemo(() => [
-    { 
-      icon: <Car size={24} />, 
-      label: 'Book A Ride', 
+    {
+      icon: <Car size={24} />,
+      label: 'Book A Ride',
       path: '/book-a-ride',
       requiresAuth: true
     },
-    { 
-      icon: <Share2 size={24} />, 
-      label: 'Ride Share', 
+    {
+      icon: <Share2 size={24} />,
+      label: 'Ride Share',
       path: '/ride-share',
       requiresAuth: true
     },
-    { 
-      icon: <Users size={24} />, 
-      label: 'Community', 
+    {
+      icon: <Users size={24} />,
+      label: 'Community',
       path: '/community',
       requiresAuth: true
     },
-    { 
-      icon: <Shield size={24} />, 
-      label: 'Safety', 
+    {
+      icon: <Shield size={24} />,
+      label: 'Safety',
       path: '/safety',
       requiresAuth: true
     }
   ], []);
 
   const quickActions = useMemo(() => [
-    { 
-      icon: <PieChart size={20} />, 
+    {
+      icon: <PieChart size={20} />,
       label: 'Analytics',
       onClick: () => navigate('/ride-analytics'),
       badge: rideStats.rewardPoints
     },
-    { 
-      icon: <Star size={20} />, 
+    {
+      icon: <Star size={20} />,
       label: 'Rewards',
       onClick: () => navigate('/rewards'),
       badge: 'New'
     },
-    { 
-      icon: <Battery size={20} />, 
+    {
+      icon: <Battery size={20} />,
       label: 'Eco Impact',
       onClick: () => navigate('/eco-impact')
     },
-    { 
-      icon: <Zap size={20} />, 
+    {
+      icon: <Zap size={20} />,
       label: 'Quick Help',
       onClick: () => navigate('/support')
     }
   ], [navigate, rideStats.rewardPoints]);
 
   const quickRideOptions = useMemo(() => [
-    { 
-      icon: <Car size={32} />, 
-      label: 'Commute', 
+    {
+      icon: <Car size={32} />,
+      label: 'Commute',
       description: 'Optimized daily routes',
       onClick: () => navigate('/book-a-ride?type=commute')
     },
-    { 
-      icon: <Users size={32} />, 
-      label: 'Carpool', 
+    {
+      icon: <Users size={32} />,
+      label: 'Carpool',
       description: 'Sustainable sharing',
       onClick: () => navigate('/pooling/dashboard')
     },
-    { 
-      icon: <MapPin size={32} />, 
-      label: 'Nearby', 
-      description: 'Local ride options',
-      onClick: () => navigate('/nearby-rides')
+    {
+      icon: <Share size={32} />,
+      label: 'Shared Ride',
+      description: 'Ride with friends',
+      onClick: () => navigate('/ride-sharing')
     },
-    { 
-      icon: <Calendar size={32} />, 
-      label: 'Schedule', 
+    {
+      icon: <Calendar size={32} />,
+      label: 'Schedule',
       description: 'Plan future trips',
       onClick: () => navigate('/schedule-ride')
     }
@@ -205,22 +197,22 @@ const RiderDashboard = () => {
   // Render loading state
   if (isLoading) {
     return (
-      <motion.div 
+      <motion.div
         className="rid-da-loading-container"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <motion.div 
+        <motion.div
           className="rid-da-loader"
-          animate={{ 
+          animate={{
             rotate: 360,
             scale: [1, 1.2, 1]
           }}
-          transition={{ 
-            duration: 1, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
+          transition={{
+            duration: 1,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         >
           <Car size={64} strokeWidth={1.5} />
@@ -230,7 +222,7 @@ const RiderDashboard = () => {
   }
 
   return (
-    <motion.div 
+    <motion.div
       className="rid-da-rider-dashboard"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -246,13 +238,13 @@ const RiderDashboard = () => {
               <p>Your sustainable journey continues today</p>
             </div>
           </div>
-          
+
           {/* Responsive Header Actions */}
           <div className="rid-da-header-actions">
             {windowWidth > 768 ? (
               quickActions.map((action, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   className="rid-da-header-action-item"
                   onClick={action.onClick}
                   whileHover={{ scale: 1.1 }}
@@ -267,8 +259,8 @@ const RiderDashboard = () => {
                 </motion.div>
               ))
             ) : (
-              <motion.div 
-                className="rid-da-mobile-menu-toggle" 
+              <motion.div
+                className="rid-da-mobile-menu-toggle"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 whileTap={{ scale: 0.9 }}
               >
@@ -283,9 +275,9 @@ const RiderDashboard = () => {
       <nav className={`rid-da-rider-navbar ${windowWidth > 768 ? 'rid-da-desktop-navbar' : 'rid-da-mobile-navbar'}`}>
         <div className="rid-da-rd-navbar-container">
           {navItems.map((item) => (
-            <Link 
+            <Link
               key={item.path}
-              to={item.path} 
+              to={item.path}
               className={`rid-da-rd-nav-item ${activeTab === item.path ? 'rid-da-active' : ''}`}
               onClick={() => setActiveTab(item.path)}
             >
@@ -295,17 +287,17 @@ const RiderDashboard = () => {
           ))}
         </div>
       </nav>
-      
+
       {/* Dashboard Content */}
       <div className="rid-da-dashboard-content">
 
-  {/* Quick Ride Section */}
+        {/* Quick Ride Section */}
         <section className="rid-da-quick-ride-section">
           <h3>Quick Ride Options</h3>
           <div className="rid-da-quick-ride-grid">
             {quickRideOptions.map((option, index) => (
-              <motion.div 
-                key={index} 
+              <motion.div
+                key={index}
                 className="rid-da-quick-ride-item"
                 onClick={option.onClick}
                 whileHover={{ scale: 1.05 }}
@@ -320,14 +312,14 @@ const RiderDashboard = () => {
             ))}
           </div>
         </section>
-        
-  {/* Upcoming Rides Section */}
+
+        {/* Upcoming Rides Section */}
         <section className="rid-da-upcoming-rides-section">
           <h3>Upcoming Rides</h3>
           <div className="rid-da-upcoming-rides-list">
             {upcomingRides.map((ride) => (
-              <motion.div 
-                key={ride.id} 
+              <motion.div
+                key={ride.id}
                 className="rid-da-upcoming-ride-item"
                 whileHover={{ x: 10 }}
               >
@@ -347,7 +339,7 @@ const RiderDashboard = () => {
 
         {/* Ride Stats Section */}
         <section className="rid-da-ride-stats-section">
-          <motion.div 
+          <motion.div
             ref={statsContainerRef}
             className="rid-da-stats-card"
             whileHover={{ scale: 1.02 }}
@@ -359,36 +351,36 @@ const RiderDashboard = () => {
             </div>
             <div className="rid-da-stats-grid">
               {[
-                { 
-                  icon: <Car size={24} />, 
-                  label: 'Total Rides', 
-                  value: rideStats.totalRides 
+                {
+                  icon: <Car size={24} />,
+                  label: 'Total Rides',
+                  value: rideStats.totalRides
                 },
-                { 
-                  icon: <Navigation size={24} />, 
-                  label: 'Miles Traveled', 
-                  value: rideStats.milesTraveled 
+                {
+                  icon: <Navigation size={24} />,
+                  label: 'Miles Traveled',
+                  value: rideStats.milesTraveled
                 },
-                { 
-                  icon: <Leaf size={24} />, 
-                  label: 'CO2 Saved', 
-                  value: `${rideStats.co2Saved} kg` 
+                {
+                  icon: <Leaf size={24} />,
+                  label: 'CO2 Saved',
+                  value: `${rideStats.co2Saved} kg`
                 },
-                { 
-                  icon: <TrendingUp size={24} />, 
-                  label: 'Efficiency', 
-                  value: `${rideStats.efficiency}%` 
+                {
+                  icon: <TrendingUp size={24} />,
+                  label: 'Efficiency',
+                  value: `${rideStats.efficiency}%`
                 },
                 {
                   //Here I want to use that component  
-                  icon:<Star size={24} />,
+                  icon: <Star size={24} />,
                   label: 'Reward Points',
-                  value: rideStats.rewardPoints                 
+                  value: rideStats.rewardPoints
 
                 }
               ].map((stat, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   className="rid-da-stat-item"
                   whileHover={{ y: -5 }}
                 >
@@ -400,7 +392,7 @@ const RiderDashboard = () => {
                 </motion.div>
               ))}
             </div>
-            
+
           </motion.div>
         </section>
 

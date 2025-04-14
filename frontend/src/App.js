@@ -11,7 +11,7 @@ import Services from "./Pages/Services/Services";
 import Contact from "./Pages/Contact/Contact";
 import About from "./Pages/About/About";
 import FAQ from "./Pages/FAQ/FAQ";
-import BookARide from "./Pages/BookARide/book_a_ride";
+import BookARide from "./Pages/Rides/BookARide/book_a_ride";
 
 import CookiesPolicy from "./Pages/Legal/CookiesPolicy/CookiesPolicy";
 import PrivacyPolicy from "./Pages/Legal/PrivacyPolicy/PrivacyPolicy";
