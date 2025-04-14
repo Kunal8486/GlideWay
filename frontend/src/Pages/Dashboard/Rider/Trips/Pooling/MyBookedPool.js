@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './MyBookedPool.css'; // Assuming you have this CSS file
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faSync, 
+  faPlus, 
+} from '@fortawesome/free-solid-svg-icons';
+
 
 const MyPassengerRides = () => {
   const [rides, setRides] = useState([]);
@@ -360,13 +366,13 @@ const MyPassengerRides = () => {
             onClick={handleRefresh}
             disabled={loading}
           >
-            ↻ Refresh
+            <FontAwesomeIcon icon={faSync} spin={loading} />  Refresh
           </button>
           <button 
             className="mbp-new-ride-btn"
-            onClick={() => window.location.href = '/search-ride'}
+            onClick={() => window.location.href = '/pooling/find'}
           >
-            + Book New Ride
+            <FontAwesomeIcon icon={faPlus} spin={loading} /> Book New Ride
           </button>
         </div>
       </div>

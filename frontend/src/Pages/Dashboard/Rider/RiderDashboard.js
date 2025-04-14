@@ -2,7 +2,7 @@ import React, {
   useState, useEffect, useMemo, useRef
 } from 'react';
 import {
-  Car, Calendar, Users, MapPin, UserCircle, Menu, X, Navigation, Leaf, TrendingUp, PieChart, Star, Shield, Share2,Share, Battery, Zap
+  Car, Calendar, Users, MapPin, UserCircle, Menu, X, Navigation,Bell ,Leaf, TrendingUp, PieChart, Star, Shield, Share2,Share, Battery, Zap
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,7 +19,7 @@ const rideService = {
           co2Saved: 42,
           efficiency: 82,
           carbonOffset: 56,
-          rewardPoints: 320,
+          rewardPoints: 11,
           averageRideTime: 22
         });
       }, 500);
@@ -123,9 +123,9 @@ const RiderDashboard = () => {
       requiresAuth: true
     },
     {
-      icon: <Share2 size={24} />,
-      label: 'Ride Share',
-      path: '/ride-share',
+      icon: <MapPin size={24} />,
+      label: 'My Trips',
+      path: '/my-trips',
       requiresAuth: true
     },
     {
@@ -146,25 +146,14 @@ const RiderDashboard = () => {
     {
       icon: <PieChart size={20} />,
       label: 'Analytics',
-      onClick: () => navigate('/ride-analytics'),
-      badge: rideStats.rewardPoints
+      onClick: () => navigate('#ride-analytics'),
     },
     {
-      icon: <Star size={20} />,
-      label: 'Rewards',
-      onClick: () => navigate('/rewards'),
-      badge: 'New'
+      icon: <Bell size={20} />,
+      label: 'Notification',
+      onClick: () => navigate('#notifications'),
+      badge: '2'
     },
-    {
-      icon: <Battery size={20} />,
-      label: 'Eco Impact',
-      onClick: () => navigate('/eco-impact')
-    },
-    {
-      icon: <Zap size={20} />,
-      label: 'Quick Help',
-      onClick: () => navigate('/support')
-    }
   ], [navigate, rideStats.rewardPoints]);
 
   const quickRideOptions = useMemo(() => [
@@ -312,29 +301,6 @@ const RiderDashboard = () => {
             ))}
           </div>
         </section>
-
-        {/* Upcoming Rides Section */}
-        <section className="rid-da-upcoming-rides-section">
-          <h3>Upcoming Rides</h3>
-          <div className="rid-da-upcoming-rides-list">
-            {upcomingRides.map((ride) => (
-              <motion.div
-                key={ride.id}
-                className="rid-da-upcoming-ride-item"
-                whileHover={{ x: 10 }}
-              >
-                <div className="rid-da-ride-details">
-                  <h4>{ride.destination}</h4>
-                  <p>{ride.date} at {ride.time}</p>
-                </div>
-                <div className={`rid-da-ride-status rid-da-${ride.status.toLowerCase()}`}>
-                  {ride.status}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
 
 
         {/* Ride Stats Section */}

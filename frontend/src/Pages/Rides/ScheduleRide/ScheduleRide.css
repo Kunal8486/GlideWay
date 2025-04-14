@@ -1,0 +1,299 @@
+/* ScheduleRide.css */
+.sr-ride-scheduling-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(165, 134, 105, 0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .sr-top {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8d9c5;
+  }
+  
+  .sr-top h1 {
+    color: #8c6e4a;
+    font-size: 2.5rem;
+    margin-bottom: 0;
+    font-weight: 700;
+  }
+  
+  .sr-top p {
+    color: #a58669;
+    font-size: 1.2rem;
+    margin-top: 5px;
+  }
+  
+  .sr-map-container {
+    margin-bottom: 25px;
+    border: 2px solid #e8d9c5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .sr-google-map {
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(165, 134, 105, 0.15);
+  }
+  
+  .sr-map-instructions {
+    background-color: #f9f3ec;
+    padding: 12px;
+    text-align: center;
+    color: #8c6e4a;
+    font-size: 0.9rem;
+  }
+  
+  .sr-reset-map-button {
+    background-color: #a58669;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-top: 8px;
+    transition: background-color 0.2s;
+  }
+  
+  .sr-reset-map-button:hover {
+    background-color: #8c6e4a;
+  }
+  
+  .sr-saved-locations {
+    background-color: #f9f3ec;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+  }
+  
+  .sr-saved-locations h3 {
+    color: #8c6e4a;
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+  }
+  
+  .sr-saved-locations-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 5px;
+  }
+  
+  .sr-saved-location-item {
+    background-color: white;
+    border: 1px solid #e8d9c5;
+    border-radius: 6px;
+    padding: 10px 15px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  
+  .sr-saved-location-item:hover {
+    background-color: #f0e6da;
+    border-color: #d3bfaa;
+  }
+  
+  .sr-saved-location-item strong {
+    color: #8c6e4a;
+    margin: 0 5px;
+    font-size: 0.9rem;
+  }
+  
+  .sr-ride-form {
+    background-color: #fff;
+  }
+  
+  .sr-form-group {
+    margin-bottom: 20px;
+  }
+  
+  .sr-form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .sr-half {
+    flex: 1;
+  }
+  
+  .sr-third {
+    flex: 1;
+  }
+  
+  .sr-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #8c6e4a;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  .sr-form-group input,
+  .sr-form-group select,
+  .sr-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e8d9c5;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #5e4c38;
+    transition: all 0.2s;
+  }
+  
+  .sr-form-group input:focus,
+  .sr-form-group select:focus,
+  .sr-form-group textarea:focus {
+    outline: none;
+    border-color: #a58669;
+    box-shadow: 0 0 0 3px rgba(165, 134, 105, 0.2);
+  }
+  
+  .sr-form-group input.sr-error,
+  .sr-form-group select.sr-error,
+  .sr-form-group textarea.sr-error {
+    border-color: #c77c56;
+  }
+  
+  .sr-error-message {
+    color: #c77c56;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+  
+  .sr-estimated-price {
+    background-color: #f9f3ec;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .sr-estimated-price h3 {
+    color: #8c6e4a;
+    margin: 0 0 5px 0;
+    font-size: 1.3rem;
+  }
+  
+  .sr-price-note {
+    font-size: 0.85rem;
+    color: #a58669;
+    margin: 0;
+  }
+  
+  .sr-save-preference {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .sr-save-preference input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    accent-color: #8c6e4a;
+  }
+  
+  .sr-save-preference label {
+    color: #8c6e4a;
+    font-size: 0.95rem;
+  }
+  
+  .sr-schedule-button {
+    background-color: #8c6e4a;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: 600;
+  }
+  
+  .sr-schedule-button:hover {
+    background-color: #735a3d;
+  }
+  
+  .sr-schedule-button.sr-loading {
+    background-color: #a58669;
+    cursor: wait;
+  }
+  
+  .sr-success-message {
+    background-color: #f9f3ec;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .sr-checkmark {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #8c6e4a;
+    color: white;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  
+  .sr-success-message h2 {
+    color: #8c6e4a;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+  }
+  
+  .sr-success-message p {
+    color: #a58669;
+    margin-bottom: 20px;
+  }
+  
+  .sr-ride-details {
+    text-align: left;
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e8d9c5;
+  }
+  
+  .sr-ride-details p {
+    margin: 10px 0;
+    color: #5e4c38;
+  }
+  
+  .sr-ride-details strong {
+    color: #8c6e4a;
+  }
+  
+  /* Ride Type and Vehicle Type Styling */
+  .sr-form-group select option {
+    padding: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .sr-form-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .sr-top h1 {
+      font-size: 2rem;
+    }
+    
+    .sr-ride-scheduling-container {
+      padding: 15px;
+    }
+  }

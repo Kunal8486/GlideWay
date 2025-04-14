@@ -1,0 +1,1196 @@
+/* Safety.css - Enhanced version with light brown and white color scheme */
+
+/* Global Styles */
+.sf-safety-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #8b6c4f;
+    background-color: #ffffff;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.sf-safety-container h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #6c4b24;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.sf-safety-container p {
+    margin-bottom: 16px;
+}
+
+.sf-safety-container button {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sf-safety-container a {
+    color: #6c4b24;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.sf-safety-container a:hover {
+    color: #8b6c4f;
+    text-decoration: underline;
+}
+
+/* Hero Section */
+.sf-safety-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 0;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+
+.sf-hero-content {
+    flex: 1;
+    padding: 0 40px;
+}
+
+.sf-hero-content h1 {
+    font-size: 42px;
+    margin-bottom: 16px;
+    color: #6c4b24;
+}
+
+.sf-hero-content p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #8b6c4f;
+}
+
+
+.sf-hero-image-final {
+    flex: 1;
+    border-radius: 12px;
+    margin-right: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #f2e8de;
+    height: 300px;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(108, 75, 36, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.sf-hero-image-final:hover {
+    transform: scale(1.02);
+}
+
+.sf-emergency-btn {
+    background-color: #6c4b24;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sf-emergency-btn:hover {
+    background-color: #8b6c4f;
+}
+
+/* Emergency Modal */
+.sf-emergency-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.sf-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 10px 25px rgba(107, 75, 36, 0.2);
+}
+
+.sf-modal-content h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6c4b24;
+    margin-bottom: 20px;
+}
+
+.sf-emergency-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.sf-emergency-option {
+    padding: 15px;
+    border: 1px solid #e6d7c6;
+    background-color: #f9f4ef;
+    color: #6c4b24;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sf-emergency-option:hover {
+    background-color: #e6d7c6;
+}
+
+.sf-close-modal {
+    width: 100%;
+    padding: 12px;
+    background-color: #6c4b24;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-top: 15px;
+}
+
+.sf-close-modal:hover {
+    background-color: #8b6c4f;
+}
+
+/* Safety Overview Section */
+.sf-safety-overview {
+    text-align: center;
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-overview h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.sf-overview-stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.sf-stat-item {
+    background-color: #f9f4ef;
+    padding: 30px;
+    border-radius: 12px;
+    width: 250px;
+    transition: transform 0.3s ease;
+}
+
+.sf-stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.sf-stat-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: #6c4b24;
+    margin-bottom: 10px;
+}
+
+.sf-stat-label {
+    font-size: 16px;
+    color: #8b6c4f;
+}
+
+/* Safety Features Section */
+.sf-safety-features {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-section-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    font-size: 18px;
+}
+
+.sf-safety-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 25px;
+}
+
+.sf-safety-card {
+    background-color: #f9f4ef;
+    padding: 30px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sf-safety-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(107, 75, 36, 0.1);
+}
+
+.sf-safety-icon {
+    background-color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #6c4b24;
+}
+
+.sf-safety-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #6c4b24;
+}
+
+/* Safety Process Section */
+.sf-safety-process {
+    padding: 40px 0;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    margin-bottom: 40px;
+}
+
+.sf-safety-process h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-process-steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.sf-process-step {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 240px;
+    position: relative;
+}
+
+.sf-step-number {
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #6c4b24;
+    color: white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.sf-process-step h3 {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.sf-process-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sf-process-list li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Safety Tabs Section */
+.sf-safety-tabs {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-tabs h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-tabs-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.sf-tab-btn {
+    padding: 12px 20px;
+    background-color: #f9f4ef;
+    border: 1px solid #e6d7c6;
+    color: #8b6c4f;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sf-tab-btn.sf-active {
+    background-color: #6c4b24;
+    color: white;
+    border-color: #6c4b24;
+}
+
+.sf-tab-content {
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.sf-tab-panel h3 {
+    margin-bottom: 15px;
+}
+
+.sf-safety-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.sf-safety-list li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Safety Tips Section */
+.sf-safety-tips {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-tips h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-tips-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.sf-tip {
+    background-color: #f9f4ef;
+    padding: 30px;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.sf-tip:hover {
+    transform: translateY(-5px);
+}
+
+.sf-tip-icon {
+    background-color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #6c4b24;
+    margin-bottom: 20px;
+}
+
+.sf-tip h3 {
+    margin-bottom: 15px;
+}
+
+/* Safety Comparison Section */
+.sf-safety-comparison {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-comparison h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-comparison-table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(107, 75, 36, 0.1);
+}
+
+.sf-table-header {
+    display: grid;
+    grid-template-columns: 3fr 1fr 2fr;
+    background-color: #6c4b24;
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+}
+
+.sf-table-row {
+    display: grid;
+    grid-template-columns: 3fr 1fr 2fr;
+    border-bottom: 1px solid #e6d7c6;
+    background-color: white;
+}
+
+.sf-table-row:nth-child(even) {
+    background-color: #f9f4ef;
+}
+
+.sf-feature-column,
+.sf-glideway-column,
+.sf-others-column {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sf-glideway-column {
+    justify-content: center;
+    color: #6c4b24;
+    font-weight: 600;
+}
+
+.sf-others-column {
+    color: #8b6c4f;
+}
+
+/* Testimonials Section */
+.sf-testimonials {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-testimonials h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-testimonial-slider {
+    display: flex;
+    overflow-x: hidden;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.sf-testimonial {
+    background-color: #f9f4ef;
+    padding: 30px;
+    border-radius: 12px;
+    flex: 0 0 100%;
+}
+
+.sf-testimonial-quote {
+    font-size: 16px;
+    font-style: italic;
+    margin-bottom: 20px;
+    color: #8b6c4f;
+}
+
+.sf-testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sf-author-avatar {
+    width: 50px;
+    height: 50px;
+    background-color: #e6d7c6;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c4b24;
+}
+
+.sf-author-name {
+    font-weight: 600;
+    margin: 0;
+    color: #6c4b24;
+}
+
+.sf-author-title {
+    margin: 0;
+    font-size: 14px;
+    color: #8b6c4f;
+}
+
+.sf-testimonial-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.sf-testimonial-nav {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid #e6d7c6;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c4b24;
+}
+
+.sf-testimonial-nav:hover {
+    background-color: #f9f4ef;
+}
+
+.sf-testimonial-indicators {
+    display: flex;
+    gap: 8px;
+}
+
+.sf-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #e6d7c6;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.sf-indicator.sf-active {
+    background-color: #6c4b24;
+    width: 20px;
+}
+
+/* FAQ Section */
+.sf-safety-faq {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-faq h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sf-faq-item {
+    margin-bottom: 15px;
+    border: 1px solid #e6d7c6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sf-faq-item summary {
+    padding: 15px 20px;
+    background-color: #f9f4ef;
+    color: #6c4b24;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sf-faq-content {
+    padding: 20px;
+    background-color: white;
+}
+
+.sf-faq-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.sf-faq-content li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Emergency Support Section */
+.sf-emergency-support {
+    padding: 40px;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.sf-emergency-support h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sf-emergency-resources {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.sf-resource {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 300px;
+}
+
+.sf-resource h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sf-contact-support-btn,
+.sf-safety-center-btn,
+.sf-report-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.sf-primary {
+    background-color: #6c4b24;
+    color: white;
+    border: none;
+}
+
+.sf-primary:hover {
+    background-color: #8b6c4f;
+}
+
+.sf-secondary {
+    background-color: white;
+    color: #6c4b24;
+    border: 1px solid #6c4b24;
+}
+
+.sf-secondary:hover {
+    background-color: #f9f4ef;
+}
+
+/* Safety Updates Section */
+.sf-safety-updates {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-updates h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.sf-updates-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.sf-update-item {
+    background-color: #f9f4ef;
+    padding: 25px;
+    border-radius: 12px;
+    position: relative;
+}
+
+.sf-update-date {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 14px;
+    color: #8b6c4f;
+}
+
+.sf-update-item h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Safety Partners Section */
+.sf-safety-partners {
+    padding: 40px 0;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.sf-safety-partners h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.sf-partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.sf-partner-logo {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sf-logo-placeholder {
+    background-color: #f9f4ef;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c4b24;
+    padding: 10px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Safety Certifications Section */
+.sf-safety-certifications {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-certifications h2 {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.sf-certifications-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+}
+
+.sf-certification {
+    background-color: #f9f4ef;
+    padding: 25px;
+    border-radius: 12px;
+    width: 220px;
+    text-align: center;
+}
+
+.sf-certification-icon {
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    border-radius: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 30px;
+    color: #6c4b24;
+}
+
+.sf-certification h3 {
+    margin-bottom: 10px;
+}
+
+.sf-certification p {
+    color: #8b6c4f;
+    font-size: 14px;
+}
+
+/* Safety Download Section */
+.sf-safety-download {
+    padding: 40px;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.sf-download-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.sf-download-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Commitment Section */
+.sf-safety-commitment {
+    display: flex;
+    align-items: center;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.sf-commitment-content {
+    flex: 2;
+    padding: 40px;
+}
+
+.sf-commitment-statement {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+.sf-commitment-signature {
+    font-style: italic;
+    text-align: right;
+}
+
+.sf-commitment-image {
+    flex: 1;
+    background-color: #e6d7c6;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sf-image-placeholder {
+    color: #6c4b24;
+}
+
+/* Subscribe Section */
+.sf-safety-subscribe {
+    padding: 40px;
+    background-color: #f9f4ef;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.sf-subscribe-form {
+    max-width: 500px;
+    margin: 25px auto 0;
+}
+
+.sf-form-group {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.sf-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #e6d7c6;
+    border-radius: 8px 0 0 8px;
+    font-size: 16px;
+    color: #8b6c4f;
+}
+
+.sf-subscribe-btn {
+    padding: 12px 24px;
+    background-color: #6c4b24;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    font-weight: 500;
+}
+
+.sf-subscribe-btn:hover {
+    background-color: #8b6c4f;
+}
+
+.sf-checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    
+}
+
+/* Resource Explore Section */
+.sf-safety-explore {
+    padding: 40px 0;
+    margin-bottom: 40px;
+}
+
+.sf-safety-explore h2 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sf-resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.sf-resource-card {
+    background-color: #f9f4ef;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.sf-resource-card:hover {
+    transform: translateY(-5px);
+}
+
+.sf-resource-icon {
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    border-radius: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: #6c4b24;
+}
+
+.sf-resource-card h3 {
+    margin-bottom: 15px;
+}
+
+.sf-resource-link {
+    display: inline-block;
+    margin-top: 15px;
+    font-weight: 500;
+    color: #6c4b24;
+}
+
+.sf-resource-link:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+.sf-safety-footer {
+    background-color: #f9f4ef;
+    padding: 40px;
+    border-radius: 12px 12px 0 0;
+}
+
+.sf-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.sf-footer-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.sf-footer-column h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #6c4b24;
+}
+
+.sf-footer-column ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sf-footer-column li {
+    margin-bottom: 10px;
+}
+
+.sf-footer-column a {
+    color: #8b6c4f;
+    transition: color 0.3s ease;
+}
+
+.sf-footer-column a:hover {
+    color: #6c4b24;
+    text-decoration: underline;
+}
+
+.sf-footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #e6d7c6;
+    color: #8b6c4f;
+}
+
+.sf-footer-legal {
+    display: flex;
+    gap: 20px;
+}
+
+.sf-footer-legal a {
+    color: #8b6c4f;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .sf-safety-hero {
+        flex-direction: column;
+    }
+
+    .sf-hero-content {
+        padding: 30px;
+    }
+
+    .sf-hero-image {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .sf-table-header,
+    .sf-table-row {
+        grid-template-columns: 2fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sf-safety-hero {
+        padding: 30px 0;
+    }
+
+    .sf-hero-content h1 {
+        font-size: 32px;
+    }
+
+    .sf-process-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sf-process-step {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .sf-safety-commitment {
+        flex-direction: column;
+    }
+
+    .sf-commitment-image {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .sf-safety-container {
+        padding: 15px;
+    }
+
+    .sf-hero-content h1 {
+        font-size: 28px;
+    }
+
+    .sf-hero-content p {
+        font-size: 16px;
+    }
+
+    .sf-safety-card,
+    .sf-update-item,
+    .sf-resource-card,
+    .sf-certification {
+        padding: 20px;
+    }
+
+    .sf-emergency-options {
+        grid-template-columns: 1fr;
+    }
+
+    .sf-table-header,
+    .sf-table-row {
+        grid-template-columns: 2fr 1fr;
+    }
+
+    .sf-others-column {
+        display: none;
+    }
+
+    .sf-form-group {
+        flex-direction: column;
+    }
+
+    .sf-input,
+    .sf-subscribe-btn {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .sf-input {
+        margin-bottom: 10px;
+    }
+}

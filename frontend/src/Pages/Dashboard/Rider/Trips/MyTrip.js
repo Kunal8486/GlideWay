@@ -1,13 +1,14 @@
 import React from 'react';
 import PoolingTrips from './Pooling/Dashboard/PoolingTrips';
 import MyBookedPool from './Pooling/MyBookedPool';
+import './MyTrip.css'; // Import your CSS file for styling
 const MyTrip = () => {
     return (
         <div>
-        <div>
+        <div className='trip-container'>
             <PoolingTrips />
         </div>
-        <div>
+        <div className='trip-container'>
                 <MyBookedPool />
             </div>
             <div>

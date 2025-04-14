@@ -11,6 +11,7 @@ import Services from "./Pages/Services/Services";
 import Contact from "./Pages/Contact/Contact";
 import About from "./Pages/About/About";
 import FAQ from "./Pages/FAQ/FAQ";
+import Safety from "./Pages/SafetyPage/SafetyPage";
 import BookARide from "./Pages/Rides/BookARide/book_a_ride";
 
 import CookiesPolicy from "./Pages/Legal/CookiesPolicy/CookiesPolicy";
@@ -116,7 +117,7 @@ const App = () => {
           <Route path="/cancellation-policy" element={<CancellationPolicy />} />
           <Route path="/payment-policy" element={<PaymentPolicy />} />
           <Route path="/driver-policy" element={<DriverPolicy />} />
-
+          <Route path="/safety" element={<Safety />} />
           {/* Authentication Routes */}
           {/* Rider Routes */}
           <Route 
