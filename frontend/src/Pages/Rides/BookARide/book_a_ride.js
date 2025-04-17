@@ -30,8 +30,8 @@ import axios from 'axios';
 import './book_a_ride.css';
 
 // API config
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
-const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY ;
 
 const RIDE_TYPES = {
   Economy: { 

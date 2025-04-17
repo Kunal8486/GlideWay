@@ -694,7 +694,7 @@ function SharedRide() {
       }
 
       // Make API call to backend to save the scheduled ride
-      const response = await axios.post('http://localhost:5000/api/rides/schedule', {
+      const response = await axios.post( `${REACT_APP_API_BASE_URL}/api/rides/schedule`, {
         ...rideParams,
         estimatedPrice: estimatedPrice
       });
