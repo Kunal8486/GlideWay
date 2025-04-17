@@ -1,0 +1,434 @@
+/* SharedRide.css - Enhanced with Light Brown and White Color Scheme */
+
+.srr-shared-ride-container {
+    margin-top: 120px !important;
+    margin-bottom: 100px !important;
+
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: white;
+    color: #6b4f35;
+  }
+  
+  .srr-page-title {
+    text-align: center;
+    color: #8a6642;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  
+  .srr-schedule-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(107, 79, 53, 0.15);
+    padding: 2rem;
+    border: 1px solid rgba(138, 102, 66, 0.1);
+  }
+  
+  .srr-schedule-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .srr-form-row {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .srr-form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .srr-form-label {
+    font-weight: 600;
+    color: #8a6642;
+    font-size: 0.9rem;
+  }
+  
+  .srr-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .srr-form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #d8c7b5;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    color: #6b4f35;
+    background-color: white;
+  }
+  
+  .srr-form-input:focus {
+    border-color: #b08968;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(176, 137, 104, 0.2);
+  }
+  
+  .srr-form-input::placeholder {
+    color: #c0a98e;
+  }
+  
+  .srr-date-input, .srr-time-input {
+    position: relative;
+  }
+  
+  .srr-input-icon {
+    position: absolute;
+    right: 10px;
+    color: #8a6642;
+    pointer-events: none;
+  }
+  
+  .srr-map-button {
+    background-color: #f5f1ec;
+    border: 1px solid #d8c7b5;
+    border-radius: 0 6px 6px 0;
+    padding: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #8a6642;
+  }
+  
+  .srr-map-button:hover {
+    background-color: #e8ded3;
+  }
+  
+  .srr-schedule-button {
+    background-color: #b08968;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .srr-schedule-button:hover {
+    background-color: #8a6642;
+  }
+  
+  .srr-schedule-button:disabled {
+    background-color: #d8c7b5;
+    cursor: not-allowed;
+  }
+  
+  .srr-icon {
+    display: inline-block;
+  }
+  
+  .srr-spin {
+    animation: spin 1.5s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .srr-error-message {
+    background-color: #fdf5f2;
+    color: #8a6642;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 4px solid #c9a788;
+  }
+  
+  .srr-success-message {
+    background-color: #f5f1ec;
+    color: #6b4f35;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-left: 4px solid #8a6642;
+  }
+  
+  .srr-map-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(107, 79, 53, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .srr-map-modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(107, 79, 53, 0.25);
+  }
+  
+  .srr-map-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e8ded3;
+    background-color: white;
+  }
+  
+  .srr-map-modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #8a6642;
+  }
+  
+  .srr-close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #b08968;
+  }
+  
+  .srr-map-container {
+    width: 100%;
+    height: 400px;
+    background-color: #f5f1ec;
+  }
+  
+  .srr-map-actions {
+    padding: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    background-color: white;
+  }
+  
+  .srr-location-button {
+    background-color: #f5f1ec;
+    border: 1px solid #d8c7b5;
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    color: #8a6642;
+  }
+  
+  .srr-location-button:hover {
+    background-color: #e8ded3;
+  }
+  
+  .srr-map-modal-footer {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #e8ded3;
+    background-color: white;
+  }
+  
+  .srr-confirm-button {
+    background-color: #b08968;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .srr-confirm-button:hover {
+    background-color: #8a6642;
+  }
+  
+  .srr-location-suggestions {
+    margin-top: 0.5rem;
+    background-color: white;
+    border: 1px solid #d8c7b5;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(107, 79, 53, 0.1);
+  }
+  
+  .srr-suggestions-title {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background-color: #f5f1ec;
+    font-size: 0.9rem;
+    color: #8a6642;
+    border-bottom: 1px solid #e8ded3;
+  }
+  
+  .srr-suggested-location-item {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid #e8ded3;
+    transition: background-color 0.2s ease;
+  }
+  
+  .srr-suggested-location-item:last-child {
+    border-bottom: none;
+  }
+  
+  .srr-suggested-location-item:hover {
+    background-color: #f5f1ec;
+  }
+  
+  .srr-location-icon {
+    color: #b08968;
+    flex-shrink: 0;
+  }
+  
+  .srr-location-info {
+    flex: 1;
+  }
+  
+  .srr-location-name {
+    margin: 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #6b4f35;
+  }
+  
+  .srr-location-address {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #a38b74;
+  }
+  
+  .srr-price-estimate {
+    background-color: #f5f1ec;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .srr-price-estimate h3 {
+    margin: 0;
+    color: #8a6642;
+    font-size: 1.2rem;
+  }
+  
+  .srr-price-note {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: #a38b74;
+  }
+  
+  .srr-success-confirmation {
+    background-color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(107, 79, 53, 0.15);
+    border: 1px solid rgba(138, 102, 66, 0.1);
+  }
+  
+  .srr-success-icon {
+    margin-bottom: 1rem;
+    color: #8a6642;
+  }
+  
+  .srr-ride-details {
+    margin: 2rem 0;
+    text-align: left;
+    background-color: #f5f1ec;
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+  
+  .srr-detail-item {
+    margin-bottom: 0.8rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .srr-detail-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .srr-detail-item strong {
+    color: #8a6642;
+  }
+  
+  .srr-status-scheduled {
+    color: #b08968;
+    font-weight: 500;
+  }
+  
+  .srr-schedule-another-button {
+    background-color: #b08968;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    margin: 0 auto;
+  }
+  
+  .srr-schedule-another-button:hover {
+    background-color: #8a6642;
+  }
+  
+  @media (max-width: 768px) {
+    .srr-shared-ride-container {
+      padding: 1rem;
+    }
+    
+    .srr-form-row {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .srr-map-modal-content {
+      width: 95%;
+      max-height: 95vh;
+    }
+    
+    .srr-map-container {
+      height: 300px;
+    }
+  }

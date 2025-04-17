@@ -1,39 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { MapIcon, Calendar, Clock, Users, Search, MapPin, RotateCw, List, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapIcon, Calendar, Clock, PlusCircle, MapPin, RotateCw, CheckCircle } from 'lucide-react';
+import axios from 'axios'; // Make sure to install axios: npm install axios
 import './ScheduleRide.css';
 
 function ScheduleRide() {
-  // State for ride search parameters
-  const [searchParams, setSearchParams] = useState({
+  // State for ride scheduling parameters
+  const [rideParams, setRideParams] = useState({
     origin: '',
     destination: '',
     originCoords: null,
     destinationCoords: null,
     date: '',
-    time: '',
-    passengers: 1,
-    radius: 2, // in kilometers
-    sortBy: 'departure',
-    priceRange: [0, 1000]
+    time: ''
   });
 
   // State for UI handling
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [availableRides, setAvailableRides] = useState([]);
   const [mapVisible, setMapVisible] = useState(false);
   const [activeLocationField, setActiveLocationField] = useState(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
-  const [userFrequentLocations, setUserFrequentLocations] = useState([]);
   const [suggestedPickupPoints, setSuggestedPickupPoints] = useState([]);
   const [suggestedDropoffPoints, setSuggestedDropoffPoints] = useState([]);
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [initialLocationFetched, setInitialLocationFetched] = useState(false);
-  const [selectedRide, setSelectedRide] = useState(null);
-  const [bookingModalVisible, setBookingModalVisible] = useState(false);
-  const [expandedRideId, setExpandedRideId] = useState(null);
+  const [rideScheduled, setRideScheduled] = useState(false);
+  const [scheduledRide, setScheduledRide] = useState(null);
+  const [estimatedPrice, setEstimatedPrice] = useState(null);
+
 
   // Refs for Google Maps
   const mapRef = useRef(null);
@@ -41,27 +35,10 @@ function ScheduleRide() {
   const autocompleteOriginRef = useRef(null);
   const autocompleteDestinationRef = useRef(null);
   const markerRef = useRef(null);
-  const directionsRendererRef = useRef(null);
   const locationMarkersRef = useRef([]);
 
   // Set minimum date to today
   const today = new Date().toISOString().split('T')[0];
-
-  // Fetch user's frequent locations on component mount
-  useEffect(() => {
-    const fetchFrequentLocations = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/frequent-locations`);
-        if (response.data && response.data.locations) {
-          setUserFrequentLocations(response.data.locations);
-        }
-      } catch (error) {
-        console.error('Error fetching frequent locations:', error);
-      }
-    };
-
-    fetchFrequentLocations();
-  }, []);
 
   // Initialize Google Maps & Places Autocomplete
   useEffect(() => {
@@ -113,7 +90,7 @@ function ScheduleRide() {
       autocompleteOriginRef.current.addListener('place_changed', () => {
         const place = autocompleteOriginRef.current.getPlace();
         if (place.geometry) {
-          setSearchParams(prev => ({
+          setRideParams(prev => ({
             ...prev,
             origin: place.formatted_address || place.name,
             originCoords: {
@@ -122,7 +99,7 @@ function ScheduleRide() {
             }
           }));
 
-          // Fetch nearby pickup points
+          // Fetch nearby pickup points using Google Places API
           fetchNearbyPickupPoints(place.geometry.location.lat(), place.geometry.location.lng());
         }
       });
@@ -135,7 +112,7 @@ function ScheduleRide() {
       autocompleteDestinationRef.current.addListener('place_changed', () => {
         const place = autocompleteDestinationRef.current.getPlace();
         if (place.geometry) {
-          setSearchParams(prev => ({
+          setRideParams(prev => ({
             ...prev,
             destination: place.formatted_address || place.name,
             destinationCoords: {
@@ -144,13 +121,51 @@ function ScheduleRide() {
             }
           }));
 
-          // Fetch nearby dropoff points
+          // Fetch nearby dropoff points using Google Places API
           fetchNearbyDropoffPoints(place.geometry.location.lat(), place.geometry.location.lng());
         }
       });
     }
   };
+  // Add this function with your other functions
+  const calculateEstimatedPrice = () => {
+    if (rideParams.originCoords && rideParams.destinationCoords) {
+      // Calculate distance between points
+      const distance = calculateDistance(
+        rideParams.originCoords.lat,
+        rideParams.originCoords.lng,
+        rideParams.destinationCoords.lat,
+        rideParams.destinationCoords.lng
+      );
 
+      // Base price + price per km
+      const basePrice = 50;
+      const pricePerKm = 10;
+      const price = basePrice + (distance * pricePerKm);
+
+      setEstimatedPrice(Math.round(price));
+    } else {
+      setEstimatedPrice(null);
+    }
+  };
+
+  // Helper function to calculate distance
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+  };
+
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
+  };
   // Function to automatically fetch the user's current location when the form loads
   const autoFetchCurrentLocation = () => {
     setLoadingLocation(true);
@@ -172,7 +187,7 @@ function ScheduleRide() {
                 const address = results[0].formatted_address;
 
                 // Set as origin
-                setSearchParams(prev => ({
+                setRideParams(prev => ({
                   ...prev,
                   origin: address,
                   originCoords: userLocation
@@ -231,124 +246,62 @@ function ScheduleRide() {
 
   // Handle input change
   const handleInputChange = (e) => {
-    const { name, value, type, min, max } = e.target;
-    let processedValue = value;
-
-    // Handle number inputs
-    if (type === 'number') {
-      if (value === '') {
-        processedValue = '';
-      } else {
-        processedValue = Math.max(
-          Number(min || 0),
-          Math.min(Number(max || Number.MAX_SAFE_INTEGER), Number(value))
-        );
-      }
-    }
-
-    setSearchParams(prev => ({
+    const { name, value } = e.target;
+    setRideParams(prev => ({
       ...prev,
-      [name]: processedValue
+      [name]: value
     }));
-
-    // Special handling for radius changes
-    if (name === 'radius' && searchParams.originCoords) {
-      fetchNearbyPickupPoints(searchParams.originCoords.lat, searchParams.originCoords.lng);
-    }
   };
 
-  // Price range change handler
-  const handlePriceRangeChange = (e, index) => {
-    const value = parseInt(e.target.value);
-    setSearchParams(prev => {
-      const newPriceRange = [...prev.priceRange];
-      newPriceRange[index] = value;
-      return {
-        ...prev,
-        priceRange: newPriceRange
-      };
-    });
-  };
-
-  // Fetch nearby pickup points
+  // Fetch nearby pickup points using Google Places API
   const fetchNearbyPickupPoints = async (lat, lng) => {
-    try {
-      setLoadingSuggestions(true);
-      // Fetch from backend or using Google Places API
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/nearby-pickup-points`, {
-        params: { lat, lng, radius: searchParams.radius * 1000 }
+    if (window.google) {
+      const service = new window.google.maps.places.PlacesService(document.createElement('div'));
+      const request = {
+        location: { lat, lng },
+        radius: 2000,
+        type: ['transit_station', 'bus_station', 'train_station', 'subway_station', 'point_of_interest']
+      };
+
+      service.nearbySearch(request, (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          const places = results.slice(0, 5).map(place => ({
+            name: place.name,
+            address: place.vicinity,
+            coords: {
+              lat: place.geometry.location.lat(),
+              lng: place.geometry.location.lng()
+            }
+          }));
+          setSuggestedPickupPoints(places);
+        }
       });
-
-      setSuggestedPickupPoints(response.data.places || []);
-      setLoadingSuggestions(false);
-    } catch (error) {
-      console.error('Error fetching pickup points:', error);
-      setLoadingSuggestions(false);
-
-      // Fallback to Google Places API directly if backend fails
-      if (window.google) {
-        const service = new window.google.maps.places.PlacesService(document.createElement('div'));
-        const request = {
-          location: { lat, lng },
-          radius: searchParams.radius * 1000,
-          type: ['transit_station', 'bus_station', 'train_station', 'subway_station', 'point_of_interest']
-        };
-
-        service.nearbySearch(request, (results, status) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            const places = results.slice(0, 5).map(place => ({
-              name: place.name,
-              address: place.vicinity,
-              coords: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng()
-              }
-            }));
-            setSuggestedPickupPoints(places);
-          }
-        });
-      }
     }
   };
 
-  // Fetch nearby dropoff points
+  // Fetch nearby dropoff points using Google Places API
   const fetchNearbyDropoffPoints = async (lat, lng) => {
-    try {
-      setLoadingSuggestions(true);
-      // Fetch from backend or using Google Places API
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/nearby-dropoff-points`, {
-        params: { lat, lng, radius: searchParams.radius * 1000 }
+    if (window.google) {
+      const service = new window.google.maps.places.PlacesService(document.createElement('div'));
+      const request = {
+        location: { lat, lng },
+        radius: 2000,
+        type: ['transit_station', 'bus_station', 'train_station', 'subway_station', 'point_of_interest']
+      };
+
+      service.nearbySearch(request, (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          const places = results.slice(0, 5).map(place => ({
+            name: place.name,
+            address: place.vicinity,
+            coords: {
+              lat: place.geometry.location.lat(),
+              lng: place.geometry.location.lng()
+            }
+          }));
+          setSuggestedDropoffPoints(places);
+        }
       });
-
-      setSuggestedDropoffPoints(response.data.places || []);
-      setLoadingSuggestions(false);
-    } catch (error) {
-      console.error('Error fetching dropoff points:', error);
-      setLoadingSuggestions(false);
-
-      // Fallback to Google Places API directly if backend fails
-      if (window.google) {
-        const service = new window.google.maps.places.PlacesService(document.createElement('div'));
-        const request = {
-          location: { lat, lng },
-          radius: searchParams.radius * 1000,
-          type: ['transit_station', 'bus_station', 'train_station', 'subway_station', 'point_of_interest']
-        };
-
-        service.nearbySearch(request, (results, status) => {
-          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-            const places = results.slice(0, 5).map(place => ({
-              name: place.name,
-              address: place.vicinity,
-              coords: {
-                lat: place.geometry.location.lat(),
-                lng: place.geometry.location.lng()
-              }
-            }));
-            setSuggestedDropoffPoints(places);
-          }
-        });
-      }
     }
   };
 
@@ -444,7 +397,7 @@ function ScheduleRide() {
 
         // Update the appropriate field based on what's active
         if (activeLocationField === 'origin') {
-          setSearchParams(prev => ({
+          setRideParams(prev => ({
             ...prev,
             origin: address,
             originCoords: { lat, lng }
@@ -453,7 +406,7 @@ function ScheduleRide() {
           // Fetch nearby pickup points
           fetchNearbyPickupPoints(lat, lng);
         } else if (activeLocationField === 'destination') {
-          setSearchParams(prev => ({
+          setRideParams(prev => ({
             ...prev,
             destination: address,
             destinationCoords: { lat, lng }
@@ -469,39 +422,16 @@ function ScheduleRide() {
     });
   };
 
-  // Select a frequent location
-  const selectFrequentLocation = (location, type) => {
-    if (type === 'origin') {
-      setSearchParams(prev => ({
-        ...prev,
-        origin: location.name,
-        originCoords: location.coords
-      }));
-
-      // Fetch nearby pickup points
-      fetchNearbyPickupPoints(location.coords.lat, location.coords.lng);
-    } else {
-      setSearchParams(prev => ({
-        ...prev,
-        destination: location.name,
-        destinationCoords: location.coords
-      }));
-
-      // Fetch nearby dropoff points
-      fetchNearbyDropoffPoints(location.coords.lat, location.coords.lng);
-    }
-  };
-
   // Select a suggested location
   const selectSuggestedLocation = (location, type) => {
     if (type === 'origin') {
-      setSearchParams(prev => ({
+      setRideParams(prev => ({
         ...prev,
         origin: `${location.name}, ${location.address}`,
         originCoords: location.coords
       }));
     } else {
-      setSearchParams(prev => ({
+      setRideParams(prev => ({
         ...prev,
         destination: `${location.name}, ${location.address}`,
         destinationCoords: location.coords
@@ -527,13 +457,18 @@ function ScheduleRide() {
     }
 
     setMapVisible(false);
-    setSuccess(`${activeLocationField === 'origin' ? 'Origin' : 'Destination'} location confirmed`);
+    setSuccess(`${activeLocationField === 'origin' ? 'Pickup' : 'Dropoff'} location confirmed`);
 
     // Clear success message after 3 seconds
     setTimeout(() => {
       setSuccess(null);
     }, 3000);
   };
+
+  // Add this useEffect hook
+  useEffect(() => {
+    calculateEstimatedPrice();
+  }, [rideParams.originCoords, rideParams.destinationCoords]);
 
   // Initialize map when showing the map modal
   useEffect(() => {
@@ -568,17 +503,17 @@ function ScheduleRide() {
       clearLocationMarkers();
 
       // Handle different map views based on the active field
-      if (activeLocationField === 'origin' && searchParams.originCoords) {
-        mapInstance.current.setCenter(searchParams.originCoords);
-        markerRef.current.setPosition(searchParams.originCoords);
+      if (activeLocationField === 'origin' && rideParams.originCoords) {
+        mapInstance.current.setCenter(rideParams.originCoords);
+        markerRef.current.setPosition(rideParams.originCoords);
 
         // Show suggested pickup points
         if (suggestedPickupPoints.length > 0) {
           displaySuggestedPickupPoints();
         }
-      } else if (activeLocationField === 'destination' && searchParams.destinationCoords) {
-        mapInstance.current.setCenter(searchParams.destinationCoords);
-        markerRef.current.setPosition(searchParams.destinationCoords);
+      } else if (activeLocationField === 'destination' && rideParams.destinationCoords) {
+        mapInstance.current.setCenter(rideParams.destinationCoords);
+        markerRef.current.setPosition(rideParams.destinationCoords);
 
         // Show suggested dropoff points
         if (suggestedDropoffPoints.length > 0) {
@@ -595,10 +530,6 @@ function ScheduleRide() {
       if (!mapVisible) {
         // Clean up markers and renderers
         clearLocationMarkers();
-        if (directionsRendererRef.current) {
-          directionsRendererRef.current.setMap(null);
-          directionsRendererRef.current = null;
-        }
         if (markerRef.current) {
           markerRef.current.setMap(null);
           markerRef.current = null;
@@ -628,7 +559,7 @@ function ScheduleRide() {
 
       // Add click event to select this location
       marker.addListener('click', () => {
-        setSearchParams(prev => ({
+        setRideParams(prev => ({
           ...prev,
           origin: `${point.name}, ${point.address}`,
           originCoords: point.coords
@@ -658,7 +589,7 @@ function ScheduleRide() {
     // Adjust map bounds to show all markers
     if (suggestedPickupPoints.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
-      bounds.extend(searchParams.originCoords);
+      bounds.extend(rideParams.originCoords);
       suggestedPickupPoints.forEach(point => bounds.extend(point.coords));
       mapInstance.current.fitBounds(bounds);
     }
@@ -685,7 +616,7 @@ function ScheduleRide() {
 
       // Add click event to select this location
       marker.addListener('click', () => {
-        setSearchParams(prev => ({
+        setRideParams(prev => ({
           ...prev,
           destination: `${point.name}, ${point.address}`,
           destinationCoords: point.coords
@@ -715,7 +646,7 @@ function ScheduleRide() {
     // Adjust map bounds to show all markers
     if (suggestedDropoffPoints.length > 0) {
       const bounds = new window.google.maps.LatLngBounds();
-      bounds.extend(searchParams.destinationCoords);
+      bounds.extend(rideParams.destinationCoords);
       suggestedDropoffPoints.forEach(point => bounds.extend(point.coords));
       mapInstance.current.fitBounds(bounds);
     }
@@ -729,189 +660,57 @@ function ScheduleRide() {
     locationMarkersRef.current = [];
   };
 
-  // View route details for a specific ride
-  const viewRideRoute = (ride) => {
-    if (expandedRideId === ride.id) {
-      setExpandedRideId(null);
-      return;
-    }
-    setExpandedRideId(ride.id);
-  };
-
-  // Book a ride
-  const bookRide = (ride) => {
-    setSelectedRide(ride);
-    setBookingModalVisible(true);
-  };
-
-  // Close booking modal
-  const closeBookingModal = () => {
-    setBookingModalVisible(false);
-    setSelectedRide(null);
-  };
-
-  // Submit booking request
-  const confirmBooking = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Simulate API call
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      if (!token) {
-        throw new Error('User is not authenticated. Please log in again.');
-      }
-
-      // Send booking request to backend
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/book/${selectedRide.id}`,
-        {
-          passengers: searchParams.passengers,
-          pickupLocation: searchParams.origin,
-          dropoffLocation: searchParams.destination,
-          pickupCoords: searchParams.originCoords ?
-            `${searchParams.originCoords.lat},${searchParams.originCoords.lng}` : null,
-          dropoffCoords: searchParams.destinationCoords ?
-            `${searchParams.destinationCoords.lat},${searchParams.destinationCoords.lng}` : null
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-
-      setSuccess('Ride booked successfully!');
-      closeBookingModal();
-
-      // Update available rides by removing or updating the booked ride
-      setAvailableRides(prevRides =>
-        prevRides.map(ride =>
-          ride.id === selectedRide.id
-            ? { ...ride, availableSeats: ride.availableSeats - searchParams.passengers }
-            : ride
-        ).filter(ride => ride.availableSeats > 0)
-      );
-
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        setSuccess(null);
-      }, 5000);
-
-    } catch (error) {
-      console.error('Error booking ride:', error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.[0]?.msg ||
-        error.message ||
-        'Failed to book ride';
-
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Search for available rides
-  const searchRides = async (e) => {
+  // Schedule a ride
+  const scheduleRide = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setAvailableRides([]);
 
     try {
-      // Validation before search
-      if (!searchParams.origin.trim()) {
-        throw new Error('Origin is required');
+      // Validation before scheduling
+      if (!rideParams.origin.trim()) {
+        throw new Error('Pickup location is required');
       }
-      if (!searchParams.destination.trim()) {
-        throw new Error('Destination is required');
+      if (!rideParams.destination.trim()) {
+        throw new Error('Dropoff location is required');
       }
-
-      // Format search parameters
-      const searchData = {
-        origin: searchParams.origin,
-        destination: searchParams.destination,
-        originCoords: searchParams.originCoords ?
-          `${searchParams.originCoords.lat},${searchParams.originCoords.lng}` : null,
-        destinationCoords: searchParams.destinationCoords ?
-          `${searchParams.destinationCoords.lat},${searchParams.destinationCoords.lng}` : null,
-        date: searchParams.date,
-        time: searchParams.time,
-        passengers: parseInt(searchParams.passengers),
-        radius: parseFloat(searchParams.radius),
-        priceRange: searchParams.priceRange,
-        sortBy: searchParams.sortBy
-      };
-
-      // Send search request to backend
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/api/rides/pool/search`,
-        searchData,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
-      // Set available rides from response
-      setAvailableRides(response.data.rides || []);
-
-      if (response.data.rides?.length === 0) {
-        setSuccess('No rides found matching your criteria. Try adjusting your search parameters.');
-        setTimeout(() => setSuccess(null), 5000);
+      if (!rideParams.date) {
+        throw new Error('Date is required');
+      }
+      if (!rideParams.time) {
+        throw new Error('Time is required');
       }
 
+      // Make API call to backend to save the scheduled ride
+      const response = await axios.post('http://localhost:5000/api/rides/schedule', rideParams);
+
+      setScheduledRide(response.data.ride);
+      setRideScheduled(true);
+      setSuccess('Your ride has been successfully scheduled!');
+
+      // Reset form after successful scheduling
+      setRideParams({
+        origin: '',
+        destination: '',
+        originCoords: null,
+        destinationCoords: null,
+        date: '',
+        time: ''
+      });
+
+      setLoading(false);
     } catch (error) {
-      console.error('Error searching rides:', error);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.[0]?.msg ||
-        error.message ||
-        'Failed to search for rides';
-
-      setError(errorMessage);
-    } finally {
+      console.error('Error scheduling ride:', error);
+      setError(error.response?.data?.message || error.message || 'Failed to schedule ride');
       setLoading(false);
     }
   };
 
-  // Calculate ride cost per passenger
-  const calculateCostPerPassenger = (ride) => {
-    return Math.round(ride.price / ride.availableSeats);
-  };
-
-  // Format date and time for display
-  const formatDateTime = (dateTimeString) => {
-    const date = new Date(dateTimeString);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // // Format duration for display
-  // const formatDuration = (minutes) => {
-  //   if (minutes < 60) {
-  //     return `${minutes} min`;
-  //   }
-  //   const hours = Math.floor(minutes / a60);
-  //   const remainingMinutes = minutes % 60;
-  //   return `${hours} hr ${remainingMinutes} min`;
-  // };
-
-  // Format distance for display
-  const formatDistance = (kilometers) => {
-    return `${kilometers.toFixed(1)} km`;
-  };
-
-
-  // Toggle expanded view for a ride
-  const toggleRideExpansion = (rideId) => {
-    if (expandedRideId === rideId) {
-      setExpandedRideId(null);
-    } else {
-      setExpandedRideId(rideId);
-    }
+  // Reset form to schedule another ride
+  const scheduleAnotherRide = () => {
+    setRideScheduled(false);
+    setScheduledRide(null);
+    setSuccess(null);
   };
 
   // Render suggested location items
@@ -929,243 +728,6 @@ function ScheduleRide() {
         </div>
       </div>
     ));
-  };
-
-  // Render frequent location items
-  const renderFrequentLocationItems = (locations, type) => {
-    return locations.map((location, index) => (
-      <div
-        key={index}
-        className="sr-frequent-location-item"
-        onClick={() => selectFrequentLocation(location, type)}
-      >
-        <MapPin size={16} className="sr-location-icon" />
-        <div className="sr-location-info">
-          <p className="sr-location-name">{location.name}</p>
-        </div>
-      </div>
-    ));
-  };
-
-  // Render the form section
-  const renderForm = () => {
-    return (
-      <form onSubmit={searchRides} className="sr-search-form">
-        <div className="sr-form-group">
-          <label htmlFor="ride-origin" className="sr-form-label">
-            Origin
-          </label>
-          <div className="sr-input-container">
-            <input
-              type="text"
-              id="ride-origin"
-              name="origin"
-              value={searchParams.origin}
-              onChange={handleInputChange}
-              placeholder="Enter pickup location"
-              className="sr-form-input"
-              required
-            />
-            <button
-              type="button"
-              className="sr-map-button"
-              onClick={() => openMapForSelection('origin')}
-              title="Select on map"
-            >
-              <MapIcon size={20} />
-            </button>
-          </div>
-          
-          {/* Origin suggestions */}
-          {searchParams.origin && suggestedPickupPoints.length > 0 && (
-            <div className="sr-location-suggestions">
-              <h4 className="sr-suggestions-title">Suggested Pickup Points</h4>
-              {renderSuggestedLocationItems(suggestedPickupPoints, 'origin')}
-            </div>
-          )}
-          
-          {/* Frequent locations */}
-          {searchParams.origin === '' && userFrequentLocations.length > 0 && (
-            <div className="sr-frequent-locations">
-              <h4 className="sr-suggestions-title">Frequent Locations</h4>
-              {renderFrequentLocationItems(userFrequentLocations, 'origin')}
-            </div>
-          )}
-        </div>
-
-        <div className="sr-form-group">
-          <label htmlFor="ride-destination" className="sr-form-label">
-            Destination
-          </label>
-          <div className="sr-input-container">
-            <input
-              type="text"
-              id="ride-destination"
-              name="destination"
-              value={searchParams.destination}
-              onChange={handleInputChange}
-              placeholder="Enter destination"
-              className="sr-form-input"
-              required
-            />
-            <button
-              type="button"
-              className="sr-map-button"
-              onClick={() => openMapForSelection('destination')}
-              title="Select on map"
-            >
-              <MapIcon size={20} />
-            </button>
-          </div>
-          
-          {/* Destination suggestions */}
-          {searchParams.destination && suggestedDropoffPoints.length > 0 && (
-            <div className="sr-location-suggestions">
-              <h4 className="sr-suggestions-title">Suggested Dropoff Points</h4>
-              {renderSuggestedLocationItems(suggestedDropoffPoints, 'destination')}
-            </div>
-          )}
-          
-          {/* Frequent locations */}
-          {searchParams.destination === '' && userFrequentLocations.length > 0 && (
-            <div className="sr-frequent-locations">
-              <h4 className="sr-suggestions-title">Frequent Locations</h4>
-              {renderFrequentLocationItems(userFrequentLocations, 'destination')}
-            </div>
-          )}
-        </div>
-
-        <div className="sr-form-row">
-          <div className="sr-form-group">
-            <label htmlFor="ride-date" className="sr-form-label">
-              <Calendar size={16} className="sr-icon" />
-              Date
-            </label>
-            <input
-              type="date"
-              id="ride-date"
-              name="date"
-              value={searchParams.date}
-              onChange={handleInputChange}
-              min={today}
-              className="sr-form-input"
-            />
-          </div>
-
-          <div className="sr-form-group">
-            <label htmlFor="ride-time" className="sr-form-label">
-              <Clock size={16} className="sr-icon" />
-              Time
-            </label>
-            <input
-              type="time"
-              id="ride-time"
-              name="time"
-              value={searchParams.time}
-              onChange={handleInputChange}
-              className="sr-form-input"
-            />
-          </div>
-        </div>
-
-        <div className="sr-form-row">
-          <div className="sr-form-group">
-            <label htmlFor="ride-passengers" className="sr-form-label">
-              <Users size={16} className="sr-icon" />
-              Passengers
-            </label>
-            <input
-              type="number"
-              id="ride-passengers"
-              name="passengers"
-              value={searchParams.passengers}
-              onChange={handleInputChange}
-              min="1"
-              max="8"
-              className="sr-form-input"
-              required
-            />
-          </div>
-
-          <div className="sr-form-group">
-            <label htmlFor="ride-radius" className="sr-form-label">
-              <MapIcon size={16} className="sr-icon" />
-              Search Radius (km)
-            </label>
-            <input
-              type="number"
-              id="ride-radius"
-              name="radius"
-              value={searchParams.radius}
-              onChange={handleInputChange}
-              min="0.5"
-              max="10"
-              step="0.5"
-              className="sr-form-input"
-            />
-          </div>
-        </div>
-
-        <div className="sr-form-group">
-          <label className="sr-form-label">Price Range (₹)</label>
-          <div className="sr-price-range-container">
-            <input
-              type="number"
-              value={searchParams.priceRange[0]}
-              onChange={(e) => handlePriceRangeChange(e, 0)}
-              min="0"
-              max={searchParams.priceRange[1]}
-              className="sr-form-input sr-price-input"
-            />
-            <span className="sr-price-separator">to</span>
-            <input
-              type="number"
-              value={searchParams.priceRange[1]}
-              onChange={(e) => handlePriceRangeChange(e, 1)}
-              min={searchParams.priceRange[0]}
-              max="5000"
-              className="sr-form-input sr-price-input"
-            />
-          </div>
-        </div>
-
-        <div className="sr-form-group">
-          <label htmlFor="ride-sort" className="sr-form-label">
-            Sort By
-          </label>
-          <select
-            id="ride-sort"
-            name="sortBy"
-            value={searchParams.sortBy}
-            onChange={handleInputChange}
-            className="sr-form-input"
-          >
-            <option value="departure">Departure Time</option>
-            <option value="price">Price (Low to High)</option>
-            <option value="duration">Duration (Shortest)</option>
-            <option value="distance">Distance (Shortest)</option>
-          </select>
-        </div>
-
-        <div className="sr-form-actions">
-          <button
-            type="submit"
-            className="sr-search-button"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <RotateCw size={16} className="sr-icon sr-spin" /> Searching...
-              </>
-            ) : (
-              <>
-                <Search size={16} className="sr-icon" /> Search Rides
-              </>
-            )}
-          </button>
-        </div>
-      </form>
-    );
   };
 
   // Render map modal
@@ -1217,234 +779,197 @@ function ScheduleRide() {
     );
   };
 
-  // Render booking modal
-  const renderBookingModal = () => {
-    if (!bookingModalVisible || !selectedRide) return null;
+  // Render success confirmation
+  const renderSuccessConfirmation = () => {
+    if (!rideScheduled || !scheduledRide) return null;
 
     return (
-      <div className="sr-booking-modal">
-        <div className="sr-booking-modal-content">
-          <div className="sr-booking-modal-header">
-            <h3>Confirm Booking</h3>
-            <button
-              className="sr-close-button"
-              onClick={closeBookingModal}
-            >
-              &times;
-            </button>
+      <div className="sr-success-confirmation">
+        <div className="sr-success-icon">
+          <CheckCircle size={48} color="#4CAF50" />
+        </div>
+        <h2>Ride Successfully Scheduled!</h2>
+        <div className="sr-ride-details">
+          <div className="sr-detail-item">
+            <strong>From:</strong> {scheduledRide.origin}
           </div>
-          <div className="sr-booking-details">
-            <div className="sr-booking-info">
-              <p><strong>From:</strong> {searchParams.origin}</p>
-              <p><strong>To:</strong> {searchParams.destination}</p>
-              <p><strong>Date:</strong> {selectedRide.departureDate}</p>
-              <p><strong>Time:</strong> {formatDateTime(selectedRide.departureTime)}</p>
-              <p><strong>Passengers:</strong> {searchParams.passengers}</p>
-              <p><strong>Total Price:</strong> ₹{calculateCostPerPassenger(selectedRide) * searchParams.passengers}</p>
-            </div>
-            <div className="sr-driver-info">
-              <h4>Driver Information</h4>
-              <p><strong>Name:</strong> {selectedRide.driver.name}</p>
-              <p><strong>Vehicle:</strong> {selectedRide.vehicle.make} {selectedRide.vehicle.model} ({selectedRide.vehicle.color})</p>
-              <p><strong>Plate:</strong> {selectedRide.vehicle.licensePlate}</p>
-              <p><strong>Rating:</strong> {selectedRide.driver.rating.toFixed(1)} ⭐</p>
-            </div>
+          <div className="sr-detail-item">
+            <strong>To:</strong> {scheduledRide.destination}
           </div>
-          <div className="sr-booking-modal-footer">
-            <button
-              className="sr-secondary-button"
-              onClick={closeBookingModal}
-            >
-              Cancel
-            </button>
-            <button
-              className="sr-confirm-button"
-              onClick={confirmBooking}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <RotateCw size={16} className="sr-icon sr-spin" /> Processing...
-                </>
-              ) : (
-                'Confirm Booking'
-              )}
-            </button>
+          <div className="sr-detail-item">
+            <strong>Date:</strong> {scheduledRide.date}
+          </div>
+          <div className="sr-detail-item">
+            <strong>Time:</strong> {scheduledRide.time}
+          </div>
+          <div className="sr-detail-item">
+            <strong>Status:</strong> <span className="sr-status-scheduled">Scheduled</span>
+          </div>
+          <div className="sr-detail-item">
+            <strong>Estimated Price:</strong> ₹{scheduledRide.estimatedPrice || estimatedPrice}
           </div>
         </div>
+        <button
+          className="sr-schedule-another-button"
+          onClick={scheduleAnotherRide}
+        >
+          <PlusCircle size={16} className="sr-icon" /> Schedule Another Ride
+        </button>
       </div>
     );
-  };
-
-  // Render ride cards
-  const renderRideCards = () => {
-    if (availableRides.length === 0) {
-      return loading ? null : (
-        <div className="sr-no-rides">
-          <p>No rides found matching your criteria.</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="sr-rides-list">
-        {availableRides.map(ride => (
-          <div key={ride.id} className="sr-ride-card">
-            <div className="sr-ride-header">
-              <div className="sr-ride-time">
-                <div className="sr-departure-time">
-                  {formatDateTime(ride.departureTime)}
-                </div>
-                <div className="sr-duration">
-                  {formatDuration(ride.durationMinutes)}
-                </div>
-                <div className="sr-arrival-time">
-                  {formatDateTime(ride.arrivalTime)}
-                </div>
-              </div>
-              <div className="sr-ride-price">
-                <span className="sr-price-amount">₹{calculateCostPerPassenger(ride)}</span>
-                <span className="sr-per-person">per person</span>
-              </div>
-            </div>
-            
-            <div className="sr-ride-details">
-              <div className="sr-ride-route">
-                <div className="sr-origin-point">
-                  <div className="sr-point-marker sr-origin-marker"></div>
-                  <div className="sr-point-name">{ride.origin}</div>
-                </div>
-                <div className="sr-route-line"></div>
-                <div className="sr-destination-point">
-                  <div className="sr-point-marker sr-destination-marker"></div>
-                  <div className="sr-point-name">{ride.destination}</div>
-                </div>
-              </div>
-              
-              <div className="sr-ride-info">
-                <div className="sr-info-item">
-                  <span className="sr-info-label">Distance:</span>
-                  <span className="sr-info-value">{formatDistance(ride.distanceKm)}</span>
-                </div>
-                <div className="sr-info-item">
-                  <span className="sr-info-label">Available seats:</span>
-                  <span className="sr-info-value">{ride.availableSeats}</span>
-                </div>
-              </div>
-              
-              <div className="sr-driver-preview">
-                <div className="sr-driver-avatar">
-                  {ride.driver.avatar ? (
-                    <img src={ride.driver.avatar} alt={ride.driver.name} />
-                  ) : (
-                    <div className="sr-avatar-placeholder">
-                      {ride.driver.name.charAt(0)}
-                    </div>
-                  )}
-                </div>
-                <div className="sr-driver-brief">
-                  <span className="sr-driver-name">{ride.driver.name}</span>
-                  <span className="sr-driver-rating">{ride.driver.rating.toFixed(1)} ⭐</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="sr-ride-actions">
-              <button
-                className="sr-route-button"
-                onClick={() => viewRideRoute(ride)}
-              >
-                {expandedRideId === ride.id ? (
-                  <>
-                    <ChevronUp size={16} className="sr-icon" /> Hide Details
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown size={16} className="sr-icon" /> View Details
-                  </>
-                )}
-              </button>
-              <button
-                className="sr-book-button"
-                onClick={() => bookRide(ride)}
-              >
-                Book Ride
-              </button>
-            </div>
-            
-            {expandedRideId === ride.id && (
-              <div className="sr-expanded-details">
-                <div className="sr-expanded-map">
-                  {/* Map would be rendered here */}
-                  <div className="sr-map-placeholder">
-                    Route map will be displayed here
-                  </div>
-                </div>
-                <div className="sr-expanded-info">
-                  <h4>Vehicle Information</h4>
-                  <p>
-                    <strong>Vehicle:</strong> {ride.vehicle.make} {ride.vehicle.model}
-                  </p>
-                  <p>
-                    <strong>Color:</strong> {ride.vehicle.color}
-                  </p>
-                  <p>
-                    <strong>License Plate:</strong> {ride.vehicle.licensePlate}
-                  </p>
-                </div>
-                <div className="sr-ride-notes">
-                  <h4>Notes from Driver</h4>
-                  <p>{ride.notes || "No additional notes from the driver."}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  // Fix typo in the formatDuration function (a60 should be 60)
-  const formatDuration = (minutes) => {
-    if (minutes < 60) {
-      return `${minutes} min`;
-    }
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return `${hours} hr ${remainingMinutes} min`;
   };
 
   return (
     <div className="sr-schedule-ride-container">
-      <h1 className="sr-page-title">Find a Ride</h1>
-      
-      {/* Error and Success messages */}
+      <h1 className="sr-page-title">Schedule a Ride</h1>
+
+      {/* Error message */}
       {error && <div className="sr-error-message">{error}</div>}
-      {success && <div className="sr-success-message">{success}</div>}
-      
-      {/* Form section */}
-      <div className="sr-search-section">
-        {renderForm()}
-      </div>
-      
-      {/* Results section */}
-      <div className="sr-results-section">
-        <h2 className="sr-section-title">Available Rides</h2>
-        {loading ? (
-          <div className="sr-loading-indicator">
-            <RotateCw size={24} className="sr-icon sr-spin" />
-            <p>Searching for rides...</p>
-          </div>
-        ) : (
-          renderRideCards()
-        )}
-      </div>
-      
+
+      {/* Success message */}
+      {success && !rideScheduled && <div className="sr-success-message">{success}</div>}
+
+      {/* Success Confirmation Screen */}
+      {rideScheduled ? renderSuccessConfirmation() : (
+        /* Form section */
+        /* Form section */
+        <div className="sr-schedule-section">
+          <form onSubmit={scheduleRide} className="sr-schedule-form">
+            <div className="sr-form-group">
+              <label htmlFor="ride-origin" className="sr-form-label">
+                Pickup Location
+              </label>
+              <div className="sr-input-container">
+                <input
+                  type="text"
+                  id="ride-origin"
+                  name="origin"
+                  value={rideParams.origin}
+                  onChange={handleInputChange}
+                  placeholder="Enter pickup location"
+                  className="sr-form-input"
+                  required
+                />
+                <button
+                  type="button"
+                  className="sr-map-button"
+                  onClick={() => openMapForSelection('origin')}
+                  title="Select on map"
+                >
+                  <MapIcon size={20} />
+                </button>
+              </div>
+
+              {/* Origin suggestions */}
+              {rideParams.origin && suggestedPickupPoints.length > 0 && (
+                <div className="sr-location-suggestions">
+                  <h4 className="sr-suggestions-title">Suggested Pickup Points</h4>
+                  {renderSuggestedLocationItems(suggestedPickupPoints, 'origin')}
+                </div>
+              )}
+            </div>
+
+            <div className="sr-form-group">
+              <label htmlFor="ride-destination" className="sr-form-label">
+                Dropoff Location
+              </label>
+              <div className="sr-input-container">
+                <input
+                  type="text"
+                  id="ride-destination"
+                  name="destination"
+                  value={rideParams.destination}
+                  onChange={handleInputChange}
+                  placeholder="Enter destination"
+                  className="sr-form-input"
+                  required
+                />
+                <button
+                  type="button"
+                  className="sr-map-button"
+                  onClick={() => openMapForSelection('destination')}
+                  title="Select on map"
+                >
+                  <MapIcon size={20} />
+                </button>
+              </div>
+
+              {/* Destination suggestions */}
+              {rideParams.destination && suggestedDropoffPoints.length > 0 && (
+                <div className="sr-location-suggestions">
+                  <h4 className="sr-suggestions-title">Suggested Dropoff Points</h4>
+                  {renderSuggestedLocationItems(suggestedDropoffPoints, 'destination')}
+                </div>
+              )}
+            </div>
+
+            <div className="sr-form-row">
+              <div className="sr-form-group">
+                <label htmlFor="ride-date" className="sr-form-label">
+                  <Calendar size={16} className="sr-icon" />
+                  Date
+                </label>
+                <input
+                  type="date"
+                  id="ride-date"
+                  name="date"
+                  value={rideParams.date}
+                  onChange={handleInputChange}
+                  min={today}
+                  className="sr-form-input"
+                  required
+                />
+              </div>
+
+              <div className="sr-form-group">
+                <label htmlFor="ride-time" className="sr-form-label">
+                  <Clock size={16} className="sr-icon" />
+                  Time
+                </label>
+                <input
+                  type="time"
+                  id="ride-time"
+                  name="time"
+                  value={rideParams.time}
+                  onChange={handleInputChange}
+                  className="sr-form-input"
+                  required
+                />
+              </div>
+            </div>
+            {/* Add this before the form-actions div */}
+            {estimatedPrice && (
+              <div className="sr-price-estimation">
+                <div className="sr-price-card">
+                  <h3>Estimated Price</h3>
+                  <div className="sr-price-amount">₹{estimatedPrice}</div>
+                  <p className="sr-price-note">Final price may vary based on traffic and other factors</p>
+                </div>
+              </div>
+            )}
+            <div className="sr-form-actions">
+              <button
+                type="submit"
+                className="sr-schedule-button"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <RotateCw size={16} className="sr-icon sr-spin" /> Scheduling...
+                  </>
+                ) : (
+                  <>
+                    <Calendar size={16} className="sr-icon" /> Schedule Ride
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Map Modal */}
       {renderMapModal()}
-      
-      {/* Booking Modal */}
-      {renderBookingModal()}
     </div>
   );
 }
