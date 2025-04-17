@@ -12,7 +12,7 @@ function Community() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   // API URL (should be in environment variables in a real app)
-  const API_URL = `${REACT_APP_API_BASE_URL}/api`;
+  const API_URL = `${process.env.REACT_APP_API_BASE_URL}/api`;
 
   useEffect(() => {
     // Fetch messages when component mounts or filters change
