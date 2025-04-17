@@ -13,6 +13,7 @@ import About from "./Pages/About/About";
 import FAQ from "./Pages/FAQ/FAQ";
 import Safety from "./Pages/SafetyPage/SafetyPage";
 import BookARide from "./Pages/Rides/BookARide/book_a_ride";
+import Community from "./Pages/Community/Community";
 
 import CookiesPolicy from "./Pages/Legal/CookiesPolicy/CookiesPolicy";
 import PrivacyPolicy from "./Pages/Legal/PrivacyPolicy/PrivacyPolicy";
@@ -277,6 +278,18 @@ const App = () => {
                 userRole={userRole}
               >
                 <DriverProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/community"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["rider", "driver"]} 
+                userRole={userRole}
+              >
+                <Community />
               </ProtectedRoute>
             }
           />
