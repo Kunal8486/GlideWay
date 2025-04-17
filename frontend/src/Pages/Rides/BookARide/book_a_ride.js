@@ -35,24 +35,24 @@ const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'YOUR_A
 
 const RIDE_TYPES = {
   Economy: { 
-    base: 5, 
-    perKm: 2, 
+    base: 50, 
+    perKm: 12, 
     description: '1-3 passengers, affordable rates',
     eta: '3-5',
     icon: faCar,
     capacity: 3
   },
   Premium: { 
-    base: 10, 
-    perKm: 3, 
+    base: 50, 
+    perKm: 20, 
     description: 'Luxury vehicles, top-rated drivers',
     eta: '5-7',
     icon: faCarSide,
     capacity: 4
   },
   XL: { 
-    base: 15, 
-    perKm: 4, 
+    base: 50, 
+    perKm: 24, 
     description: 'SUVs and vans, up to 6 passengers',
     eta: '7-10',
     icon: faVanShuttle,
