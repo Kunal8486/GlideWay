@@ -1,19 +1,19 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { 
-  GoogleMap, 
-  Marker, 
-  Autocomplete, 
+import {
+  GoogleMap,
+  Marker,
+  Autocomplete,
   DirectionsRenderer,
   useJsApiLoader
 } from '@react-google-maps/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faLocationDot, 
-  faCarSide, 
-  faCar, 
-  faVanShuttle, 
-  faCreditCard, 
-  faMoneyBill, 
+import {
+  faLocationDot,
+  faCarSide,
+  faCar,
+  faVanShuttle,
+  faCreditCard,
+  faMoneyBill,
   faWallet,
   faMessage,
   faTimes,
@@ -36,31 +36,32 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import './book_a_ride.css';
+import { useNavigate } from 'react-router-dom';
 
 // API config
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY ;
+const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 const RIDE_TYPES = {
-  Economy: { 
-    base: 50, 
-    perKm: 12, 
+  Economy: {
+    base: 50,
+    perKm: 12,
     description: '1-3 passengers, affordable rates',
     eta: '3-5',
     icon: faCar,
     capacity: 3
   },
-  Premium: { 
-    base: 50, 
-    perKm: 20, 
+  Premium: {
+    base: 50,
+    perKm: 20,
     description: 'Luxury vehicles, top-rated drivers',
     eta: '5-7',
     icon: faCarSide,
     capacity: 4
   },
-  XL: { 
-    base: 50, 
-    perKm: 24, 
+  XL: {
+    base: 50,
+    perKm: 24,
     description: 'SUVs and vans, up to 6 passengers',
     eta: '7-10',
     icon: faVanShuttle,
@@ -69,64 +70,63 @@ const RIDE_TYPES = {
 };
 
 const PAYMENT_METHODS = {
-  cash: { 
-    label: 'Cash', 
-    icon: faMoneyBill 
+  cash: {
+    label: 'Cash',
+    icon: faMoneyBill
   },
-  card: { 
-    label: 'Credit Card', 
-    icon: faCreditCard 
+  card: {
+    label: 'Credit Card',
+    icon: faCreditCard
   },
-  wallet: { 
-    label: 'Digital Wallet', 
-    icon: faWallet 
+  wallet: {
+    label: 'Digital Wallet',
+    icon: faWallet
   }
 };
 
-// Ride preferences options
 const RIDE_PREFERENCES = {
-  pet_friendly: { 
-    label: 'Pet Friendly', 
+  pet_friendly: {
+    label: 'Pet Friendly',
     icon: faPaw,
     description: 'Driver accepts pets in the vehicle'
   },
-  eco_friendly: { 
-    label: 'Eco Friendly', 
+  eco_friendly: {
+    label: 'Eco Friendly',
     icon: faLeaf,
     description: 'Electric or hybrid vehicles'
   },
-  wheelchair: { 
-    label: 'Wheelchair Accessible', 
+  wheelchair: {
+    label: 'Wheelchair Accessible',
     icon: faWheelchair,
     description: 'Vehicle with wheelchair access'
   },
-  quiet_ride: { 
-    label: 'Quiet Ride', 
+  quiet_ride: {
+    label: 'Quiet Ride',
     icon: faVolumeXmark,
     description: 'Driver minimizes conversation'
   },
-  extra_stops: { 
-    label: 'Extra Stops', 
+  extra_stops: {
+    label: 'Extra Stops',
     icon: faMapMarkerAlt,
     description: 'Plan for multiple stops'
   },
-  food_allowed: { 
-    label: 'Food Allowed', 
+  food_allowed: {
+    label: 'Food Allowed',
     icon: faUtensils,
     description: 'Eating is permitted in vehicle'
   },
-  temperature: { 
-    label: 'Temperature Preference', 
+  temperature: {
+    label: 'Temperature Preference',
     icon: faTemperatureArrowUp,
     description: 'Set your preferred temperature'
   },
-  top_rated: { 
-    label: 'Top Rated Drivers', 
+  top_rated: {
+    label: 'Top Rated Drivers',
     icon: faStar,
     description: 'Only 4.8+ rated drivers'
   },
-  female_driver: { 
-    label: 'Female Driver', 
+  female_driver: {
+    label: 'Female Driver',
     icon: faShieldAlt,
     description: 'Request female driver only'
   }
@@ -135,13 +135,22 @@ const RIDE_PREFERENCES = {
 const LoadingSpinner = () => <div className="loading-spinner"></div>;
 
 const BookARide = () => {
+  const navigate = useNavigate();
   const pickupRef = useRef(null);
   const dropoffRef = useRef(null);
   const mapRef = useRef(null);
   const geocoderRef = useRef(null);
   const autocompletePickupRef = useRef(null);
   const autocompleteDropoffRef = useRef(null);
-  
+
+  // Form state
+  const [pickupInputValue, setPickupInputValue] = useState('');
+  const [dropoffInputValue, setDropoffInputValue] = useState('');
+
+  // Auth state
+  const [authToken, setAuthToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   // Core states
   const [currentLocation, setCurrentLocation] = useState(null);
   const [pickupLocation, setPickupLocation] = useState(null);
@@ -151,7 +160,7 @@ const BookARide = () => {
   const [fareEstimate, setFareEstimate] = useState(0);
   const [eta, setEta] = useState("-- min");
   const [paymentMethod, setPaymentMethod] = useState('cash');
-  
+
   // UI states
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
@@ -159,13 +168,13 @@ const BookARide = () => {
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showRideOptions, setShowRideOptions] = useState(false);
-  const [isEditingLocation, setIsEditingLocation] = useState(null); // 'pickup' or 'dropoff' or null
+  const [isEditingLocation, setIsEditingLocation] = useState(null);
   const [showMapTooltip, setShowMapTooltip] = useState(false);
   const [showPromoInput, setShowPromoInput] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  
+
   // Ride details
   const [distance, setDistance] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -176,10 +185,8 @@ const BookARide = () => {
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [selectedPreferences, setSelectedPreferences] = useState([]);
 
-  // Libraries for Google Maps
   const libraries = ['places', 'geometry', 'drawing'];
-  
-  // Map Options
+
   const mapOptions = {
     styles: [
       {
@@ -200,15 +207,29 @@ const BookARide = () => {
     gestureHandling: "greedy"
   };
 
-  // Check if we're on mobile
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setAuthToken(token);
+      setIsAuthenticated(true);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      navigate('/login', { state: { from: '/book-a-ride' } });
+    }
+
+    return () => {
+      delete axios.defaults.headers.common['Authorization'];
+    };
+  }, [navigate]);
+
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkIfMobile();
     window.addEventListener('resize', checkIfMobile);
-    
+
     return () => {
       window.removeEventListener('resize', checkIfMobile);
     };
@@ -220,17 +241,14 @@ const BookARide = () => {
   });
 
   const containerStyle = { width: '100%', height: '100%' };
-  const center = currentLocation || { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco
+  const center = currentLocation || { lat: 37.7749, lng: -122.4194 };
 
-  // Initialize app and load saved locations
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && isAuthenticated) {
       getCurrentLocation();
-      
-      // Simulate nearby drivers
       simulateNearbyDrivers();
-      
-      // Update driver positions
+      loadSavedLocations();
+
       const interval = setInterval(() => {
         if (nearbyDrivers.length > 0) {
           setNearbyDrivers(prev => prev.map(driver => ({
@@ -243,20 +261,28 @@ const BookARide = () => {
           })));
         }
       }, 3000);
-      
+
       return () => clearInterval(interval);
     }
-  }, [isLoaded]);
+  }, [isLoaded, isAuthenticated]);
 
-  // Set up geocoder when map is loaded
+  const loadSavedLocations = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/users/locations`);
+      if (response.data.savedLocations && response.data.savedLocations.length > 0) {
+        console.log('Saved locations loaded:', response.data.savedLocations);
+      }
+    } catch (error) {
+      console.error('Error loading saved locations:', error);
+    }
+  };
+
   useEffect(() => {
     if (isLoaded && window.google) {
       geocoderRef.current = new window.google.maps.Geocoder();
     }
   }, [isLoaded]);
 
-
-  // Simulate nearby drivers
   const simulateNearbyDrivers = () => {
     const drivers = Array(8).fill(null).map((_, i) => ({
       id: i,
@@ -270,7 +296,6 @@ const BookARide = () => {
     setNearbyDrivers(drivers);
   };
 
-  // Get user's current location
   const getCurrentLocation = async () => {
     try {
       setIsFetchingLocation(true);
@@ -281,18 +306,15 @@ const BookARide = () => {
           maximumAge: 0
         });
       });
-      
+
       const coords = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      
+
       setCurrentLocation(coords);
-      
-      // Set pickup location to current location by default
       setPickupLocation(coords);
-      
-      // Update the input field with the address
+
       if (geocoderRef.current) {
         try {
           const { results } = await new Promise((resolve, reject) => {
@@ -304,19 +326,16 @@ const BookARide = () => {
               }
             });
           });
-          
-          if (results[0] && pickupRef.current) {
-            pickupRef.current.value = results[0].formatted_address;
+
+          if (results[0]) {
+            setPickupInputValue(results[0].formatted_address);
           }
         } catch (error) {
           console.error('Error getting address from coordinates:', error);
-          if (pickupRef.current) {
-            pickupRef.current.value = "Current Location";
-          }
+          setPickupInputValue("Current Location");
         }
       }
-      
-      // Center map on user's location
+
       if (mapRef.current) {
         mapRef.current.panTo(coords);
         mapRef.current.setZoom(15);
@@ -329,23 +348,20 @@ const BookARide = () => {
     }
   };
 
-  // Handle map click to set location
   const handleMapClick = async (event) => {
     if (!isEditingLocation) return;
-    
+
     const clickedPosition = {
       lat: event.latLng.lat(),
       lng: event.latLng.lng()
     };
-    
-    // Update the location state
+
     if (isEditingLocation === 'pickup') {
       setPickupLocation(clickedPosition);
     } else if (isEditingLocation === 'dropoff') {
       setDropoffLocation(clickedPosition);
     }
-    
-    // Update the input field with the address
+
     if (geocoderRef.current) {
       try {
         const { results } = await new Promise((resolve, reject) => {
@@ -357,45 +373,44 @@ const BookARide = () => {
             }
           });
         });
-        
+
         if (results[0]) {
           const address = results[0].formatted_address;
-          if (isEditingLocation === 'pickup' && pickupRef.current) {
-            pickupRef.current.value = address;
-          } else if (isEditingLocation === 'dropoff' && dropoffRef.current) {
-            dropoffRef.current.value = address;
+          if (isEditingLocation === 'pickup') {
+            setPickupInputValue(address);
+          } else if (isEditingLocation === 'dropoff') {
+            setDropoffInputValue(address);
           }
         }
       } catch (error) {
         console.error('Error getting address from coordinates:', error);
       }
     }
-    
-    // Exit editing mode
+
     setIsEditingLocation(null);
     setShowMapTooltip(false);
   };
 
-  // Handle when user selects a place from autocomplete
   const onPlaceChanged = (type) => {
     const autocomplete = type === 'pickup' ? autocompletePickupRef.current : autocompleteDropoffRef.current;
-    
+
     if (autocomplete !== null) {
       const place = autocomplete.getPlace();
-      
-      if (place && place.geometry && place.geometry.location) {
+
+      if (place?.geometry?.location) {
         const location = {
           lat: place.geometry.location.lat(),
           lng: place.geometry.location.lng()
         };
-        
+
         if (type === 'pickup') {
           setPickupLocation(location);
+          setPickupInputValue(place.formatted_address || '');
         } else {
           setDropoffLocation(location);
+          setDropoffInputValue(place.formatted_address || '');
         }
-        
-        // Center map on the selected location
+
         if (mapRef.current) {
           mapRef.current.panTo(location);
           mapRef.current.setZoom(15);
@@ -404,9 +419,8 @@ const BookARide = () => {
     }
   };
 
-  // Calculate route between pickup and dropoff
   const calculateRoute = async () => {
-    if (!pickupRef.current.value || !dropoffRef.current.value) {
+    if (!pickupInputValue || !dropoffInputValue) {
       setError("Please enter both pickup and dropoff locations");
       return;
     }
@@ -420,12 +434,12 @@ const BookARide = () => {
       }
 
       const directionsService = new window.google.maps.DirectionsService();
-      
+
       const result = await new Promise((resolve, reject) => {
         directionsService.route(
           {
-            origin: pickupLocation || pickupRef.current.value,
-            destination: dropoffLocation || dropoffRef.current.value,
+            origin: pickupLocation || pickupInputValue,
+            destination: dropoffLocation || dropoffInputValue,
             travelMode: window.google.maps.TravelMode.DRIVING,
           },
           (result, status) => {
@@ -439,49 +453,28 @@ const BookARide = () => {
       });
 
       setDirections(result);
-      
-      // Update marker positions based on the calculated route
-      if (result.routes[0] && result.routes[0].legs[0]) {
+
+      if (result.routes[0]?.legs[0]) {
         const leg = result.routes[0].legs[0];
-        
+
         setPickupLocation({
           lat: leg.start_location.lat(),
           lng: leg.start_location.lng()
         });
-        
+
         setDropoffLocation({
           lat: leg.end_location.lat(),
           lng: leg.end_location.lng()
         });
-        
-        // Update distance and duration
+
         const distanceInKm = leg.distance.value / 1000;
         const durationInMin = Math.ceil(leg.duration.value / 60);
-        
+
         setDistance(distanceInKm);
         setDuration(durationInMin);
-        
-        // Calculate fare
-        const rideDetails = RIDE_TYPES[rideType];
-        const baseFare = rideDetails.base;
-        const distanceFare = distanceInKm * rideDetails.perKm;
-        let calculatedFare = (baseFare + distanceFare).toFixed(2);
-        
-        // Add preference surcharges
-        if (selectedPreferences.length > 0) {
-          // Add a small surcharge for each preference (5%)
-          const preferenceSurcharge = (baseFare + distanceFare) * 0.05 * selectedPreferences.length;
-          calculatedFare = (parseFloat(calculatedFare) + preferenceSurcharge).toFixed(2);
-        }
-        
-        setFareEstimate(calculatedFare);
-        setEta(`${leg.duration.text}`);
-        setShowRideOptions(true);
-        
-        // Send route data to backend
+
         try {
-          /*
-          await axios.post(`${API_BASE_URL}/routes/estimate`, {
+          const response = await axios.post(`${API_BASE_URL}/rides/estimate`, {
             pickupLocation: {
               address: leg.start_address,
               coordinates: {
@@ -499,15 +492,35 @@ const BookARide = () => {
             distance: distanceInKm,
             duration: durationInMin,
             rideType,
-            estimatedFare: calculatedFare,
             preferences: selectedPreferences
           });
-          */
+
+          setFareEstimate(response.data.estimate.total_fare);
+          setEta(`${leg.duration.text}`);
+          setShowRideOptions(true);
         } catch (error) {
-          console.error('Error saving route estimate:', error);
+          console.error('Error getting fare estimate:', error);
+
+          if (error.response?.status === 401) {
+            handleAuthError();
+            return;
+          }
+
+          const rideDetails = RIDE_TYPES[rideType];
+          const baseFare = rideDetails.base;
+          const distanceFare = distanceInKm * rideDetails.perKm;
+          let calculatedFare = (baseFare + distanceFare).toFixed(2);
+
+          if (selectedPreferences.length > 0) {
+            const preferenceSurcharge = (baseFare + distanceFare) * 0.05 * selectedPreferences.length;
+            calculatedFare = (parseFloat(calculatedFare) + preferenceSurcharge).toFixed(2);
+          }
+
+          setFareEstimate(calculatedFare);
+          setEta(`${leg.duration.text}`);
+          setShowRideOptions(true);
         }
-        
-        // Adjust view to show the whole route
+
         if (mapRef.current && result.routes[0].bounds) {
           mapRef.current.fitBounds(result.routes[0].bounds);
         }
@@ -520,7 +533,13 @@ const BookARide = () => {
     }
   };
 
-  // Toggle preference selection
+  const handleAuthError = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setError("Your session has expired. Please log in again.");
+    navigate('/login', { state: { from: '/book-a-ride' } });
+  };
+
   const togglePreference = (preference) => {
     setSelectedPreferences(prev => {
       if (prev.includes(preference)) {
@@ -531,23 +550,26 @@ const BookARide = () => {
     });
   };
 
-  // Handle booking submission
   const handleBookRide = async () => {
     if (!directions || !fareEstimate) {
       setError("Please calculate fare estimate first");
       return;
     }
 
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/book-a-ride' } });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Prepare booking data
       const bookingData = {
         pickupLocation: {
-          address: pickupRef.current.value,
+          address: pickupInputValue,
           coordinates: pickupLocation
         },
         dropoffLocation: {
-          address: dropoffRef.current.value,
+          address: dropoffInputValue,
           coordinates: dropoffLocation
         },
         rideType,
@@ -560,77 +582,83 @@ const BookARide = () => {
         promoCode: promoCode || null,
         preferences: selectedPreferences
       };
-      
-      // This would be an API call to your backend
-      /* 
-      const response = await axios.post(`${API_BASE_URL}/bookings`, bookingData);
+
+      const response = await axios.post(`${API_BASE_URL}/rides/book`, bookingData);
       setBookingId(response.data.bookingId);
-      setDriverInfo(response.data.driver);
-      */
-      
-      // For now, let's simulate a successful booking
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock driver data
-      setDriverInfo({
-        id: 'driver-123',
-        name: 'Alex Johnson',
-        rating: 4.9,
-        vehicle: {
-          make: 'Toyota',
-          model: 'Camry',
-          color: 'Silver',
-          plateNumber: 'ABC 123'
-        },
-        photo: 'https://randomuser.me/api/portraits/men/32.jpg',
-        phone: '+1 (555) 123-4567'
-      });
-      
-      setBookingId('RIDE' + Math.floor(100000 + Math.random() * 900000));
-      setIsBookingConfirmed(true);
+
+      if (response.data.driver) {
+        setDriverInfo(response.data.driver);
+        setIsBookingConfirmed(true);
+      } else {
+        setError("Searching for drivers nearby...");
+
+        setTimeout(async () => {
+          try {
+            const driverResponse = await axios.get(`${API_BASE_URL}/rides/${response.data.rideId}/status`);
+
+            if (driverResponse.data.driver) {
+              setDriverInfo(driverResponse.data.driver);
+              setIsBookingConfirmed(true);
+              setError("");
+            } else {
+              setError("No drivers available right now. Please try again later.");
+            }
+          } catch (err) {
+            if (err.response?.status === 401) {
+              handleAuthError();
+              return;
+            }
+            setError("Something went wrong while finding a driver.");
+          } finally {
+            setIsLoading(false);
+          }
+        }, 3000);
+      }
     } catch (err) {
+      if (err.response?.status === 401) {
+        handleAuthError();
+        return;
+      }
+
       setError("Failed to book ride. Please try again.");
       console.error('Booking error:', err);
-    } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle canceling a booked ride
   const handleCancelRide = async () => {
     setIsLoading(true);
     try {
-      // This would be an API call to your backend
-      // await axios.post(`${API_BASE_URL}/bookings/${bookingId}/cancel`);
-      
-      // For now, let's simulate cancellation
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Reset states
+      await axios.post(`${API_BASE_URL}/rides/${bookingId}/cancel`, {
+        reason: "Cancelled by user"
+      });
+
       setIsBookingConfirmed(false);
       setShowRideOptions(false);
       setDirections(null);
       setDriverInfo(null);
       setBookingId(null);
     } catch (error) {
+      if (error.response?.status === 401) {
+        handleAuthError();
+        return;
+      }
+
       setError("Failed to cancel ride. Please try again.");
       console.error('Cancellation error:', error);
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Handle map load
+
   const onMapLoad = useCallback((map) => {
     mapRef.current = map;
   }, []);
 
-  // Start location editing
   const startLocationEditing = (locationType) => {
     setIsEditingLocation(locationType);
     setShowMapTooltip(true);
-    
-    // Center map on current location
+
     if (mapRef.current) {
       if (locationType === 'pickup' && pickupLocation) {
         mapRef.current.panTo(pickupLocation);
@@ -641,8 +669,7 @@ const BookARide = () => {
       }
       mapRef.current.setZoom(16);
     }
-    
-    // Clear selection after 10 seconds if user doesn't click
+
     setTimeout(() => {
       if (isEditingLocation === locationType) {
         setIsEditingLocation(null);
@@ -651,13 +678,25 @@ const BookARide = () => {
     }, 10000);
   };
 
-  // Create payment method icon
   const renderPaymentIcon = (method) => {
     const paymentInfo = PAYMENT_METHODS[method];
     return <FontAwesomeIcon icon={paymentInfo.icon} />;
   };
 
-  // Loading state
+  if (!isAuthenticated && !isLoading) {
+    return (
+      <div className="loading-container">
+        <p>Please log in to book a ride.</p>
+        <button 
+          className="auth-redirect-btn"
+          onClick={() => navigate('/login', { state: { from: '/book-a-ride' } })}
+        >
+          Go to Login
+        </button>
+      </div>
+    );
+  }
+
   if (loadError) {
     return <div className="error-message">Error loading Google Maps</div>;
   }
@@ -671,7 +710,6 @@ const BookARide = () => {
     );
   }
 
-  // Ride confirmation screen
   if (isBookingConfirmed && driverInfo) {
     return (
       <div className="booking-confirmation">
@@ -689,8 +727,8 @@ const BookARide = () => {
           <div className="trip-info">
             <div className="booking-id">Booking ID: {bookingId}</div>
             <div className="ride-route">
-              <p><strong>From:</strong> {pickupRef.current.value}</p>
-              <p><strong>To:</strong> {dropoffRef.current.value}</p>
+              <p><strong>From:</strong> {pickupInputValue}</p>
+              <p><strong>To:</strong> {dropoffInputValue}</p>
             </div>
             <div className="ride-details">
               <p><strong>Fare:</strong> ₹{fareEstimate}</p>
@@ -702,16 +740,16 @@ const BookARide = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="map-view-book">
-          <GoogleMap 
-            mapContainerStyle={{ width: '100%', height: '300px' }} 
-            center={pickupLocation} 
+          <GoogleMap
+            mapContainerStyle={{ width: '100%', height: '300px' }}
+            center={pickupLocation}
             zoom={14}
             options={mapOptions}
           >
             {directions && <DirectionsRenderer directions={directions} />}
-            
+
             {nearbyDrivers
               .filter(driver => driver.type === rideType)
               .slice(0, 3)
@@ -731,11 +769,11 @@ const BookARide = () => {
               ))}
           </GoogleMap>
         </div>
-        
+
         <div className="driver-eta">
           <FontAwesomeIcon icon={faCarSide} /> Driver arrives in approximately {eta}
         </div>
-        
+
         <div className="confirmation-actions">
           <button className="action-btn message">
             <FontAwesomeIcon icon={faMessage} /> Contact Driver
@@ -751,18 +789,15 @@ const BookARide = () => {
     );
   }
 
-  // Main booking interface
   return (
     <div className="book-ride-container">
       <div className={`form-container ${showRideOptions ? 'ride-options-open' : ''}`}>
         <h2>Book Your Ride</h2>
         {error && <div className="error-message">{error}</div>}
-        
-        {/* Location form */}
+
         {!showRideOptions ? (
           <form onSubmit={(e) => { e.preventDefault(); calculateRoute(); }}>
             <div className="location-inputs">
-              {/* Pickup location */}
               <div className="input-group">
                 <div className="location-dot pickup">
                   <FontAwesomeIcon icon={faLocationDot} className="location-icon" />
@@ -775,29 +810,29 @@ const BookARide = () => {
                     onPlaceChanged={() => onPlaceChanged('pickup')}
                     restrictions={{ country: 'in' }}
                   >
-                    <input 
-                      type="text" 
-                      ref={pickupRef} 
-                      placeholder="Pickup location" 
-                      required 
+                    <input
+                      type="text"
+                      ref={pickupRef}
+                      value={pickupInputValue}
+                      onChange={(e) => setPickupInputValue(e.target.value)}
+                      placeholder="Pickup location"
+                      required
                       className="location-input"
                     />
                   </Autocomplete>
-                  
-                  
                 </div>
                 <div className="location-actions">
-                  <button 
-                    type="button" 
-                    className="map-location-btn" 
+                  <button
+                    type="button"
+                    className="map-location-btn"
                     onClick={() => startLocationEditing('pickup')}
                     title="Set on map"
                   >
                     <FontAwesomeIcon icon={faMapMarkerAlt} />
                   </button>
-                  <button 
-                    type="button" 
-                    className="current-location-btn" 
+                  <button
+                    type="button"
+                    className="current-location-btn"
                     onClick={getCurrentLocation}
                     disabled={isFetchingLocation}
                     title="Use current location"
@@ -806,8 +841,7 @@ const BookARide = () => {
                   </button>
                 </div>
               </div>
-              
-              {/* Dropoff location */}
+
               <div className="input-group">
                 <div className="location-dot dropoff">
                   <FontAwesomeIcon icon={faLocationDot} className="location-icon" />
@@ -820,21 +854,21 @@ const BookARide = () => {
                     onPlaceChanged={() => onPlaceChanged('dropoff')}
                     restrictions={{ country: 'in' }}
                   >
-                    <input 
-                      type="text" 
-                      ref={dropoffRef} 
-                      placeholder="Where to?" 
-                      required 
+                    <input
+                      type="text"
+                      ref={dropoffRef}
+                      value={dropoffInputValue}
+                      onChange={(e) => setDropoffInputValue(e.target.value)}
+                      placeholder="Where to?"
+                      required
                       className="location-input"
                     />
                   </Autocomplete>
-                  
-                  
                 </div>
                 <div className="location-actions">
-                  <button 
-                    type="button" 
-                    className="map-location-btn" 
+                  <button
+                    type="button"
+                    className="map-location-btn"
                     onClick={() => startLocationEditing('dropoff')}
                     title="Set on map"
                   >
@@ -844,12 +878,11 @@ const BookARide = () => {
               </div>
             </div>
 
-            {/* Additional options */}
             <div className="additional-options">
               <div className="passenger-count">
                 <label>Passengers:</label>
-                <select 
-                  value={passengerCount} 
+                <select
+                  value={passengerCount}
                   onChange={(e) => setPassengerCount(parseInt(e.target.value))}
                 >
                   {[1, 2, 3, 4, 5, 6].map(num => (
@@ -857,29 +890,27 @@ const BookARide = () => {
                   ))}
                 </select>
               </div>
-              
-              {/* Ride Preferences Button */}
+
               <div className="preferences-toggle">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className={`preferences-btn ${selectedPreferences.length > 0 ? 'has-preferences' : ''}`}
                   onClick={() => setShowPreferences(!showPreferences)}
                 >
-                  <FontAwesomeIcon icon={faFilter} /> Preferences 
+                  <FontAwesomeIcon icon={faFilter} /> Preferences
                   {selectedPreferences.length > 0 && ` (${selectedPreferences.length})`}
                 </button>
               </div>
             </div>
-            
-            {/* Ride Preferences Section */}
+
             {showPreferences && (
               <div className="ride-preferences-section">
                 <h4>Ride Preferences</h4>
                 <p className="preferences-note">Select your ride preferences (may affect availability and pricing)</p>
                 <div className="preferences-grid">
                   {Object.entries(RIDE_PREFERENCES).map(([key, preference]) => (
-                    <div 
-                      key={key} 
+                    <div
+                      key={key}
                       className={`preference-item ${selectedPreferences.includes(key) ? 'selected' : ''}`}
                       onClick={() => togglePreference(key)}
                     >
@@ -894,9 +925,9 @@ const BookARide = () => {
               </div>
             )}
 
-            <button 
-              type="submit" 
-              className="calculate-btn" 
+            <button
+              type="submit"
+              className="calculate-btn"
               disabled={isLoading}
             >
               {isLoading ? <LoadingSpinner /> : (
@@ -907,29 +938,26 @@ const BookARide = () => {
             </button>
           </form>
         ) : (
-          // Ride options view
           <div className="ride-options">
-            {/* Route summary */}
             <div className="route-summary">
               <div className="route-preview">
                 <div className="location-dot pickup">
                   <FontAwesomeIcon icon={faLocationDot} className="location-icon" />
                 </div>
-                <div className="location-text truncate-text">{pickupRef.current.value}</div>
+                <div className="location-text truncate-text">{pickupInputValue}</div>
                 <div className="location-dot dropoff">
                   <FontAwesomeIcon icon={faLocationDot} className="location-icon" />
                 </div>
-                <div className="location-text truncate-text">{dropoffRef.current.value}</div>
+                <div className="location-text truncate-text">{dropoffInputValue}</div>
               </div>
-              <button 
-                className="edit-route-btn" 
+              <button
+                className="edit-route-btn"
                 onClick={() => setShowRideOptions(false)}
               >
                 <FontAwesomeIcon icon={faEdit} /> Edit
               </button>
             </div>
-            
-            {/* Trip summary */}
+
             <div className="trip-summary">
               <div className="trip-detail">
                 <span className="detail-label">Distance:</span>
@@ -940,18 +968,16 @@ const BookARide = () => {
                 <span className="detail-value">{eta}</span>
               </div>
             </div>
-            
+
             <h3>Choose a ride</h3>
             <div className="ride-types-list">
               {Object.entries(RIDE_TYPES).map(([type, details]) => (
-                <div 
+                <div
                   key={type}
                   className={`ride-type-item ${rideType === type ? 'selected' : ''} ${passengerCount > details.capacity ? 'disabled' : ''}`}
                   onClick={() => {
                     if (passengerCount <= details.capacity) {
                       setRideType(type);
-                      
-                      // Recalculate fare when ride type changes
                       const newFare = (details.base + distance * details.perKm).toFixed(2);
                       setFareEstimate(newFare);
                     }
@@ -973,14 +999,13 @@ const BookARide = () => {
               ))}
             </div>
 
-            {/* Payment section */}
             <div className="booking-details">
               <div className="payment-section">
                 <div className="payment-header" onClick={() => setShowPaymentDetails(!showPaymentDetails)}>
                   <h4>Payment Method</h4>
                   <FontAwesomeIcon icon={showPaymentDetails ? 'angle-up' : 'angle-down'} />
                 </div>
-                
+
                 <div className={`payment-selector ${showPaymentDetails ? 'expanded' : ''}`}>
                   {Object.entries(PAYMENT_METHODS).map(([method, info]) => (
                     <div
@@ -995,7 +1020,6 @@ const BookARide = () => {
                 </div>
               </div>
 
-              {/* Promo code section */}
               <div className="promo-section">
                 {showPromoInput ? (
                   <div className="promo-input-group">
@@ -1008,7 +1032,6 @@ const BookARide = () => {
                     <button
                       className="apply-promo-btn"
                       onClick={() => {
-                        // Apply promo code logic here
                         setShowPromoInput(false);
                       }}
                     >
@@ -1025,7 +1048,6 @@ const BookARide = () => {
                 )}
               </div>
 
-              {/* Additional notes */}
               <div className="notes-section">
                 <textarea
                   placeholder="Additional notes for driver (optional)"
@@ -1037,9 +1059,8 @@ const BookARide = () => {
               </div>
             </div>
 
-            {/* Book button */}
-            <button 
-              className="submit-btn" 
+            <button
+              className="submit-btn"
               onClick={handleBookRide}
               disabled={isLoading || passengerCount > RIDE_TYPES[rideType].capacity}
             >
@@ -1053,19 +1074,17 @@ const BookARide = () => {
         )}
       </div>
 
-      {/* Map container */}
       <div className="map-container-book">
-        <GoogleMap 
-          mapContainerStyle={containerStyle} 
-          center={center} 
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={center}
           zoom={14}
           onLoad={onMapLoad}
           onClick={handleMapClick}
           options={mapOptions}
         >
-          {/* Current location marker */}
           {currentLocation && !pickupLocation && !dropoffLocation && (
-            <Marker 
+            <Marker
               position={currentLocation}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
@@ -1077,10 +1096,9 @@ const BookARide = () => {
               }}
             />
           )}
-          
-          {/* Pickup location marker */}
+
           {pickupLocation && !directions && (
-            <Marker 
+            <Marker
               position={pickupLocation}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
@@ -1093,10 +1111,9 @@ const BookARide = () => {
               title="Pickup Location"
             />
           )}
-          
-          {/* Dropoff location marker */}
+
           {dropoffLocation && !directions && (
-            <Marker 
+            <Marker
               position={dropoffLocation}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
@@ -1109,10 +1126,9 @@ const BookARide = () => {
               title="Dropoff Location"
             />
           )}
-          
-          {/* Route directions */}
+
           {directions && (
-            <DirectionsRenderer 
+            <DirectionsRenderer
               directions={directions}
               options={{
                 polylineOptions: {
@@ -1124,10 +1140,9 @@ const BookARide = () => {
               }}
             />
           )}
-          
-          {/* Route markers when directions are shown */}
+
           {directions && pickupLocation && (
-            <Marker 
+            <Marker
               position={pickupLocation}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
@@ -1140,9 +1155,9 @@ const BookARide = () => {
               title="Pickup Location"
             />
           )}
-          
+
           {directions && dropoffLocation && (
-            <Marker 
+            <Marker
               position={dropoffLocation}
               icon={{
                 path: window.google.maps.SymbolPath.CIRCLE,
@@ -1155,8 +1170,7 @@ const BookARide = () => {
               title="Dropoff Location"
             />
           )}
-          
-          {/* Nearby drivers */}
+
           {nearbyDrivers.map(driver => (
             <Marker
               key={driver.id}
@@ -1171,27 +1185,24 @@ const BookARide = () => {
               }}
             />
           ))}
-          
-          {/* Map tooltip when editing location */}
+
           {showMapTooltip && (
             <div className="map-tooltip-book">
               Click on the map to set your {isEditingLocation} location
             </div>
           )}
         </GoogleMap>
-        
-        {/* Mobile-friendly current location button */}
-        <button 
+
+        <button
           onClick={getCurrentLocation}
           className="current-location-map-btn"
           disabled={isFetchingLocation}
         >
           {isFetchingLocation ? <LoadingSpinner /> : <FontAwesomeIcon icon={faLocationDot} />}
         </button>
-        
-        {/* Cancel map location selection button */}
+
         {isEditingLocation && (
-          <button 
+          <button
             onClick={() => {
               setIsEditingLocation(null);
               setShowMapTooltip(false);

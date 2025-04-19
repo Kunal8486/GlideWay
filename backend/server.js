@@ -9,6 +9,7 @@ const poolrideRoutes = require('./Routes/poolride')
 const poolride2Routes = require('./Routes/poolride2.js')
 const poolride3Routes = require('./Routes/poolride3.js')
 const communityRoutes = require('./Routes/community.js')
+const rideRoutes = require('./Routes/ride.js')
 require('./Models/Rider.js');
 require('./Models/Ride.js'); 
 
@@ -36,6 +37,7 @@ app.use('/api/rides/pool', poolrideRoutes);
 app.use('/api/rides/pool', poolride2Routes);
 app.use('/api/rides/pool', poolride3Routes);
 app.use('/api/community', communityRoutes);
+app.use('/api/rides', rideRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
