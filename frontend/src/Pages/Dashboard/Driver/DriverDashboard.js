@@ -34,6 +34,18 @@ const DriverDashboard = () => {
       time: '1 hour ago'
     }
   ]);
+  
+  // Added rider preferences state
+  const [driverPreferences, setDriverPreferences] = useState({
+    petFriendly: false,
+    ecoFriendly: true,
+    wheelchairAccessible: false,
+    quietRide: true,
+    extraStops: true,
+    foodAllowed: false,
+    temperaturePreference: "moderate" // options: cool, moderate, warm
+  });
+  
   const [opportunities, setOpportunities] = useState([
     {
       id: 'opp1',
@@ -65,7 +77,11 @@ const DriverDashboard = () => {
           estimatedEarning: '$12.50',
           estimatedTime: '15 mins',
           passengerRating: 4.7,
-          rideType: 'Standard'
+          rideType: 'Standard',
+          passengerPreferences: {
+            petFriendly: true,
+            quietRide: true
+          }
         },
         {
           id: 'ride-2',
@@ -76,7 +92,11 @@ const DriverDashboard = () => {
           estimatedEarning: '$18.75',
           estimatedTime: '22 mins',
           passengerRating: 4.9,
-          rideType: 'Premium'
+          rideType: 'Premium',
+          passengerPreferences: {
+            ecoFriendly: true,
+            temperaturePreference: "cool"
+          }
         }
       ];
 
@@ -104,6 +124,22 @@ const DriverDashboard = () => {
       setCurrentRide(null);
       console.log('Driver is now offline');
     }
+  };
+
+  // Handle preference toggle
+  const togglePreference = (preference) => {
+    setDriverPreferences(prev => ({
+      ...prev,
+      [preference]: !prev[preference]
+    }));
+  };
+
+  // Handle temperature preference change
+  const changeTemperaturePreference = (value) => {
+    setDriverPreferences(prev => ({
+      ...prev,
+      temperaturePreference: value
+    }));
   };
 
   // Accept a ride
@@ -223,6 +259,46 @@ const DriverDashboard = () => {
     }
   };
 
+  // Get preference icon
+  const getPreferenceIcon = (preference) => {
+    switch(preference) {
+      case 'petFriendly': return '🐾';
+      case 'ecoFriendly': return '🌱';
+      case 'wheelchairAccessible': return '♿';
+      case 'quietRide': return '🔇';
+      case 'extraStops': return '🛑';
+      case 'foodAllowed': return '🍔';
+      case 'temperaturePreference': return '🌡️';
+      default: return '⚙️';
+    }
+  };
+
+  // Format preference label
+  const formatPreferenceLabel = (preference) => {
+    switch(preference) {
+      case 'petFriendly': return 'Pet Friendly';
+      case 'ecoFriendly': return 'Eco Friendly';
+      case 'wheelchairAccessible': return 'Wheelchair Accessible';
+      case 'quietRide': return 'Quiet Ride';
+      case 'extraStops': return 'Extra Stops';
+      case 'foodAllowed': return 'Food Allowed';
+      case 'temperaturePreference': return 'Temperature';
+      default: return preference;
+    }
+  };
+
+  // Save preferences
+  const savePreferences = () => {
+    // In a real app, this would make an API call to save preferences
+    const newNotification = {
+      id: Date.now(),
+      type: 'success',
+      message: 'Your preferences have been updated successfully!',
+      time: 'Just now'
+    };
+    setNotifications([newNotification, ...notifications.slice(0, 4)]);
+  };
+
   return (
     <div className="driver-dashboard">
       <aside className="side-nav">
@@ -251,6 +327,13 @@ const DriverDashboard = () => {
           >
             <span className="nav-icon">📝</span>
             Activity
+          </button>
+          <button 
+            className={`nav-link ${activeTab === 'preferences' ? 'active' : ''}`}
+            onClick={() => setActiveTab('preferences')}
+          >
+            <span className="nav-icon">⚙️</span>
+            Preferences
           </button>
           <button 
             className={`nav-link ${activeTab === 'account' ? 'active' : ''}`}
@@ -300,390 +383,571 @@ const DriverDashboard = () => {
         </header>
 
         <div className="dashboard-content">
-          <div className="quick-stats">
-            <div className="quick-stat-item">
-              <span className="stat-icon">💰</span>
-              <div className="stat-details">
-                <span className="stat-label">Today's Earnings</span>
-                <span className="stat-value">{formatCurrency(earnings.today)}</span>
-              </div>
-            </div>
-            <div className="quick-stat-item">
-              <span className="stat-icon">🚕</span>
-              <div className="stat-details">
-                <span className="stat-label">Total Rides</span>
-                <span className="stat-value">{stats.totalRides}</span>
-              </div>
-            </div>
-            <div className="quick-stat-item">
-              <span className="stat-icon">⭐</span>
-              <div className="stat-details">
-                <span className="stat-label">Rating</span>
-                <span className="stat-value">{stats.rating}</span>
-              </div>
-            </div>
-            <div className="quick-stat-item">
-              <span className="stat-icon">✓</span>
-              <div className="stat-details">
-                <span className="stat-label">Acceptance</span>
-                <span className="stat-value">{stats.acceptanceRate}%</span>
-              </div>
-            </div>
-          </div>
-
-          {currentRide && (
-            <div className="current-ride-section section-card active-card">
+          {activeTab === 'preferences' ? (
+            <div className="preferences-section section-card">
               <div className="section-header">
-                <h2>Current Trip</h2>
-                <span className="ride-type-badge">{currentRide.rideType}</span>
+                <h2>Ride Preferences</h2>
+                <p className="preferences-description">Set your preferences to be matched with compatible riders</p>
               </div>
               
-              <div className="ride-details">
-                <div className="ride-passenger">
-                  <div className="passenger-avatar"></div>
-                  <div>
-                    <p className="passenger-name">{currentRide.passenger}</p>
-                    <p className="passenger-rating">
-                      <span className="star">★</span> {currentRide.passengerRating}
-                    </p>
-                  </div>
-                  <button className="contact-button" onClick={contactPassenger}>
-                    <span className="contact-icon">📞</span>
-                  </button>
-                </div>
-                
-                <div className="ride-locations">
-                  <div className="location pickup">
-                    <div className="location-dot"></div>
-                    <div className="location-details">
-                      <span className="location-label">Pickup</span>
-                      <p className="location-address">{currentRide.pickupLocation}</p>
+              <div className="preferences-grid">
+                {/* Toggle switches for boolean preferences */}
+                {Object.keys(driverPreferences).filter(key => typeof driverPreferences[key] === 'boolean').map(preference => (
+                  <div className="preference-item" key={preference}>
+                    <div className="preference-header">
+                      <span className="preference-icon">{getPreferenceIcon(preference)}</span>
+                      <span className="preference-label">{formatPreferenceLabel(preference)}</span>
                     </div>
-                    <button className="navigate-button" onClick={navigateToPickup}>
-                      <span className="navigate-icon">🗺️</span>
-                    </button>
-                  </div>
-                  <div className="location-connector">
-                    <div className="connector-progress"></div>
-                  </div>
-                  <div className="location dropoff">
-                    <div className="location-dot"></div>
-                    <div className="location-details">
-                      <span className="location-label">Dropoff</span>
-                      <p className="location-address">{currentRide.dropoffLocation}</p>
+                    <div className="preference-toggle">
+                      <label className="switch">
+                        <input 
+                          type="checkbox" 
+                          checked={driverPreferences[preference]} 
+                          onChange={() => togglePreference(preference)}
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                      <span className="toggle-status">{driverPreferences[preference] ? 'Yes' : 'No'}</span>
                     </div>
                   </div>
-                </div>
+                ))}
                 
-                <div className="ride-meta">
-                  <div className="meta-item">
-                    <span className="meta-icon">📏</span>
-                    <span className="meta-label">Distance</span>
-                    <span className="meta-value">{currentRide.distance}</span>
+                {/* Temperature preference (select) */}
+                <div className="preference-item">
+                  <div className="preference-header">
+                    <span className="preference-icon">{getPreferenceIcon('temperaturePreference')}</span>
+                    <span className="preference-label">{formatPreferenceLabel('temperaturePreference')}</span>
                   </div>
-                  <div className="meta-item">
-                    <span className="meta-icon">⏱️</span>
-                    <span className="meta-label">Est. Time</span>
-                    <span className="meta-value">{currentRide.estimatedTime}</span>
-                  </div>
-                  <div className="meta-item">
-                    <span className="meta-icon">💵</span>
-                    <span className="meta-label">Earning</span>
-                    <span className="meta-value">{currentRide.estimatedEarning}</span>
+                  <div className="temperature-preference">
+                    <select 
+                      value={driverPreferences.temperaturePreference}
+                      onChange={(e) => changeTemperaturePreference(e.target.value)}
+                    >
+                      <option value="cool">Cool</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="warm">Warm</option>
+                    </select>
                   </div>
                 </div>
-                
-                <div className="ride-actions">
-                  <button 
-                    className="cancel-ride-button"
-                    onClick={cancelRide}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="complete-ride-button"
-                    onClick={completeRide}
-                  >
-                    Complete Trip
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!currentRide && pendingRides.length > 0 && (
-            <div className="pending-rides-section section-card active-card">
-              <div className="section-header">
-                <h2>New Ride Request</h2>
-                <div className="countdown-timer">15</div>
               </div>
               
-              {pendingRides.map(ride => (
-                <div className="ride-request" key={ride.id}>
-                  <div className="request-header">
+              <div className="preference-badges">
+                <h3>Your Rider Match Preferences:</h3>
+                <div className="badge-container">
+                  {Object.entries(driverPreferences).map(([key, value]) => {
+                    if (typeof value === 'boolean' && value) {
+                      return (
+                        <span className="preference-badge" key={key}>
+                          {getPreferenceIcon(key)} {formatPreferenceLabel(key)}
+                        </span>
+                      );
+                    } else if (key === 'temperaturePreference') {
+                      return (
+                        <span className="preference-badge" key={key}>
+                          {getPreferenceIcon(key)} {value.charAt(0).toUpperCase() + value.slice(1)}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+              
+              <div className="preferences-footer">
+                <button className="save-preferences-button" onClick={savePreferences}>
+                  Save Preferences
+                </button>
+                <p className="preferences-note">
+                  Riders will be able to filter by these preferences when looking for a ride
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="quick-stats">
+                <div className="quick-stat-item">
+                  <span className="stat-icon">💰</span>
+                  <div className="stat-details">
+                    <span className="stat-label">Today's Earnings</span>
+                    <span className="stat-value">{formatCurrency(earnings.today)}</span>
+                  </div>
+                </div>
+                <div className="quick-stat-item">
+                  <span className="stat-icon">🚕</span>
+                  <div className="stat-details">
+                    <span className="stat-label">Total Rides</span>
+                    <span className="stat-value">{stats.totalRides}</span>
+                  </div>
+                </div>
+                <div className="quick-stat-item">
+                  <span className="stat-icon">⭐</span>
+                  <div className="stat-details">
+                    <span className="stat-label">Rating</span>
+                    <span className="stat-value">{stats.rating}</span>
+                  </div>
+                </div>
+                <div className="quick-stat-item">
+                  <span className="stat-icon">✓</span>
+                  <div className="stat-details">
+                    <span className="stat-label">Acceptance</span>
+                    <span className="stat-value">{stats.acceptanceRate}%</span>
+                  </div>
+                </div>
+              </div>
+
+              {currentRide && (
+                <div className="current-ride-section section-card active-card">
+                  <div className="section-header">
+                    <h2>Current Trip</h2>
+                    <span className="ride-type-badge">{currentRide.rideType}</span>
+                  </div>
+                  
+                  <div className="ride-details">
                     <div className="ride-passenger">
                       <div className="passenger-avatar"></div>
                       <div>
-                        <p className="passenger-name">{ride.passenger}</p>
+                        <p className="passenger-name">{currentRide.passenger}</p>
                         <p className="passenger-rating">
-                          <span className="star">★</span> {ride.passengerRating}
+                          <span className="star">★</span> {currentRide.passengerRating}
                         </p>
                       </div>
+                      <button className="contact-button" onClick={contactPassenger}>
+                        <span className="contact-icon">📞</span>
+                      </button>
                     </div>
-                    <span className="ride-type-badge">{ride.rideType}</span>
-                  </div>
-                  
-                  <div className="ride-locations">
-                    <div className="location pickup">
-                      <div className="location-dot"></div>
-                      <div className="location-details">
-                        <span className="location-label">Pickup</span>
-                        <p className="location-address">{ride.pickupLocation}</p>
+                    
+                    {/* Display passenger preferences if available */}
+                    {currentRide.passengerPreferences && (
+                      <div className="passenger-preferences">
+                        <h4>Passenger Preferences:</h4>
+                        <div className="preference-badges">
+                          {Object.entries(currentRide.passengerPreferences).map(([key, value]) => {
+                            if (value === true) {
+                              return (
+                                <span className="preference-badge" key={key}>
+                                  {getPreferenceIcon(key)} {formatPreferenceLabel(key)}
+                                </span>
+                              );
+                            } else if (key === 'temperaturePreference' && value) {
+                              return (
+                                <span className="preference-badge" key={key}>
+                                  {getPreferenceIcon(key)} {value.charAt(0).toUpperCase() + value.slice(1)}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="ride-locations">
+                      <div className="location pickup">
+                        <div className="location-dot"></div>
+                        <div className="location-details">
+                          <span className="location-label">Pickup</span>
+                          <p className="location-address">{currentRide.pickupLocation}</p>
+                        </div>
+                        <button className="navigate-button" onClick={navigateToPickup}>
+                          <span className="navigate-icon">🗺️</span>
+                        </button>
+                      </div>
+                      <div className="location-connector">
+                        <div className="connector-progress"></div>
+                      </div>
+                      <div className="location dropoff">
+                        <div className="location-dot"></div>
+                        <div className="location-details">
+                          <span className="location-label">Dropoff</span>
+                          <p className="location-address">{currentRide.dropoffLocation}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="location-connector"></div>
-                    <div className="location dropoff">
-                      <div className="location-dot"></div>
-                      <div className="location-details">
-                        <span className="location-label">Dropoff</span>
-                        <p className="location-address">{ride.dropoffLocation}</p>
+                    
+                    <div className="ride-meta">
+                      <div className="meta-item">
+                        <span className="meta-icon">📏</span>
+                        <span className="meta-label">Distance</span>
+                        <span className="meta-value">{currentRide.distance}</span>
+                      </div>
+                      <div className="meta-item">
+                        <span className="meta-icon">⏱️</span>
+                        <span className="meta-label">Est. Time</span>
+                        <span className="meta-value">{currentRide.estimatedTime}</span>
+                      </div>
+                      <div className="meta-item">
+                        <span className="meta-icon">💵</span>
+                        <span className="meta-label">Earning</span>
+                        <span className="meta-value">{currentRide.estimatedEarning}</span>
                       </div>
                     </div>
-                  </div>
-                  
-                  <div className="ride-meta">
-                    <div className="meta-item">
-                      <span className="meta-icon">📏</span>
-                      <span className="meta-label">Distance</span>
-                      <span className="meta-value">{ride.distance}</span>
+                    
+                    <div className="ride-actions">
+                      <button 
+                        className="cancel-ride-button"
+                        onClick={cancelRide}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        className="complete-ride-button"
+                        onClick={completeRide}
+                      >
+                        Complete Trip
+                      </button>
                     </div>
-                    <div className="meta-item">
-                      <span className="meta-icon">⏱️</span>
-                      <span className="meta-label">Est. Time</span>
-                      <span className="meta-value">{ride.estimatedTime}</span>
-                    </div>
-                    <div className="meta-item">
-                      <span className="meta-icon">💵</span>
-                      <span className="meta-label">Earning</span>
-                      <span className="meta-value">{ride.estimatedEarning}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="request-actions">
-                    <button 
-                      className="decline-button"
-                      onClick={() => declineRide(ride.id)}
-                    >
-                      Decline
-                    </button>
-                    <button 
-                      className="accept-button"
-                      onClick={() => acceptRide(ride)}
-                    >
-                      Accept
-                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {!currentRide && !pendingRides.length && (
-            <div className={`dashboard-grid ${isOnline ? '' : 'offline-mode'}`}>
-              <div className="earnings-section section-card">
-                <h2>Earnings Overview</h2>
-                <div className="earnings-grid">
-                  <div className="earning-item">
-                    <span className="earning-label">Today</span>
-                    <span className="earning-value">{formatCurrency(earnings.today)}</span>
-                  </div>
-                  <div className="earning-item">
-                    <span className="earning-label">This Week</span>
-                    <span className="earning-value">{formatCurrency(earnings.week)}</span>
-                  </div>
-                  <div className="earning-item">
-                    <span className="earning-label">This Month</span>
-                    <span className="earning-value">{formatCurrency(earnings.month)}</span>
-                  </div>
-                </div>
-                
-                <div className="earnings-chart">
-                  <div className="chart-legend">
-                    <span className="day">M</span>
-                    <span className="day">T</span>
-                    <span className="day">W</span>
-                    <span className="day">T</span>
-                    <span className="day">F</span>
-                    <span className="day">S</span>
-                    <span className="day">S</span>
-                  </div>
-                  <div className="chart-bars">
-                    <div className="chart-bar" style={{height: '30%'}}></div>
-                    <div className="chart-bar" style={{height: '50%'}}></div>
-                    <div className="chart-bar" style={{height: '70%'}}></div>
-                    <div className="chart-bar" style={{height: '45%'}}></div>
-                    <div className="chart-bar" style={{height: '85%'}}></div>
-                    <div className="chart-bar" style={{height: '60%'}}></div>
-                    <div className="chart-bar active" style={{height: '20%'}}></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stats-section section-card">
-                <h2>Performance</h2>
-                <div className="performance-stats">
-                  <div className="performance-item">
-                    <div className="performance-header">
-                      <span className="performance-label">Acceptance Rate</span>
-                      <span className="performance-value">{stats.acceptanceRate}%</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress" style={{width: `${stats.acceptanceRate}%`}}></div>
-                    </div>
+              {!currentRide && pendingRides.length > 0 && (
+                <div className="pending-rides-section section-card active-card">
+                  <div className="section-header">
+                    <h2>New Ride Request</h2>
+                    <div className="countdown-timer">15</div>
                   </div>
                   
-                  <div className="performance-item">
-                    <div className="performance-header">
-                      <span className="performance-label">Completion Rate</span>
-                      <span className="performance-value">{stats.completionRate}%</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress" style={{width: `${stats.completionRate}%`}}></div>
-                    </div>
-                  </div>
-                  
-                  <div className="performance-item">
-                    <div className="performance-header">
-                      <span className="performance-label">Cancellation Rate</span>
-                      <span className="performance-value">{stats.cancelRate}%</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress red" style={{width: `${stats.cancelRate * 3}%`}}></div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="rating-breakdown">
-                  <h3>Rating Breakdown</h3>
-                  <div className="rating-stars">
-                    <div className="rating-row">
-                      <span className="rating-label">5 ★</span>
-                      <div className="rating-bar-container">
-                        <div className="rating-bar" style={{width: '75%'}}></div>
-                      </div>
-                      <span className="rating-percent">75%</span>
-                    </div>
-                    <div className="rating-row">
-                      <span className="rating-label">4 ★</span>
-                      <div className="rating-bar-container">
-                        <div className="rating-bar" style={{width: '20%'}}></div>
-                      </div>
-                      <span className="rating-percent">20%</span>
-                    </div>
-                    <div className="rating-row">
-                      <span className="rating-label">3 ★</span>
-                      <div className="rating-bar-container">
-                        <div className="rating-bar" style={{width: '5%'}}></div>
-                      </div>
-                      <span className="rating-percent">5%</span>
-                    </div>
-                    <div className="rating-row">
-                      <span className="rating-label">2 ★</span>
-                      <div className="rating-bar-container">
-                        <div className="rating-bar" style={{width: '0%'}}></div>
-                      </div>
-                      <span className="rating-percent">0%</span>
-                    </div>
-                    <div className="rating-row">
-                      <span className="rating-label">1 ★</span>
-                      <div className="rating-bar-container">
-                        <div className="rating-bar" style={{width: '0%'}}></div>
-                      </div>
-                      <span className="rating-percent">0%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {isOnline && (
-                <div className="opportunities-section section-card">
-                  <h2>Opportunities</h2>
-                  {opportunities.length > 0 ? (
-                    <div className="opportunities-list">
-                      {opportunities.map(opportunity => (
-                        <div className="opportunity-item" key={opportunity.id}>
-                          <span className="opportunity-icon">{getOpportunityIcon(opportunity.type)}</span>
-                          <div className="opportunity-details">
-                            <span className="opportunity-title">
-                              {opportunity.type === 'surge' 
-                                ? `${opportunity.multiplier} Surge Pricing` 
-                                : `${opportunity.description}`}
-                            </span>
-                            <span className="opportunity-location">{opportunity.location}</span>
-                            {opportunity.time && (
-                              <span className="opportunity-time">{opportunity.time}</span>
-                            )}
+                  {pendingRides.map(ride => (
+                    <div className="ride-request" key={ride.id}>
+                      <div className="request-header">
+                        <div className="ride-passenger">
+                          <div className="passenger-avatar"></div>
+                          <div>
+                            <p className="passenger-name">{ride.passenger}</p>
+                            <p className="passenger-rating">
+                              <span className="star">★</span> {ride.passengerRating}
+                            </p>
                           </div>
-                          <span className="opportunity-distance">{opportunity.distance}</span>
+                        </div>
+                        <span className="ride-type-badge">{ride.rideType}</span>
+                      </div>
+                      
+                      {/* Display passenger preferences if available */}
+                      {ride.passengerPreferences && (
+                        <div className="passenger-preferences">
+                          <h4>Passenger Preferences:</h4>
+                          <div className="preference-badges">
+                            {Object.entries(ride.passengerPreferences).map(([key, value]) => {
+                              if (value === true) {
+                                return (
+                                  <span className="preference-badge" key={key}>
+                                    {getPreferenceIcon(key)} {formatPreferenceLabel(key)}
+                                  </span>
+                                );
+                              } else if (key === 'temperaturePreference' && value) {
+                                return (
+                                  <span className="preference-badge" key={key}>
+                                    {getPreferenceIcon(key)} {value.charAt(0).toUpperCase() + value.slice(1)}
+                                  </span>
+                                );
+                              }
+                              return null;
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="ride-locations">
+                        <div className="location pickup">
+                          <div className="location-dot"></div>
+                          <div className="location-details">
+                            <span className="location-label">Pickup</span>
+                            <p className="location-address">{ride.pickupLocation}</p>
+                          </div>
+                        </div>
+                        <div className="location-connector"></div>
+                        <div className="location dropoff">
+                          <div className="location-dot"></div>
+                          <div className="location-details">
+                            <span className="location-label">Dropoff</span>
+                            <p className="location-address">{ride.dropoffLocation}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="ride-meta">
+                        <div className="meta-item">
+                          <span className="meta-icon">📏</span>
+                          <span className="meta-label">Distance</span>
+                          <span className="meta-value">{ride.distance}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-icon">⏱️</span>
+                          <span className="meta-label">Est. Time</span>
+                          <span className="meta-value">{ride.estimatedTime}</span>
+                        </div>
+                        <div className="meta-item">
+                          <span className="meta-icon">💵</span>
+                          <span className="meta-label">Earning</span>
+                          <span className="meta-value">{ride.estimatedEarning}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="request-actions">
+                        <button 
+                          className="decline-button"
+                          onClick={() => declineRide(ride.id)}
+                        >
+                          Decline
+                        </button>
+                        <button 
+                          className="accept-button"
+                          onClick={() => acceptRide(ride)}
+                        >
+                          Accept
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {!currentRide && !pendingRides.length && (
+                <div className={`dashboard-grid ${isOnline ? '' : 'offline-mode'}`}>
+                  <div className="earnings-section section-card">
+                    <h2>Earnings Overview</h2>
+                    <div className="earnings-grid">
+                      <div className="earning-item">
+                        <span className="earning-label">Today</span>
+                        <span className="earning-value">{formatCurrency(earnings.today)}</span>
+                      </div>
+                      <div className="earning-item">
+                        <span className="earning-label">This Week</span>
+                        <span className="earning-value">{formatCurrency(earnings.week)}</span>
+                      </div>
+                      <div className="earning-item">
+                        <span className="earning-label">This Month</span>
+                        <span className="earning-value">{formatCurrency(earnings.month)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="earnings-chart">
+                      <div className="chart-legend">
+                        <span className="day">M</span>
+                        <span className="day">T</span>
+                        <span className="day">W</span>
+                        <span className="day">T</span>
+                        <span className="day">F</span>
+                        <span className="day">S</span>
+                        <span className="day">S</span>
+                      </div>
+                      <div className="chart-bars">
+                        <div className="chart-bar" style={{height: '30%'}}></div>
+                        <div className="chart-bar" style={{height: '50%'}}></div>
+                        <div className="chart-bar" style={{height: '70%'}}></div>
+                        <div className="chart-bar" style={{height: '45%'}}></div>
+                        <div className="chart-bar" style={{height: '85%'}}></div>
+                        <div className="chart-bar" style={{height: '60%'}}></div>
+                        <div className="chart-bar active" style={{height: '20%'}}></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="stats-section section-card">
+                    <h2>Performance</h2>
+                    <div className="performance-stats">
+                      <div className="performance-item">
+                        <div className="performance-header">
+                          <span className="performance-label">Acceptance Rate</span>
+                          <span className="performance-value">{stats.acceptanceRate}%</span>
+                        </div>
+                        <div className="progress-bar">
+                          <div className="progress" style={{width: `${stats.acceptanceRate}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="performance-item">
+                        <div className="performance-header">
+                          <span className="performance-label">Completion Rate</span>
+                          <span className="performance-value">{stats.completionRate}%</span>
+                        </div>
+                        <div className="progress-bar">
+                          <div className="progress" style={{width: `${stats.completionRate}%`}}></div>
+                        </div>
+                      </div>
+                      
+                      <div className="performance-item">
+                        <div className="performance-header">
+                          <span className="performance-label">Cancellation Rate</span>
+                          <span className="performance-value">{stats.cancelRate}%</span>
+                        </div>
+                        <div className="progress-bar">
+                          <div className="progress red" style={{width: `${stats.cancelRate * 3}%`}}></div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="rating-breakdown">
+                      <h3>Rating Breakdown</h3>
+                      <div className="rating-stars">
+                        <div className="rating-row">
+                          <span className="rating-label">5 ★</span>
+                          <div className="rating-bar-container">
+                            <div className="rating-bar" style={{width: '75%'}}></div>
+                          </div>
+                          <span className="rating-percent">75%</span>
+                        </div>
+                        <div className="rating-row">
+                          <span className="rating-label">4 ★</span>
+                          <div className="rating-bar-container">
+                            <div className="rating-bar" style={{width: '20%'}}></div>
+                            </div>
+                          <span className="rating-percent">20%</span>
+                        </div>
+                        <div className="rating-row">
+                          <span className="rating-label">3 ★</span>
+                          <div className="rating-bar-container">
+                            <div className="rating-bar" style={{width: '5%'}}></div>
+                          </div>
+                          <span className="rating-percent">5%</span>
+                        </div>
+                        <div className="rating-row">
+                          <span className="rating-label">2 ★</span>
+                          <div className="rating-bar-container">
+                            <div className="rating-bar" style={{width: '0%'}}></div>
+                          </div>
+                          <span className="rating-percent">0%</span>
+                        </div>
+                        <div className="rating-row">
+                          <span className="rating-label">1 ★</span>
+                          <div className="rating-bar-container">
+                            <div className="rating-bar" style={{width: '0%'}}></div>
+                          </div>
+                          <span className="rating-percent">0%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Added Preferences Summary Card to Dashboard */}
+                  <div className="preferences-summary-section section-card">
+                    <h2>Your Rider Preferences</h2>
+                    <div className="active-preferences">
+                      {Object.entries(driverPreferences).filter(([key, value]) => 
+                        typeof value === 'boolean' && value
+                      ).map(([key]) => (
+                        <div className="preference-item-summary" key={key}>
+                          <span className="preference-icon">{getPreferenceIcon(key)}</span>
+                          <span className="preference-label">{formatPreferenceLabel(key)}</span>
                         </div>
                       ))}
+                      <div className="preference-item-summary">
+                        <span className="preference-icon">{getPreferenceIcon('temperaturePreference')}</span>
+                        <span className="preference-label">
+                          Temperature: {driverPreferences.temperaturePreference.charAt(0).toUpperCase() + driverPreferences.temperaturePreference.slice(1)}
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="no-opportunities">No current opportunities in your area</p>
+                    <button 
+                      className="edit-preferences-button"
+                      onClick={() => setActiveTab('preferences')}
+                    >
+                      Edit Preferences
+                    </button>
+                  </div>
+
+                  {isOnline && (
+                    <div className="opportunities-section section-card">
+                      <h2>Opportunities</h2>
+                      {opportunities.length > 0 ? (
+                        <div className="opportunities-list">
+                          {opportunities.map(opportunity => (
+                            <div className="opportunity-item" key={opportunity.id}>
+                              <span className="opportunity-icon">{getOpportunityIcon(opportunity.type)}</span>
+                              <div className="opportunity-details">
+                                <span className="opportunity-title">
+                                  {opportunity.type === 'surge' 
+                                    ? `${opportunity.multiplier} Surge Pricing` 
+                                    : `${opportunity.description}`}
+                                </span>
+                                <span className="opportunity-location">{opportunity.location}</span>
+                                {opportunity.time && (
+                                  <span className="opportunity-time">{opportunity.time}</span>
+                                )}
+                              </div>
+                              <span className="opportunity-distance">{opportunity.distance}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="no-opportunities">No current opportunities in your area</p>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="notifications-section section-card">
+                    <h2>Notifications</h2>
+                    {notifications.length > 0 ? (
+                      <div className="notifications-list">
+                        {notifications.map(notification => (
+                          <div className="notification-item" key={notification.id}>
+                            <span className="notification-icon">{getNotificationIcon(notification.type)}</span>
+                            <div className="notification-content">
+                              <p className="notification-message">{notification.message}</p>
+                              <span className="notification-time">{notification.time}</span>
+                            </div>
+                            <button 
+                              className="dismiss-button"
+                              onClick={() => dismissNotification(notification.id)}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-notifications">No new notifications</p>
+                    )}
+                  </div>
+
+                  {isOnline && !pendingRides.length && !currentRide && (
+                    <div className="waiting-section section-card">
+                      <div className="waiting-animation">
+                        <div className="pulsating-circle"></div>
+                        <div className="car-icon">🚗</div>
+                      </div>
+                      <h2>Looking for Trips</h2>
+                      <p>You'll be notified when a new request arrives</p>
+                      <div className="preference-match-info">
+                        <p>Matching with riders based on your preferences:</p>
+                        <div className="preference-badges mini">
+                          {Object.entries(driverPreferences).map(([key, value]) => {
+                            if (typeof value === 'boolean' && value) {
+                              return (
+                                <span className="preference-badge" key={key}>
+                                  {getPreferenceIcon(key)} {formatPreferenceLabel(key)}
+                                </span>
+                              );
+                            } else if (key === 'temperaturePreference') {
+                              return (
+                                <span className="preference-badge" key={key}>
+                                  {getPreferenceIcon(key)} {value.charAt(0).toUpperCase() + value.slice(1)}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isOnline && (
+                    <div className="offline-section section-card">
+                      <div className="offline-illustration">🌙</div>
+                      <h2>You're Offline</h2>
+                      <p>Go online to start accepting trips and earning</p>
+                      <button 
+                        className="go-online-button"
+                        onClick={toggleOnlineStatus}
+                      >
+                        Go Online Now
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
-
-              <div className="notifications-section section-card">
-                <h2>Notifications</h2>
-                {notifications.length > 0 ? (
-                  <div className="notifications-list">
-                    {notifications.map(notification => (
-                      <div className="notification-item" key={notification.id}>
-                        <span className="notification-icon">{getNotificationIcon(notification.type)}</span>
-                        <div className="notification-content">
-                          <p className="notification-message">{notification.message}</p>
-                          <span className="notification-time">{notification.time}</span>
-                        </div>
-                        <button 
-                          className="dismiss-button"
-                          onClick={() => dismissNotification(notification.id)}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="no-notifications">No new notifications</p>
-                )}
-              </div>
-
-              {isOnline && !pendingRides.length && !currentRide && (
-                <div className="waiting-section section-card">
-                  <div className="waiting-animation">
-                    <div className="pulsating-circle"></div>
-                    <div className="car-icon">🚗</div>
-                  </div>
-                  <h2>Looking for Trips</h2>
-                  <p>You'll be notified when a new request arrives</p>
-                </div>
-              )}
-
-              {!isOnline && (
-                <div className="offline-section section-card">
-                  <div className="offline-illustration">🌙</div>
-                  <h2>You're Offline</h2>
-                  <p>Go online to start accepting trips and earning</p>
-                  <button 
-                    className="go-online-button"
-                    onClick={toggleOnlineStatus}
-                  >
-                    Go Online Now
-                  </button>
-                </div>
-              )}
-            </div>
+            </>
           )}
         </div>
       </main>
