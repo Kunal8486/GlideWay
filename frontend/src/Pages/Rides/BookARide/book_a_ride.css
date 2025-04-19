@@ -881,3 +881,103 @@ textarea {
     margin-bottom: 12px;
   }
 }
+
+/* Ride Preferences Section */
+.preferences-toggle {
+  margin-left: auto;
+}
+
+.preferences-btn {
+  background-color: var(--secondary-color);
+  color: var(--accent-color);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preferences-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--white);
+}
+
+.preferences-btn.has-preferences {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.ride-preferences-section {
+  background-color: var(--light-gray);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  animation: fadeIn 0.3s ease;
+}
+
+.preferences-note {
+  font-size: 0.85rem;
+  color: var(--text-lighter);
+  margin-bottom: 12px;
+}
+
+.preferences-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.preference-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--white);
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--light-gray);
+  transition: all 0.2s ease;
+}
+
+.preference-item:hover {
+  border-color: var(--primary-color);
+}
+
+.preference-item.selected {
+  border-color: var(--primary-color);
+  background-color: rgba(139, 115, 95, 0.05);
+}
+
+.preference-item svg {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  min-width: 20px;
+}
+
+.preference-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.preference-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.preference-desc {
+  font-size: 0.75rem;
+  color: var(--text-lighter);
+}
+
+/* Responsive adjustments for preferences */
+@media (max-width: 480px) {
+  .preferences-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .preference-item {
+    padding: 10px;
+  }
+}

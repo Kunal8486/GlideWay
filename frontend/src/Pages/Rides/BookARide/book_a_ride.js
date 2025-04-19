@@ -24,7 +24,15 @@ import {
   faHistory,
   faStar,
   faShield,
-  faInfoCircle
+  faInfoCircle,
+  faPaw,
+  faLeaf,
+  faWheelchair,
+  faVolumeXmark,
+  faUtensils,
+  faTemperatureArrowUp,
+  faShieldAlt,
+  faFilter
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import './book_a_ride.css';
@@ -75,6 +83,55 @@ const PAYMENT_METHODS = {
   }
 };
 
+// Ride preferences options
+const RIDE_PREFERENCES = {
+  pet_friendly: { 
+    label: 'Pet Friendly', 
+    icon: faPaw,
+    description: 'Driver accepts pets in the vehicle'
+  },
+  eco_friendly: { 
+    label: 'Eco Friendly', 
+    icon: faLeaf,
+    description: 'Electric or hybrid vehicles'
+  },
+  wheelchair: { 
+    label: 'Wheelchair Accessible', 
+    icon: faWheelchair,
+    description: 'Vehicle with wheelchair access'
+  },
+  quiet_ride: { 
+    label: 'Quiet Ride', 
+    icon: faVolumeXmark,
+    description: 'Driver minimizes conversation'
+  },
+  extra_stops: { 
+    label: 'Extra Stops', 
+    icon: faMapMarkerAlt,
+    description: 'Plan for multiple stops'
+  },
+  food_allowed: { 
+    label: 'Food Allowed', 
+    icon: faUtensils,
+    description: 'Eating is permitted in vehicle'
+  },
+  temperature: { 
+    label: 'Temperature Preference', 
+    icon: faTemperatureArrowUp,
+    description: 'Set your preferred temperature'
+  },
+  top_rated: { 
+    label: 'Top Rated Drivers', 
+    icon: faStar,
+    description: 'Only 4.8+ rated drivers'
+  },
+  female_driver: { 
+    label: 'Female Driver', 
+    icon: faShieldAlt,
+    description: 'Request female driver only'
+  }
+};
+
 const LoadingSpinner = () => <div className="loading-spinner"></div>;
 
 const BookARide = () => {
@@ -107,6 +164,7 @@ const BookARide = () => {
   const [showPromoInput, setShowPromoInput] = useState(false);
   const [promoCode, setPromoCode] = useState('');
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [showPreferences, setShowPreferences] = useState(false);
   
   // Ride details
   const [distance, setDistance] = useState(0);
@@ -116,6 +174,7 @@ const BookARide = () => {
   const [driverInfo, setDriverInfo] = useState(null);
   const [passengerCount, setPassengerCount] = useState(1);
   const [additionalNotes, setAdditionalNotes] = useState('');
+  const [selectedPreferences, setSelectedPreferences] = useState([]);
 
   // Libraries for Google Maps
   const libraries = ['places', 'geometry', 'drawing'];
@@ -406,7 +465,14 @@ const BookARide = () => {
         const rideDetails = RIDE_TYPES[rideType];
         const baseFare = rideDetails.base;
         const distanceFare = distanceInKm * rideDetails.perKm;
-        const calculatedFare = (baseFare + distanceFare).toFixed(2);
+        let calculatedFare = (baseFare + distanceFare).toFixed(2);
+        
+        // Add preference surcharges
+        if (selectedPreferences.length > 0) {
+          // Add a small surcharge for each preference (5%)
+          const preferenceSurcharge = (baseFare + distanceFare) * 0.05 * selectedPreferences.length;
+          calculatedFare = (parseFloat(calculatedFare) + preferenceSurcharge).toFixed(2);
+        }
         
         setFareEstimate(calculatedFare);
         setEta(`${leg.duration.text}`);
@@ -433,7 +499,8 @@ const BookARide = () => {
             distance: distanceInKm,
             duration: durationInMin,
             rideType,
-            estimatedFare: calculatedFare
+            estimatedFare: calculatedFare,
+            preferences: selectedPreferences
           });
           */
         } catch (error) {
@@ -451,6 +518,17 @@ const BookARide = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Toggle preference selection
+  const togglePreference = (preference) => {
+    setSelectedPreferences(prev => {
+      if (prev.includes(preference)) {
+        return prev.filter(p => p !== preference);
+      } else {
+        return [...prev, preference];
+      }
+    });
   };
 
   // Handle booking submission
@@ -479,7 +557,8 @@ const BookARide = () => {
         paymentMethod,
         passengerCount,
         notes: additionalNotes,
-        promoCode: promoCode || null
+        promoCode: promoCode || null,
+        preferences: selectedPreferences
       };
       
       // This would be an API call to your backend
@@ -572,8 +651,6 @@ const BookARide = () => {
     }, 10000);
   };
 
-
-
   // Create payment method icon
   const renderPaymentIcon = (method) => {
     const paymentInfo = PAYMENT_METHODS[method];
@@ -619,6 +696,9 @@ const BookARide = () => {
               <p><strong>Fare:</strong> ₹{fareEstimate}</p>
               <p><strong>ETA:</strong> {eta}</p>
               <p><strong>Payment:</strong> {PAYMENT_METHODS[paymentMethod].label}</p>
+              {selectedPreferences.length > 0 && (
+                <p><strong>Preferences:</strong> {selectedPreferences.map(pref => RIDE_PREFERENCES[pref].label).join(', ')}</p>
+              )}
             </div>
           </div>
         </div>
@@ -777,7 +857,42 @@ const BookARide = () => {
                   ))}
                 </select>
               </div>
+              
+              {/* Ride Preferences Button */}
+              <div className="preferences-toggle">
+                <button 
+                  type="button" 
+                  className={`preferences-btn ${selectedPreferences.length > 0 ? 'has-preferences' : ''}`}
+                  onClick={() => setShowPreferences(!showPreferences)}
+                >
+                  <FontAwesomeIcon icon={faFilter} /> Preferences 
+                  {selectedPreferences.length > 0 && ` (${selectedPreferences.length})`}
+                </button>
+              </div>
             </div>
+            
+            {/* Ride Preferences Section */}
+            {showPreferences && (
+              <div className="ride-preferences-section">
+                <h4>Ride Preferences</h4>
+                <p className="preferences-note">Select your ride preferences (may affect availability and pricing)</p>
+                <div className="preferences-grid">
+                  {Object.entries(RIDE_PREFERENCES).map(([key, preference]) => (
+                    <div 
+                      key={key} 
+                      className={`preference-item ${selectedPreferences.includes(key) ? 'selected' : ''}`}
+                      onClick={() => togglePreference(key)}
+                    >
+                      <FontAwesomeIcon icon={preference.icon} />
+                      <div className="preference-text">
+                        <span className="preference-label">{preference.label}</span>
+                        <span className="preference-desc">{preference.description}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button 
               type="submit" 
@@ -815,8 +930,7 @@ const BookARide = () => {
             </div>
             
             {/* Trip summary */}
-{/* Trip summary */}
-<div className="trip-summary">
+            <div className="trip-summary">
               <div className="trip-detail">
                 <span className="detail-label">Distance:</span>
                 <span className="detail-value">{distance.toFixed(1)} km</span>

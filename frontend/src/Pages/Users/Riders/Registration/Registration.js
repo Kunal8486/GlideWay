@@ -403,7 +403,7 @@ const Registration = () => {
                 id="name"
                 type="text"
                 name="name"
-                placeholder="Enter your full name"
+                placeholder="     Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
                 className={errors.name ? "usreg-input usreg-input-error" : "usreg-input"}
