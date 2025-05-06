@@ -193,7 +193,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
         if (userRole === 'driver') {
             return [
                 { path: '/driver/profile', label: 'My Profile', icon: 'fas fa-user' },
-                { path: '/driver/trips', label: 'My Trips', icon: 'fas fa-route' },
+                { path: '/driver/my-trips', label: 'My Trips', icon: 'fas fa-route' },
                 { path: '/driver/earnings', label: 'My Earnings', icon: 'fas fa-dollar-sign' },
                 { path: '/driver/vehicle', label: 'My Vehicle', icon: 'fas fa-car' }
             ];

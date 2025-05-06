@@ -48,6 +48,7 @@ import RidePooling from "./Pages/Rides/RidePooling/RidePooling";
 import CreatePool from "./Pages/Rides/RidePooling/CreatePool/CreatePool";
 import FindPool from "./Pages/Rides/RidePooling/FindPool/FindPool"; 
 import MyTrips from "./Pages/Dashboard/Rider/Trips/MyTrip";
+import DriverTrips from "./Pages/Dashboard/Driver/Trip/MyTrips";
 import EditRide from './Pages/Dashboard/Rider/Trips/Pooling/EditPooling';
 
 
@@ -270,6 +271,19 @@ const App = () => {
             }
           />
           <Route
+            path="/driver/my-trips"
+            element={
+              <ProtectedRoute 
+                isLoggedIn={isLoggedIn} 
+                allowedRoles={["driver"]} 
+                userRole={userRole}
+              >
+                <DriverTrips />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
             path="/driver/profile"
             element={
               <ProtectedRoute 
@@ -293,6 +307,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          
 
           {/* Logout Route */}
           <Route 

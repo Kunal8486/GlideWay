@@ -1,0 +1,539 @@
+/* Base styles and variables */
+:root {
+    --primary-brown: #8B7355;
+    --light-brown: #D2B48C;
+    --lighter-brown: #F5DEB3;
+    --lightest-brown: #FFF8DC;
+    --dark-brown: #6B4423;
+    --white: #FFFFFF;
+    --light-gray: #F5F5F5;
+    --gray: #E0E0E0;
+    --text-dark: #333333;
+    --text-medium: #666666;
+    --success: #4CAF50;
+    --error: #F44336;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+    --small-radius: 8px;
+  }
+  
+  /* Main container */
+  .dtr-trips-container {
+    max-width: 100%;
+    margin: 0 auto;
+    width: 1300px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--lightest-brown);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Header Section */
+  .dtr-header {
+    background-color: var(--primary-brown);
+    color: var(--white);
+    padding: 24px 16px 0;
+    border-bottom-left-radius: var(--small-radius);
+    border-bottom-right-radius: var(--small-radius);
+    box-shadow: var(--shadow);
+  }
+  
+  .dtr-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .dtr-main-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .dtr-header-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin: 0 0 16px;
+  }
+  
+  .dtr-header-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .dtr-icon-button {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: var(--white);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .dtr-icon-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  /* Tab Navigation */
+  .dtr-tab-navigation {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--small-radius) var(--small-radius) 0 0;
+    overflow: hidden;
+  }
+  
+  .dtr-tab-button {
+    flex: 1;
+    padding: 14px 8px;
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  .dtr-tab-button.dtr-active {
+    background-color: var(--white);
+    color: var(--primary-brown);
+    font-weight: 600;
+  }
+  
+  .dtr-tab-badge {
+    background-color: var(--success);
+    color: white;
+    font-size: 12px;
+    border-radius: 12px;
+    padding: 2px 8px;
+    margin-left: 8px;
+  }
+  
+  /* Main Content */
+  .dtr-main-content {
+    flex: 1;
+    padding: 16px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    margin: 16px;
+    box-shadow: var(--shadow);
+  }
+  
+  /* Section Headers */
+  .dtr-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .dtr-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-brown);
+    margin: 0;
+  }
+  
+  .dtr-badge {
+    background-color: var(--lighter-brown);
+    color: var(--dark-brown);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-weight: 500;
+  }
+  
+  /* Filter Button */
+  .dtr-filter-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--light-gray);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-medium);
+    transition: background-color 0.2s;
+  }
+  
+  .dtr-filter-button:hover {
+    background-color: var(--gray);
+  }
+  
+  /* Rides List */
+  .dtr-rides-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  /* Ride Cards */
+  .dtr-ride-card {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--lighter-brown);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+  }
+  
+  .dtr-ride-card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .dtr-ride-card.dtr-accepted {
+    border-left: 4px solid var(--success);
+  }
+  
+  .dtr-ride-card.dtr-past {
+    border-left: 4px solid var(--light-brown);
+  }
+  
+  /* Ride Card Header */
+  .dtr-ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--lighter-brown);
+  }
+  
+  .dtr-passenger-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .dtr-passenger-name {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .dtr-passenger-rating {
+    background-color: var(--lightest-brown);
+    color: var(--dark-brown);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dtr-fare-container {
+    background-color: var(--lightest-brown);
+    padding: 8px 12px;
+    border-radius: var(--small-radius);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--dark-brown);
+    font-weight: 600;
+  }
+  
+  .dtr-status {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .dtr-status-accepted {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: var(--success);
+  }
+  
+  /* Ride Details */
+  .dtr-ride-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .dtr-location-detail {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .dtr-location-text {
+    flex: 1;
+  }
+  
+  .dtr-label {
+    color: var(--text-medium);
+    font-size: 12px;
+    margin: 0 0 2px;
+  }
+  
+  .dtr-location {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .dtr-pickup-icon {
+    color: var(--primary-brown);
+  }
+  
+  .dtr-destination-icon {
+    color: var(--dark-brown);
+  }
+  
+  .dtr-trip-info-row {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--lightest-brown);
+    padding: 12px;
+    border-radius: var(--small-radius);
+  }
+  
+  .dtr-time-detail {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .dtr-time-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+  }
+  
+  .dtr-trip-estimates {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .dtr-estimate-item {
+    font-size: 13px;
+    text-align: right;
+  }
+  
+  .dtr-estimate-label {
+    color: var(--text-medium);
+    margin-right: 4px;
+  }
+  
+  .dtr-estimate-value {
+    font-weight: 500;
+  }
+  
+  .dtr-fare-detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-brown);
+  }
+  
+  /* Action Buttons */
+  .dtr-action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  
+  .dtr-accept-button, .dtr-reject-button, .dtr-navigate-button, .dtr-contact-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--small-radius);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .dtr-accept-button {
+    background-color: var(--success);
+    color: white;
+    flex: 1;
+  }
+  
+  .dtr-accept-button:hover {
+    background-color: #43A047;
+  }
+  
+  .dtr-reject-button {
+    background-color: var(--error);
+    color: white;
+    flex: 1;
+  }
+  
+  .dtr-reject-button:hover {
+    background-color: #E53935;
+  }
+  
+  .dtr-navigate-button {
+    background-color: var(--primary-brown);
+    color: white;
+    flex: 1;
+  }
+  
+  .dtr-navigate-button:hover {
+    background-color: var(--dark-brown);
+  }
+  
+  .dtr-contact-button {
+    background-color: var(--lighter-brown);
+    color: var(--dark-brown);
+    flex: 1;
+    justify-content: space-between;
+  }
+  
+  .dtr-contact-button:hover {
+    background-color: var(--light-brown);
+  }
+  
+  /* Empty States */
+  .dtr-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: var(--lightest-brown);
+    border-radius: var(--border-radius);
+    margin: 20px 0;
+  }
+  
+  .dtr-empty-state p {
+    color: var(--text-medium);
+    margin-bottom: 16px;
+  }
+  
+  .dtr-refresh-button, .dtr-view-available-button {
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--small-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .dtr-refresh-button:hover, .dtr-view-available-button:hover {
+    background-color: var(--dark-brown);
+  }
+  
+  /* Completed Label */
+  .dtr-completed-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--success);
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+  
+  /* Footer */
+  .dtr-footer {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    margin: 0 16px 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  
+  .dtr-stats-container {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .dtr-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .dtr-stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--dark-brown);
+  }
+  
+  .dtr-stat-label {
+    font-size: 12px;
+    color: var(--text-medium);
+    margin-top: 4px;
+  }
+  
+  /* Icon styling */
+  .dtr-icon {
+    flex-shrink: 0;
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (max-width: 768px) {
+    .dtr-trip-info-row {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .dtr-trip-estimates {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    
+    .dtr-action-buttons {
+      flex-direction: column;
+    }
+    
+    .dtr-stats-container {
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .dtr-stat-item {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dtr-header {
+      padding: 16px 12px 0;
+    }
+    
+    .dtr-main-content {
+      margin: 12px;
+      padding: 12px;
+    }
+    
+    .dtr-footer {
+      margin: 0 12px 12px;
+    }
+    
+    .dtr-tab-button {
+      padding: 12px 6px;
+      font-size: 13px;
+    }
+    
+    .dtr-time-detail {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
